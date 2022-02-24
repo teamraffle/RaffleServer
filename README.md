@@ -1,0 +1,2 @@
+# RaffleServer
+Server for Raffle
