@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/hagopj13/node-express-boilerplate/badge.svg?branch=master)](https://coveralls.io/github/hagopj13/node-express-boilerplate?branch=master)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-A boilerplate/starter project for quickly building RESTful APIs using Node.js, Express, and Mongoose.
+A boilerplate/starter project for quickly building RESTful APIs using Node.js, Express.
 
 By running a single command, you will get a production-ready Node.js app installed and fully configured on your machine. The app comes with many built-in features, such as authentication using JWT, request validation, unit and integration tests, continuous integration, docker support, API documentation, pagination, etc. For more details, check the features list below.
 
@@ -66,7 +66,6 @@ cp .env.example .env
 
 ## Features
 
-- **NoSQL database**: [MongoDB](https://www.mongodb.com) object data modeling using [Mongoose](https://mongoosejs.com)
 - **Authentication and authorization**: using [passport](http://www.passportjs.org)
 - **Validation**: request data validation using [Joi](https://github.com/hapijs/joi)
 - **Logging**: using [winston](https://github.com/winstonjs/winston) and [morgan](https://github.com/expressjs/morgan)
@@ -152,8 +151,6 @@ The environment variables can be found and modified in the `.env` file. They com
 # Port number
 PORT=3000
 
-# URL of the Mongo DB
-MONGODB_URL=mongodb://127.0.0.1:27017/node-boilerplate
 
 # JWT
 # JWT secret key
