@@ -1,4 +1,3 @@
-// const mongoose = require('mongoose');
 const mariadb = require('mariadb');
 const app = require('./app');
 const config = require('./config/config');
@@ -16,14 +15,6 @@ mariadb.createConnection({host: config.mariadb.host, user: config.mariadb.user, 
       logger.info(`Failed to connect MariaDB: ${err}`);
       //handle connection error
     });
-
-// mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
-//   logger.info('Connected to MariaDB');
-//   server = app.listen(config.port, () => {
-//     logger.info(`Listening to port ${config.port}`);
-//   });
-// });
-
 
 const exitHandler = () => {
   if (server) {
