@@ -1,18 +1,22 @@
-const mongoose = require('mongoose');
-const config = require('../../src/config/config');
+//=========================
+//TODO: Mariadb 로 대체할것
+//=========================
 
-const setupTestDB = () => {
-  beforeAll(async () => {
-    await mongoose.connect(config.mongoose.url, config.mongoose.options);
-  });
+// const mongoose = require('mongoose');
+// const config = require('../../src/config/config');
 
-  beforeEach(async () => {
-    await Promise.all(Object.values(mongoose.connection.collections).map(async (collection) => collection.deleteMany()));
-  });
+// const setupTestDB = () => {
+//   beforeAll(async () => {
+//     await mongoose.connect(config.mongoose.url, config.mongoose.options);
+//   });
 
-  afterAll(async () => {
-    await mongoose.disconnect();
-  });
-};
+//   beforeEach(async () => {
+//     await Promise.all(Object.values(mongoose.connection.collections).map(async (collection) => collection.deleteMany()));
+//   });
 
-module.exports = setupTestDB;
+//   afterAll(async () => {
+//     await mongoose.disconnect();
+//   });
+// };
+
+// module.exports = setupTestDB;

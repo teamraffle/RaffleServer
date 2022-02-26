@@ -43,6 +43,10 @@ module.exports = {
       useUnifiedTopology: true,
     },
   },
+  mariadb: {
+    host = envVars.MARIADB_URL,
+    user = envVars.MARIADB_USER,
+    pswd = envVars.MARIADB_PSWD,
   jwt: {
     secret: envVars.JWT_SECRET,
     accessExpirationMinutes: envVars.JWT_ACCESS_EXPIRATION_MINUTES,
