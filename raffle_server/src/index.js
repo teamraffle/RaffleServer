@@ -2,19 +2,40 @@ const mariadb = require('mariadb');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
+const pool = require('./models/plugins/dbHelper');
 
 let server;
-mariadb.createConnection({host: config.mariadb.host, user: config.mariadb.user, password: config.mariadb.pswd})
-    .then(conn => {
-      logger.info('Connected to MariaDB');
-      server = app.listen(config.port, () => {
-        logger.info(`Listening to port ${config.port}`);
-      });
-    })
-    .catch(err => {
-      logger.info(`Failed to connect MariaDB: ${err}`);
-      //handle connection error
-    });
+
+const startServer = () => {
+  server = app.listen(config.port, () => {
+    logger.info(`Listening to port ${config.port}`);
+  });
+}
+
+async function mariaDBFunction() {
+  let conn;
+  try {
+
+
+	conn = await pool.getConnection();
+  logger.info('Connected to MariaDB');
+  startServer();
+
+	// const rows = await conn.query("SELECT 1 as val");
+	// // rows: [ {val: 1}, meta: ... ]
+
+	// const res = await conn.query("INSERT INTO myTable value (?, ?)", [1, "mariadb"]);
+	// // res: { affectedRows: 1, insertId: 1, warningStatus: 0 }
+
+  } finally {
+	if (conn) conn.release(); //release to pool
+  }
+}
+
+mariaDBFunction();
+
+
+
 
 const exitHandler = () => {
   if (server) {
