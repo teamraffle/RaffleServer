@@ -133,7 +133,7 @@ paths:
           in: query
           name: nickname
           required: true
-  /users:
+  '/users':
     parameters: []
     get:
       summary: Get User Info by User ID
