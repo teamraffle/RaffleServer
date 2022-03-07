@@ -20,14 +20,14 @@ router
 module.exports = router;
 
 /**
- * @swagger
+ * 
  * tags:
  *   name: Users
  *   description: User management and retrieval
  */
 
 /**
- * @swagger
+ * 
  * /users:
  *   post:
  *     summary: Create a user
@@ -147,7 +147,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ * 
  * /users/{id}:
  *   get:
  *     summary: Get a user

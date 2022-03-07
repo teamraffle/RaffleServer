@@ -18,14 +18,14 @@ router.post('/verify-email', validate(authValidation.verifyEmail), authControlle
 module.exports = router;
 
 /**
- * @swagger
+ *
  * tags:
  *   name: Auth
  *   description: Authentication
  */
 
 /**
- * @swagger
+ * 
  * /auth/register:
  *   post:
  *     summary: Register as user
@@ -73,7 +73,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ * 
  * /auth/login:
  *   post:
  *     summary: Login
@@ -121,7 +121,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ * 
  * /auth/logout:
  *   post:
  *     summary: Logout
@@ -147,7 +147,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ * 
  * /auth/refresh-tokens:
  *   post:
  *     summary: Refresh auth tokens
@@ -177,7 +177,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ * 
  * /auth/forgot-password:
  *   post:
  *     summary: Forgot password
@@ -205,7 +205,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ * 
  * /auth/reset-password:
  *   post:
  *     summary: Reset password
@@ -248,7 +248,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ *
  * /auth/send-verification-email:
  *   post:
  *     summary: Send verification email
@@ -264,7 +264,7 @@ module.exports = router;
  */
 
 /**
- * @swagger
+ *
  * /auth/verify-email:
  *   post:
  *     summary: verify email

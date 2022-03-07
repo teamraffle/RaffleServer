@@ -1,0 +1,472 @@
+openapi: 3.0.0
+info:
+  title: NFT Ranks
+  version: '1.0'
+  description: ''
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/users/{user_id}':
+    parameters:
+      - schema:
+          type: string
+        name: user_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      responses:
+        '200':
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/404'
+        '409':
+          description: Conflict - 지갑주소나 닉네임이 겹침
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  message:
+                    type: string
+                    minLength: 1
+                required:
+                  - message
+                x-examples:
+                  example-1:
+                    message: Invalid hex number
+              examples:
+                example:
+                  value:
+                    message: 'Already exist: Nickname / Wallet Address'
+      operationId: get-users-userId
+      description: Retrieve the information of the user with the matching user ID.
+      tags:
+        - users
+      parameters: []
+    patch:
+      summary: Update User Information
+      operationId: patch-users-userId
+      responses:
+        '200':
+          description: User Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User Not Found
+        '409':
+          description: Nickname Already Taken
+      description: Update the information of an existing user.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  description: 'If a new email is given, the user''s email verified property will be set to false.'
+                dateOfBirth:
+                  type: string
+            examples:
+              Update First Name:
+                value:
+                  firstName: Rebecca
+              Update Email:
+                value:
+                  email: rebecca@gmail.com
+              Update Last Name & Date of Birth:
+                value:
+                  lastName: Baker
+                  dateOfBirth: '1985-10-02'
+        description: Patch user properties to update.
+      tags:
+        - users
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: chain_id
+        - schema:
+            type: string
+          in: query
+          name: nickname
+    post:
+      summary: Make New User
+      operationId: post-users-user_id
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '409':
+          description: Conflict - 지갑주소나 닉네임이 겹침
+      description: 새로 유저 만듬(신규가입)
+      tags:
+        - users
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: chain_id
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: address
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: nickname
+          required: true
+  /users:
+    parameters: []
+    get:
+      summary: Get User Info by User ID
+      responses:
+        '200':
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-users-by-address
+      description: 지갑 연결시 이미 가입된 회원인지 확인함
+      tags:
+        - users
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: chain_id
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: address
+          required: true
+  '/rankings/{standard}':
+    parameters:
+      - schema:
+          type: string
+        name: standard
+        in: path
+        required: true
+    get:
+      summary: Get ranking
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    user_id:
+                      ranking: 0
+                      nickname: string
+                      totalvalue: string
+                      nfts: 0
+                      profit_24h: 0
+                      profit_7d: 0
+                properties:
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  page_size:
+                    type: integer
+                  result:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Ranking'
+        '201':
+          description: Created
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-rankings-standard
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: walletAddr
+          description: Should be hex number
+      tags:
+        - rankings
+  '/portfolios/{user_id_or_address}':
+    parameters:
+      - schema:
+          type: string
+        name: user_id_or_address
+        in: path
+        required: true
+    get:
+      summary: Check if user exist by wallet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    name: string
+                    walletaddress: string
+                    totalnft: 0
+                    totalcollection: 0
+                    holdingvalue: 0
+                    gasfee: 0
+                    buyvolume: 0
+                    sellvolume: 0
+                    profit: 0
+                    ntfs:
+                      collectionname: string
+                      nftname: string
+                      in_timestamp: string
+                      floorprice: 0
+                    '': string
+                properties:
+                  portfolio:
+                    $ref: '#/components/schemas/Portfolio'
+              examples:
+                example-1:
+                  value:
+                    name: string
+                    walletaddress: string
+                    totalnft: 0
+                    totalcollection: 0
+                    holdingvalue: 0
+                    gasfee: 0
+                    buyvolume: 0
+                    sellvolume: 0
+                    profit: 0
+                    ntfs:
+                      collectionname: string
+                      nftname: string
+                      in_timestamp: string
+                      floorprice: 0
+                    '': string
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-portfolios-user-id-or-address
+      tags:
+        - portfolios
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: offset
+        - schema:
+            type: integer
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: cursor
+        - schema:
+            type: string
+          in: query
+          name: chain_id
+          required: true
+  '/portfolios/nft/{user_id_or_address}':
+    get:
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: chain_id
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: offset
+        - schema:
+            type: integer
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: cursor
+        - schema:
+            type: string
+          in: query
+          name: format
+      description: NFT탭 재정렬/리프레시할때 사용
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  page_size:
+                    type: integer
+                  result:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NFT'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-portfolios-nft-userid-or-address
+      tags:
+        - portfolios
+      summary: ''
+    parameters:
+      - schema:
+          type: string
+        name: user_id_or_address
+        in: path
+        required: true
+  '/portfolios/stats/{user_id_or_address}':
+    parameters:
+      - schema:
+          type: string
+        name: user_id_or_address
+        in: path
+        required: true
+    get:
+      summary: Check if user exist by wallet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    name: string
+                    walletaddress: string
+                    totalnft: 0
+                    totalcollection: 0
+                    holdingvalue: 0
+                    gasfee: 0
+                    buyvolume: 0
+                    sellvolume: 0
+                    profit: 0
+                    ntfs:
+                      collectionname: string
+                      nftname: string
+                      in_timestamp: string
+                      floorprice: 0
+                    '': string
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-portfolios-stats
+      tags:
+        - portfolios
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: offset
+        - schema:
+            type: integer
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: cursor
+        - schema:
+            type: string
+          in: query
+          name: format
+          description: 정렬 기준
+        - schema:
+            type: string
+          in: query
+          name: chain_id
+          required: true
+  '/portfolios/activity/{user_id_or_address}':
+    parameters:
+      - schema:
+          type: string
+        name: user_id_or_address
+        in: path
+        required: true
+    get:
+      summary: Check if user exist by wallet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                x-examples:
+                  example-1:
+                    name: string
+                    walletaddress: string
+                    totalnft: 0
+                    totalcollection: 0
+                    holdingvalue: 0
+                    gasfee: 0
+                    buyvolume: 0
+                    sellvolume: 0
+                    profit: 0
+                    ntfs:
+                      collectionname: string
+                      nftname: string
+                      in_timestamp: string
+                      floorprice: 0
+                    '': string
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-portfolios-activity
+      tags:
+        - portfolios
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: offset
+        - schema:
+            type: integer
+          in: query
+          name: limit
+        - schema:
+            type: string
+          in: query
+          name: cursor
+        - schema:
+            type: string
+          in: query
+          name: format
+          description: 정렬 기준
+        - schema:
+            type: string
+          in: query
+          name: chain_id
+          required: true
