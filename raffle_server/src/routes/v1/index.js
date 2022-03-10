@@ -22,14 +22,14 @@ const defaultRoutes = [
     path: '/portfolios',
     route: portfolioRoute,
   },
-];
-
-const devRoutes = [
-  // routes available only in development mode
   {
     path: '/docs',
     route: docsRoute,
   },
+];
+
+const devRoutes = [
+  // routes available only in development mode
   {
     path: '/test',
     route: testRoute,
