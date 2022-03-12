@@ -1,4 +1,3 @@
-const mariadb = require('mariadb');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
@@ -15,8 +14,6 @@ const startServer = () => {
 async function mariaDBFunction() {
   let conn;
   try {
-
-
 	conn = await pool.getConnection();
   logger.info('Connected to MariaDB');
   startServer();

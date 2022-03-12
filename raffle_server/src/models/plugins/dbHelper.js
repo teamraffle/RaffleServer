@@ -6,6 +6,7 @@ const config_mdb = {
       user: config.mariadb.user,
       password: config.mariadb.pswd,
       connectionLimit: 5,
+      database: "innodb",
   };
 
 let pool = mariadb.createPool(config_mdb);
