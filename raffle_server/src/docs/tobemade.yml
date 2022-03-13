@@ -6,11 +6,11 @@ info:
 servers:
   - url: 'http://localhost:3000'
 paths:
-  '/users/{user_id}':
+  '/users/{userId}':
     parameters:
       - schema:
           type: string
-        name: user_id
+        name: userId
         in: path
         required: true
     get:
@@ -70,36 +70,13 @@ paths:
             schema:
               type: object
               properties:
-                firstName:
+                profilePic:
                   type: string
-                lastName:
+                nickname:
                   type: string
-                email:
-                  type: string
-                  description: 'If a new email is given, the user''s email verified property will be set to false.'
-                dateOfBirth:
-                  type: string
-            examples:
-              Update First Name:
-                value:
-                  firstName: Rebecca
-              Update Email:
-                value:
-                  email: rebecca@gmail.com
-              Update Last Name & Date of Birth:
-                value:
-                  lastName: Baker
-                  dateOfBirth: '1985-10-02'
+            examples: {}
         description: Patch user properties to update.
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: chain_id
-        - schema:
-            type: string
-          in: query
-          name: nickname
+      parameters: []
       tags:
         - Users
   /users:
@@ -139,26 +116,73 @@ paths:
         '409':
           description: Conflict - 지갑주소나 닉네임이 겹침
       description: 새로 유저 만듬(신규가입)
-      parameters: []
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: chainId
+        - schema:
+            type: string
+          in: query
+          name: address
+        - schema:
+            type: string
+          in: query
+          name: nickname
+        - schema:
+            type: string
+          in: query
+          name: email
+        - schema:
+            type: string
+          in: query
+          name: profilePic
       tags:
         - Users
       requestBody:
         content:
           application/json:
             schema:
+              description: ''
               type: object
+              x-examples:
+                example-1:
+                  chainId: 1
+                  address: asd
+                  nickname: yewon
+                  email: adsd
+                  profilePic: asdsd
               properties:
                 chainId:
-                  type: string
+                  type:
+                    - number
+                    - integer
                 address:
                   type: string
+                  minLength: 1
                 nickname:
                   type: string
+                  minLength: 1
                 email:
                   type: string
+                  minLength: 1
                 profilePic:
                   type: string
-            examples: {}
+                  minLength: 1
+              required:
+                - chainId
+                - address
+                - nickname
+                - email
+                - profilePic
+            examples:
+              example-1:
+                value:
+                  chainId: 1
+                  address: asd
+                  nickname: yewon
+                  email: adsd
+                  profilePic: asdsd
         description: ''
   '/rankings/{standard}':
     parameters:
