@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
+const validate = require('../../middlewares/validate');
+const userValidation = require('../../validations/user.validation');
+const userController = require('../../controllers/user.controller');
+
 const uuidv4 = require('uuid');
 const logger = require('../../config/logger');
 const pool = require('../../models/plugins/dbHelper');
@@ -14,27 +18,10 @@ router.patch('/:userId', function (req, res) {
   res.send('user');
 })
 
+router
+  .route('/')
+  .post(validate(userValidation.createUser), userController.createUser)
 
-router.post('/', function (req, res) {
-  console.log(req);
-  var wallet ={
-    address : req.body.address,
-    chainId : req.body.chainId
-  }
-  var user = {
-    nickname : req.body.nickname,
-    profilePic : req.body.profilePic,
-    email: req.body.email
-  } 
-
-  saveNewWallet(wallet).then(function(wallet_id){
-    saveNewUser(user, wallet_id) 
-  }).then(function(user_id){
-    res.send(user_id);
-  });
-
-
-})
 
 router.get('/', function (req, res) {
   // console.log(req.body);  
@@ -54,56 +41,7 @@ console.log(req);
   
 })
 
-async function saveNewWallet(wallet) {
-  try {
-    conn = await pool.getConnection();
 
-    const sql = `INSERT INTO tb_wallet_eth
-    (
-        wallet_id, chain_id, address, create_timestamp
-    ) VALUES (
-        ?, ?, ?, ?
-    )`
-    var splittedAddr = wallet.address.replace('0x','');
-    const wallet_id = uuidv4.v1();
-    const dbRes = await conn.query(sql, [wallet_id, 1,  splittedAddr, new Date().toISOString().slice(0, 19).replace('T', ' ')]);
-    
-    console.log(dbRes);//성공 리턴
-    return wallet_id;
-    
-  }catch(err) {
-    console.log(err);
-  }
-   finally {
-	  if (conn) conn.release(); //release to pool
-  }
-  return 'success'; 
-}
-
-async function saveNewUser(user, wallet_id) {
-  try {
-    conn = await pool.getConnection();
-    const member_id = uuidv4.v1();
-    const sql = `INSERT INTO tb_user
-    (
-        user_id, wallet_id, nickname, profile_pic
-    ) VALUES (
-        ?, ?, ?, ?
-    )`
-    
-    const user_id = uuidv4.v1();
-    const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profilePic]);
-    console.log(dbRes);//성공 리턴
-    return user_id;
-
-  }catch(err) {
-    console.log(err);
-  }
-   finally {
-	  if (conn) conn.release(); //release to pool
-  }
-  return 'success'; 
-}
 
 async function checkUserByWallet(wallet) {
   var rows;
