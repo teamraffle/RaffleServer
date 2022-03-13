@@ -11,13 +11,10 @@ const createUser = {
   }),
 };
 
-const getUsers = {
+const getUserbyWallet = {
   query: Joi.object().keys({
-    name: Joi.string(),
-    role: Joi.string(),
-    sortBy: Joi.string(),
-    limit: Joi.number().integer(),
-    page: Joi.number().integer(),
+    address : Joi.string().required().custom(ethWallet),
+    chainId : Joi.number().integer().required(),
   }),
 };
 
@@ -49,6 +46,6 @@ const deleteUser = {
 module.exports = {
   createUser,
   // getUserbyID,
-  // getUserbyWallet,
+  getUserbyWallet,
   // updateUser,
 };

@@ -16,13 +16,25 @@ const createUser = async (body) => {
   //   throw new ApiError(httpStatus.BAD_REQUEST, 'Nickname already taken');
   // }
   const userID = await User.create(body, walletId);
-  
-  return userID;
+  const msg ={
+    userID : userID
+  }
+  return msg;
 };
+
+const getUserbyWallet = async (query) => {
+  const userAndWallet = await User.searchByWallet(query);
+  if(!userAndWallet){
+    throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
+  }else{
+    return userAndWallet; 
+  }
+}
 
 
 module.exports = {
   createUser,
+  getUserbyWallet,
   // queryUsers,
   // getUserById,
   // getUserByEmail,

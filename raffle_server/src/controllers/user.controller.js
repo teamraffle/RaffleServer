@@ -5,7 +5,12 @@ const catchAsync = require('../utils/catchAsync');
 const { userService } = require('../services');
 
 const createUser = catchAsync(async (req, res) => {
-  const userAndWallet = await userService.createUser(req.body);
+  const userId = await userService.createUser(req.body);
+  res.status(httpStatus.CREATED).send(userId);
+});
+
+const getUserbyWallet = catchAsync(async (req, res) => {
+  const userAndWallet = await userService.getUserbyWallet(req.query);
   res.status(httpStatus.CREATED).send(userAndWallet);
 });
 
@@ -36,7 +41,7 @@ const createUser = catchAsync(async (req, res) => {
 
 module.exports = {
   createUser,
-  // getUsers,
+  getUserbyWallet,
   // getUser,
   // updateUser,
   // deleteUser,
