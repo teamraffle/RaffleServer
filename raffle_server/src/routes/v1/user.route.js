@@ -16,6 +16,7 @@ router.patch('/:userId', function (req, res) {
 
 
 router.post('/', function (req, res) {
+  console.log(req);
   var wallet ={
     address : req.body.address,
     chainId : req.body.chainId
@@ -37,10 +38,10 @@ router.post('/', function (req, res) {
 
 router.get('/', function (req, res) {
   // console.log(req.body);  
-
+console.log(req);
   var wallet ={
-    address : req.body.address,
-    chainId : req.body.chainId
+    address : req.query.address,
+    chainId : req.query.chainId
   }
   checkUserByWallet(wallet).then(function(output){
     // if(output.length==0){

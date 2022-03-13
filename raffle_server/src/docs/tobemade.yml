@@ -139,29 +139,27 @@ paths:
         '409':
           description: Conflict - 지갑주소나 닉네임이 겹침
       description: 새로 유저 만듬(신규가입)
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: chainId
-        - schema:
-            type: string
-          in: query
-          name: address
-        - schema:
-            type: string
-          in: query
-          name: nickname
-        - schema:
-            type: string
-          in: query
-          name: email
-        - schema:
-            type: string
-          in: query
-          name: profilePic
+      parameters: []
       tags:
         - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chainId:
+                  type: string
+                address:
+                  type: string
+                nickname:
+                  type: string
+                email:
+                  type: string
+                profilePic:
+                  type: string
+            examples: {}
+        description: ''
   '/rankings/{standard}':
     parameters:
       - schema:
