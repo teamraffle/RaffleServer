@@ -48,10 +48,10 @@ const searchByWallet= async (query) => {
         const splittedAddr = wallet.address.replace('0x','');
         const query ="SELECT tb_wallet_eth.chain_id, tb_wallet_eth.address, tb_user.user_id, tb_user.nickname, tb_user.profile_pic, tb_user.status  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
         rows = await conn.query(query, splittedAddr);
-        if(rows == undefined){
+        if(rows[0] == undefined){
             return false;
         }else{
-            logger.info(rows[0]);
+            console.log(rows[0]);
             return rows[0];//TODO 양식맞추기
         }
       }
