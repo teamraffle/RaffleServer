@@ -32,7 +32,34 @@ const create= async (body) => {
       }
 }
 
+const findIdByAddress= async (body) => {
+    var wallet ={
+        address : body.address,
+        chainId : body.chainId
+      }
+      try {
+        conn = await pool.getConnection();
+    
+        const sql = `SELECT wallet_id FROM tb_wallet_eth
+        WHERE address = ?`
+        var splittedAddr = wallet.address.replace('0x','');
+        const dbRes = await conn.query(sql, splittedAddr);
+        
+        console.log(dbRes[0].wallet_id);//성공 리턴
+        
+        return dbRes[0].wallet_id;
+        
+      }catch(err) {
+        console.log(err);
+        return false;
+      }
+       finally {
+          if (conn) conn.release(); //release to pool
+      }
+}
+
 module.exports = {
     create,
+    findIdByAddress,
 };
   
