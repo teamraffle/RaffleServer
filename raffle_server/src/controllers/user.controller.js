@@ -14,6 +14,12 @@ const getUserbyWallet = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(userAndWallet);
 });
 
+const getUserbyId = catchAsync(async (req, res) => {
+  const userAndWallet = await userService.getUserbyId(req.params);
+  res.status(httpStatus.CREATED).send(userAndWallet);
+
+});
+
 // const getUsers = catchAsync(async (req, res) => {
 //   const filter = pick(req.query, ['name', 'role']);
 //   const options = pick(req.query, ['sortBy', 'limit', 'page']);
@@ -42,7 +48,7 @@ const getUserbyWallet = catchAsync(async (req, res) => {
 module.exports = {
   createUser,
   getUserbyWallet,
-  // getUser,
+  getUserbyId,
   // updateUser,
   // deleteUser,
 };

@@ -31,12 +31,20 @@ const getUserbyWallet = async (query) => {
   }
 }
 
+const getUserbyId = async (params) => {
+  const userAndWallet = await User.searchById(params);
+  if(!userAndWallet){
+    throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
+  }else{
+    return userAndWallet; 
+  }
+}
 
 module.exports = {
   createUser,
   getUserbyWallet,
   // queryUsers,
-  // getUserById,
+  getUserbyId,
   // getUserByEmail,
   // updateUserById,
   // deleteUserById,

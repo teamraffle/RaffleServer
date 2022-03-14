@@ -1,5 +1,5 @@
 const Joi = require('joi');
-const { ethWallet } = require('./custom.validation');
+const { ethWallet,UUID } = require('./custom.validation');
 
 const createUser = {
   body: Joi.object().keys({
@@ -17,6 +17,13 @@ const getUserbyWallet = {
     chainId : Joi.number().integer().required(),
   }),
 };
+
+const getUserbyID = {
+  params: Joi.object().keys({
+    userId: Joi.string().required().custom(UUID)
+  }),
+};
+
 
 const getUser = {
   // params: Joi.object().keys({
@@ -45,7 +52,7 @@ const deleteUser = {
 
 module.exports = {
   createUser,
-  // getUserbyID,
+  getUserbyID,
   getUserbyWallet,
   // updateUser,
 };

@@ -1,5 +1,5 @@
 const UUID = (value, helpers) => {
-  if (value.length != 42) {
+  if (value.length != 36) {
     return helpers.message('Invalid ID');
   }
   //TODO 나중에 3765a161-a230-11ec-9e4b-a1145dc9a584 양식 맞는지도 체크
