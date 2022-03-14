@@ -32,16 +32,13 @@ const getUser = {
 };
 
 const updateUser = {
-  // params: Joi.object().keys({
-  //   userId: Joi.required().custom(objectId),
-  // }),
-  // body: Joi.object()
-  //   .keys({
-  //     email: Joi.string().email(),
-  //     password: Joi.string().custom(password),
-  //     name: Joi.string(),
-  //   })
-  //   .min(1),
+  params: Joi.object().keys({
+    userId: Joi.string().required().custom(UUID)
+  }),
+  body: Joi.object().keys({
+    nickname : Joi.string(),
+    profilePic : Joi.string(),
+  }),
 };
 
 const deleteUser = {
@@ -54,5 +51,5 @@ module.exports = {
   createUser,
   getUserbyID,
   getUserbyWallet,
-  // updateUser,
+  updateUser,
 };

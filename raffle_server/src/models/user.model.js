@@ -1,4 +1,5 @@
 const uuidv4 = require('uuid');
+const { query } = require('../config/logger');
 const logger = require('../config/logger');
 const pool = require('./plugins/dbHelper');
 let conn;
@@ -80,6 +81,47 @@ const searchById= async (params) => {
   }    
 }
 
+const updatepatchUserById= async (params,body) => {
+  var userId = params.userId;
+  var nickname = body.nickname;
+  var profilePic = body.profilePic;
+  console.log(userId);
+  console.log(nickname);
+  console.log(profilePic);
+  var rows;
+
+  var query = "";
+  if(typeof profilePic =="undefined"){
+    console.log("1번째 경우")
+    query ="UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ userId+ "'";
+    ;}
+  else if(typeof nickname =="undefined")
+  { console.log("2번째 경우")
+  query ="UPDATE tb_user SET profile_pic='"+profilePic+"'WHERE tb_user.user_id='"+ userId+ "'";
+  }
+  else{
+    console.log("3번째 경우")
+    query ="UPDATE tb_user SET nickname='"+nickname +"',profile_pic='"+profilePic+"'WHERE tb_user.user_id='"+ userId+ "'";
+  }
+
+  try {
+  
+    conn = await pool.getConnection();
+
+    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
+      rows = await conn.query(query);
+      console.log(query);
+      if(rows == undefined){
+          return false;
+      }else{
+          logger.info(rows[0]);
+          return true;//TODO 양식맞추기
+      }
+    
+  } finally {
+      if (conn) conn.release();
+  }    
+}
 const isNicknameTaken= async (body) => {
     var user = {
         nickname : body.nickname,
@@ -108,6 +150,7 @@ module.exports = {
     create,
     searchByWallet,
     searchById,
+    updatepatchUserById,
     isNicknameTaken,
 };
   
