@@ -6,11 +6,11 @@ info:
 servers:
   - url: 'http://localhost:3000'
 paths:
-  '/users/{userId}':
+  '/users/{user_id}':
     parameters:
       - schema:
           type: string
-        name: userId
+        name: user_id
         in: path
         required: true
     get:
@@ -44,14 +44,17 @@ paths:
                 example:
                   value:
                     message: 'Already exist: Nickname / Wallet Address'
-      operationId: get-users-userId
+      operationId: get-users-user_id
       description: Retrieve the information of the user with the matching user ID.
-      parameters: []
+      parameters:
+        - schema:
+            type: string
+          in: query
       tags:
         - Users
     patch:
       summary: Update User Information
-      operationId: patch-users-userId
+      operationId: patch-users-user_id
       responses:
         '200':
           description: User Updated
@@ -70,7 +73,7 @@ paths:
             schema:
               type: object
               properties:
-                profilePic:
+                profile_pic:
                   type: string
                 nickname:
                   type: string
@@ -98,7 +101,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: chainId
+          name: chain_id
           required: true
         - schema:
             type: string
@@ -120,7 +123,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: chainId
+          name: chain_id
         - schema:
             type: string
           in: query
@@ -136,7 +139,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: profilePic
+          name: profile_pic
       tags:
         - Users
       requestBody:
@@ -232,7 +235,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: walletAddr
+          name: wallet_addr
           description: Should be hex number
       tags:
         - Rankings

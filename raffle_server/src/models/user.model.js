@@ -7,7 +7,7 @@ let conn;
 const create= async (body, wallet_id) => {
     var user = {
         nickname : body.nickname,
-        profilePic : body.profilePic,
+        profile_pic : body.profile_pic,
         email: body.email
       } 
 
@@ -21,7 +21,7 @@ const create= async (body, wallet_id) => {
         )`
         
         const user_id = uuidv4.v1();
-        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profilePic]);
+        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profile_pic]);
         logger.info(dbRes);//성공 리턴
         return user_id;
     
@@ -37,15 +37,15 @@ const create= async (body, wallet_id) => {
 const searchByWallet= async (query) => {
     var wallet ={
         address : query.address,
-        chainId : query.chainId
+        chain_id : query.chain_id
       }
-      
+    
     var rows;
     try {
       conn = await pool.getConnection();
   
       //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-      if(wallet.chainId==1){
+      if(wallet.chain_id==1){
         const splittedAddr = wallet.address.replace('0x','');
         const query ="SELECT tb_wallet_eth.chain_id, tb_wallet_eth.address, tb_user.user_id, tb_user.nickname, tb_user.profile_pic, tb_user.status  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
         rows = await conn.query(query, splittedAddr);
@@ -61,14 +61,13 @@ const searchByWallet= async (query) => {
     }    
 }
 const searchById= async (params) => {
-  var userId = params.userId;
-  console.log(userId);
+  var user_id = params.user_id;
   var rows;
   try {
     conn = await pool.getConnection();
 
       const query ="SELECT tb_wallet_eth.chain_id, tb_wallet_eth.address, tb_user.user_id, tb_user.nickname, tb_user.profile_pic, tb_user.status  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_user.user_id=?"
-      rows = await conn.query(query, userId);
+      rows = await conn.query(query, user_id);
       if(rows == undefined){
           return false;
       }else{
@@ -82,26 +81,24 @@ const searchById= async (params) => {
 }
 
 const updatepatchUserById= async (params,body) => {
-  var userId = params.userId;
+  var user_id = params.user_id;
   var nickname = body.nickname;
-  var profilePic = body.profilePic;
-  console.log(userId);
-  console.log(nickname);
-  console.log(profilePic);
+  var profile_pic = body.profile_pic;
+
   var rows;
 
   var query = "";
   if(typeof profilePic =="undefined"){
     console.log("1번째 경우")
-    query ="UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ userId+ "'";
+    query ="UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ user_id+ "'";
     ;}
   else if(typeof nickname =="undefined")
   { console.log("2번째 경우")
-  query ="UPDATE tb_user SET profile_pic='"+profilePic+"'WHERE tb_user.user_id='"+ userId+ "'";
+  query ="UPDATE tb_user SET profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
   }
   else{
     console.log("3번째 경우")
-    query ="UPDATE tb_user SET nickname='"+nickname +"',profile_pic='"+profilePic+"'WHERE tb_user.user_id='"+ userId+ "'";
+    query ="UPDATE tb_user SET nickname='"+nickname +"',profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
   }
 
   try {
@@ -125,7 +122,7 @@ const updatepatchUserById= async (params,body) => {
 const isNicknameTaken= async (body) => {
     var user = {
         nickname : body.nickname,
-        profilePic : body.profilePic,
+        profile_pic : body.profile_pic,
         email: body.email
       } 
     
