@@ -34,6 +34,8 @@ const getUserbyWallet = async (query) => {
 }
 
 const getUserbyId = async (params) => {
+  //TODO 닉넴중복여부확인
+
   const userAndWallet = await User.searchById(params);
   if(!userAndWallet){
     throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
@@ -43,8 +45,14 @@ const getUserbyId = async (params) => {
 }
 
 const updateUserById = async (params,body) => {
+  
+  const nicknamecheck = await User.isNicknameTaken(body);
+  console.log(nicknamecheck);
+  if(nicknamecheck){
+  throw new ApiError(httpStatus.NOT_FOUND, 'Nickname already taken');
+
+  }
   const userAndWallet = await User.updatepatchUserById(params,body);
-  console.log("userandwallet"+userAndWallet);
   if(!userAndWallet){
     throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
   }else{
