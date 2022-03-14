@@ -67,8 +67,6 @@ const searchById= async (params) => {
   try {
     conn = await pool.getConnection();
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-
       const query ="SELECT tb_wallet_eth.chain_id, tb_wallet_eth.address, tb_user.user_id, tb_user.nickname, tb_user.profile_pic, tb_user.status  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_user.user_id=?"
       rows = await conn.query(query, userId);
       if(rows == undefined){
@@ -124,10 +122,35 @@ const updatepatchUserById= async (params,body) => {
       if (conn) conn.release();
   }    
 }
+const isNicknameTaken= async (body) => {
+    var user = {
+        nickname : body.nickname,
+        profilePic : body.profilePic,
+        email: body.email
+      } 
+    
+      var rows;
+    try {
+      conn = await pool.getConnection();
+  
+        const query ="SELECT nickname FROM tb_user WHERE nickname = ?"
+        rows = await conn.query(query, user.nickname);
+        if(rows[0] == undefined){
+            return false;
+        }else{
+            return true;
+        }
+    } finally {
+        if (conn) conn.release();
+    }  
+
+}
+
 module.exports = {
     create,
     searchByWallet,
     searchById,
-    updatepatchUserById
+    updatepatchUserById,
+    isNicknameTaken,
 };
   
