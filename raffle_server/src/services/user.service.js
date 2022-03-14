@@ -40,12 +40,21 @@ const getUserbyId = async (params) => {
   }
 }
 
+const updateUserById = async (params,body) => {
+  const userAndWallet = await User.updatepatchUserById(params,body);
+  console.log("userandwallet"+userAndWallet);
+  if(!userAndWallet){
+    throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
+  }else{
+    return userAndWallet; 
+  }
+}
 module.exports = {
   createUser,
   getUserbyWallet,
   // queryUsers,
   getUserbyId,
   // getUserByEmail,
-  // updateUserById,
+  updateUserById,
   // deleteUserById,
 };

@@ -9,35 +9,16 @@ const userController = require('../../controllers/user.controller');
 const pool = require('../../models/plugins/dbHelper');
 let conn;
 
-// router.get('/:userId', function (req, res) {
-
- 
-//   console.log(req.params.userId);
-//   checkUserByWallet2(req.params.userId).then(function(output){
-//     // if(output.length==0){
-//     //   res.sendStatus(404);
-//     // }else{
-//     //   res.send(output);
-//     // }
-//     res.send(output);
-//   });
-  
-// })
-
-router.patch('/:userId', function (req, res) {
-  
-  
-  res.send('user');
-})
 router
 .route('/:userId')
 .get(validate(userValidation.getUserbyID), userController.getUserbyId)
+.patch(validate(userValidation.updateUser), userController.updateUser)
 
 
 
 router
   .route('/')
-  .post(validate(userValidation.createUser), userController.createUser)
+  .post(validate(userValidation.createUser), userController.createUser) 
   .get(validate(userValidation.getUserbyWallet), userController.getUserbyWallet)
 
 
