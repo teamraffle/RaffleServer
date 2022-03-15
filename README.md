@@ -23,4 +23,6 @@ src\
  |--index.js        # App entry point
 ```
 
+현재 구현된 API : User
+
 [보일러플레이트 출처](https://github.com/hagopj13/node-express-boilerplate)
