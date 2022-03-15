@@ -11,33 +11,19 @@ const createUser = catchAsync(async (req, res) => {
 
 const getUserbyWallet = catchAsync(async (req, res) => {
   const userAndWallet = await userService.getUserbyWallet(req.query);
-  res.status(httpStatus.CREATED).send(userAndWallet);
+  res.status(httpStatus.OK).send(userAndWallet);
 });
 
 const getUserbyId = catchAsync(async (req, res) => {
   const userAndWallet = await userService.getUserbyId(req.params);
-  res.status(httpStatus.CREATED).send(userAndWallet);
+  res.status(httpStatus.OK).send(userAndWallet);
 
 });
 
-// const getUsers = catchAsync(async (req, res) => {
-//   const filter = pick(req.query, ['name', 'role']);
-//   const options = pick(req.query, ['sortBy', 'limit', 'page']);
-//   const result = await userService.queryUsers(filter, options);
-//   res.send(result);
-// });
-
-// const getUser = catchAsync(async (req, res) => {
-//   const user = await userService.getUserById(req.params.userId);
-//   if (!user) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
-//   }
-//   res.send(user);
-// });
-
 const updateUser = catchAsync(async (req, res) => {
   const user = await userService.updateUserById(req.params, req.body);
-  res.send(user);
+  res.status(httpStatus.OK).send(user);
+
 });
 
 // const deleteUser = catchAsync(async (req, res) => {

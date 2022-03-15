@@ -4,7 +4,7 @@ info:
   version: '1.0'
   description: ''
 servers:
-  - url: 'http://localhost:3000'
+  - url: 'https://nftranks.xyz:3033'
 paths:
   '/users/{user_id}':
     parameters:
@@ -22,34 +22,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    id: 0
+                    createDate: '2019-08-24'
+                    nickname: string
+                    profile_pic: string
+                    status: string
+                    wallet:
+                      id: 0
+                      address: string
+                      chainId: 0
+        '400':
+          description: invalid ID
         '404':
           $ref: '#/components/responses/404'
-        '409':
-          description: Conflict - 지갑주소나 닉네임이 겹침
-          content:
-            application/json:
-              schema:
-                description: ''
-                type: object
-                properties:
-                  message:
-                    type: string
-                    minLength: 1
-                required:
-                  - message
-                x-examples:
-                  example-1:
-                    message: Invalid hex number
-              examples:
-                example:
-                  value:
-                    message: 'Already exist: Nickname / Wallet Address'
       operationId: get-users-user_id
       description: Retrieve the information of the user with the matching user ID.
-      parameters:
-        - schema:
-            type: string
-          in: query
+      parameters: []
       tags:
         - Users
     patch:
@@ -61,11 +52,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                description: ''
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                required:
+                  - result
+                x-examples:
+                  example-1:
+                    result: true
+        '400':
+          description: Nickname Already Taken or request validation fail
         '404':
           description: User Not Found
-        '409':
-          description: Nickname Already Taken
       description: Update the information of an existing user.
       requestBody:
         content:
@@ -77,7 +77,6 @@ paths:
                   type: string
                 nickname:
                   type: string
-            examples: {}
         description: Patch user properties to update.
       parameters: []
       tags:
@@ -93,13 +92,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          description: 'request validation fail '
         '404':
           $ref: '#/components/responses/404'
       operationId: get-users-by-address
       description: 지갑 연결시 이미 가입된 회원인지 확인함
       parameters:
         - schema:
-            type: string
+            type: integer
           in: query
           name: chain_id
           required: true
@@ -116,30 +117,19 @@ paths:
       responses:
         '201':
           description: Created
-        '409':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userID:
+                    type: string
+        '400':
           description: Conflict - 지갑주소나 닉네임이 겹침
+        '404':
+          $ref: '#/components/responses/404'
       description: 새로 유저 만듬(신규가입)
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: chain_id
-        - schema:
-            type: string
-          in: query
-          name: address
-        - schema:
-            type: string
-          in: query
-          name: nickname
-        - schema:
-            type: string
-          in: query
-          name: email
-        - schema:
-            type: string
-          in: query
-          name: profile_pic
+      parameters: []
       tags:
         - Users
       requestBody:
@@ -150,16 +140,14 @@ paths:
               type: object
               x-examples:
                 example-1:
-                  chainId: 1
-                  address: asd
-                  nickname: yewon
-                  email: adsd
-                  profilePic: asdsd
+                  chain_id: 1
+                  address: '0xA96e16Cdc8c47e1E1E754af62a36D0d4ac7B7c67'
+                  nickname: kwqeiqw
+                  email: bqeuw@gmail.com
+                  profile_pic: asdasds
               properties:
-                chainId:
-                  type:
-                    - number
-                    - integer
+                chain_id:
+                  type: integer
                 address:
                   type: string
                   minLength: 1
@@ -169,23 +157,19 @@ paths:
                 email:
                   type: string
                   minLength: 1
-                profilePic:
+                profile_pic:
                   type: string
                   minLength: 1
               required:
-                - chainId
+                - chain_id
                 - address
                 - nickname
                 - email
-                - profilePic
-            examples:
-              example-1:
-                value:
-                  chainId: 1
-                  address: asd
-                  nickname: yewon
-                  email: adsd
-                  profilePic: asdsd
+                - profile_pic
+          application/xml:
+            schema:
+              type: object
+              properties: {}
         description: ''
   '/rankings/{standard}':
     parameters:
@@ -204,15 +188,6 @@ paths:
               schema:
                 description: ''
                 type: object
-                x-examples:
-                  example-1:
-                    user_id:
-                      ranking: 0
-                      nickname: string
-                      totalvalue: string
-                      nfts: 0
-                      profit_24h: 0
-                      profit_7d: 0
                 properties:
                   total:
                     type: integer
@@ -256,44 +231,9 @@ paths:
               schema:
                 description: ''
                 type: object
-                x-examples:
-                  example-1:
-                    name: string
-                    walletaddress: string
-                    totalnft: 0
-                    totalcollection: 0
-                    holdingvalue: 0
-                    gasfee: 0
-                    buyvolume: 0
-                    sellvolume: 0
-                    profit: 0
-                    ntfs:
-                      collectionname: string
-                      nftname: string
-                      in_timestamp: string
-                      floorprice: 0
-                    '': string
                 properties:
                   portfolio:
                     $ref: '#/components/schemas/Portfolio'
-              examples:
-                example-1:
-                  value:
-                    name: string
-                    walletaddress: string
-                    totalnft: 0
-                    totalcollection: 0
-                    holdingvalue: 0
-                    gasfee: 0
-                    buyvolume: 0
-                    sellvolume: 0
-                    profit: 0
-                    ntfs:
-                      collectionname: string
-                      nftname: string
-                      in_timestamp: string
-                      floorprice: 0
-                    '': string
         '404':
           $ref: '#/components/responses/404'
       operationId: get-portfolios-user-id-or-address
@@ -389,23 +329,6 @@ paths:
               schema:
                 description: ''
                 type: object
-                x-examples:
-                  example-1:
-                    name: string
-                    walletaddress: string
-                    totalnft: 0
-                    totalcollection: 0
-                    holdingvalue: 0
-                    gasfee: 0
-                    buyvolume: 0
-                    sellvolume: 0
-                    profit: 0
-                    ntfs:
-                      collectionname: string
-                      nftname: string
-                      in_timestamp: string
-                      floorprice: 0
-                    '': string
         '404':
           $ref: '#/components/responses/404'
       operationId: get-portfolios-stats
@@ -451,23 +374,6 @@ paths:
               schema:
                 description: ''
                 type: object
-                x-examples:
-                  example-1:
-                    name: string
-                    walletaddress: string
-                    totalnft: 0
-                    totalcollection: 0
-                    holdingvalue: 0
-                    gasfee: 0
-                    buyvolume: 0
-                    sellvolume: 0
-                    profit: 0
-                    ntfs:
-                      collectionname: string
-                      nftname: string
-                      in_timestamp: string
-                      floorprice: 0
-                    '': string
         '404':
           $ref: '#/components/responses/404'
       operationId: get-portfolios-activity
@@ -503,25 +409,25 @@ components:
       type: object
       description: ''
       properties:
-        id:
+        chain_id:
           type: integer
           description: Unique identifier for the given user.
-        createDate:
+        address:
           type: string
           format: date
           description: The date that the user was created.
+        user_id:
+          type: string
         nickname:
           type: string
         profile_pic:
           type: string
         status:
-          type: string
-        wallet:
-          $ref: '#/components/schemas/Wallet'
+          type: integer
       required:
-        - id
-        - createDate
-        - nickname
+        - chain_id
+        - address
+        - user_id
         - status
     Wallet:
       title: Wallet
@@ -602,10 +508,6 @@ components:
             properties:
               id:
                 type: string
-          examples:
-            Invalid hex number:
-              value:
-                message: Invalid hex number
     '404':
       description: 경로 못찾는 에러 + 데이터 없음
       content:
@@ -619,10 +521,7 @@ components:
                 minLength: 1
             required:
               - message
-            x-examples:
-              example-1:
-                message: No data found! Try again later
           examples:
-            not found:
+            example-1:
               value:
-                message: Not Found
+                message: string

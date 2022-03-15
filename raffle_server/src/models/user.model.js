@@ -88,16 +88,15 @@ const updatepatchUserById= async (params,body) => {
   var rows;
 
   var query = "";
-  if(typeof profilePic =="undefined"){
-    console.log("1번째 경우")
+  if(typeof profile_pic =="undefined"){
     query ="UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ user_id+ "'";
     ;}
   else if(typeof nickname =="undefined")
-  { console.log("2번째 경우")
+  { 
   query ="UPDATE tb_user SET profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
   }
   else{
-    console.log("3번째 경우")
+   
     query ="UPDATE tb_user SET nickname='"+nickname +"',profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
   }
 
@@ -107,7 +106,7 @@ const updatepatchUserById= async (params,body) => {
 
     //TODO 체인아이디 따라 디비테이블 분기 넣을것 
       rows = await conn.query(query);
-      console.log(query);
+
       if(rows == undefined){
           return false;
       }else{
@@ -135,7 +134,9 @@ const isNicknameTaken= async (body) => {
         if(rows[0] == undefined){
             return false;
         }else{
+        
             return true;
+            ;
         }
     } finally {
         if (conn) conn.release();

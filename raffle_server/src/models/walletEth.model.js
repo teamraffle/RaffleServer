@@ -5,7 +5,7 @@ let conn;
 const create= async (body) => {
     var wallet ={
         address : body.address,
-        chainId : body.chainId
+        chainId : body.chain_id
       }
       try {
         conn = await pool.getConnection();
@@ -35,7 +35,7 @@ const create= async (body) => {
 const findIdByAddress= async (body) => {
     var wallet ={
         address : body.address,
-        chainId : body.chainId
+        chainId : body.chain_id
       }
       try {
         conn = await pool.getConnection();
