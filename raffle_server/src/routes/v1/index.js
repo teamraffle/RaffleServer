@@ -4,6 +4,7 @@ const portfolioRoute = require('./portfolio.route');
 const rankingRoute = require('./ranking.route');
 const docsRoute = require('./docs.route');
 const testRoute = require('./test.route');
+const registerRoute = require('./register.route');
 
 const config = require('../../config/config');
 
@@ -21,6 +22,10 @@ const defaultRoutes = [
   {
     path: '/portfolios',
     route: portfolioRoute,
+  },
+  {
+    path: '/register',
+    route: registerRoute,
   },
   {
     path: '/docs',

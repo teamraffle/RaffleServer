@@ -14,7 +14,6 @@ router
 .patch(validate(userValidation.updateUser), userController.updateUser)
 
 
-
 router
   .route('/')
   .post(validate(userValidation.createUser), userController.createUser) 

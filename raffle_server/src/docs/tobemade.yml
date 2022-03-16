@@ -62,6 +62,10 @@ paths:
                 x-examples:
                   example-1:
                     result: true
+              examples:
+                example-1:
+                  value:
+                    result: true
         '400':
           description: Nickname Already Taken or request validation fail
         '404':
@@ -92,6 +96,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    chain_id: 0
+                    address: '2019-08-24'
+                    user_id: string
+                    nickname: string
+                    profile_pic: string
+                    status: 0
         '400':
           description: 'request validation fail '
         '404':
@@ -171,6 +184,48 @@ paths:
               type: object
               properties: {}
         description: ''
+  /register/nickname:
+    get:
+      summary: Your GET endpoint
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: ''
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                required:
+                  - result
+                x-examples:
+                  example-1:
+                    result: true
+              examples:
+                example-1:
+                  value:
+                    result: true
+        '400':
+          $ref: '#/components/responses/400'
+        '404':
+          $ref: '#/components/responses/404'
+      operationId: get-users-nickname
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: check_value
+          required: true
+        - schema:
+            type: integer
+          in: query
+          name: chain_id
+      description: ''
+      tags:
+        - Register
+    parameters: []
   '/rankings/{standard}':
     parameters:
       - schema:
@@ -261,11 +316,6 @@ paths:
     get:
       parameters:
         - schema:
-            type: string
-          in: query
-          name: chain_id
-          required: true
-        - schema:
             type: integer
           in: query
           name: offset
@@ -281,6 +331,11 @@ paths:
             type: string
           in: query
           name: format
+        - schema:
+            type: integer
+          in: query
+          name: chain_id
+          required: true
       description: NFT탭 재정렬/리프레시할때 사용
       responses:
         '200':
@@ -300,6 +355,19 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/NFT'
+              examples:
+                example-1:
+                  value:
+                    total: 0
+                    page: 0
+                    page_size: 0
+                    result:
+                      - id: string
+                        name: string
+                        symbol: string
+                        token_id: string
+                        floor_price: string
+                        in_timestamp: string
         '404':
           $ref: '#/components/responses/404'
       operationId: get-portfolios-nft-userid-or-address
@@ -374,6 +442,62 @@ paths:
               schema:
                 description: ''
                 type: object
+                x-examples:
+                  example-1:
+                    total: 0
+                    page: 0
+                    page_size: 0
+                    result:
+                      - id: string
+                        name: string
+                        symbol: string
+                        token_id: string
+                        floor_price: string
+                        in_timestamp: string
+                properties:
+                  total:
+                    type: number
+                  page:
+                    type: number
+                  page_size:
+                    type: number
+                  result:
+                    type: array
+                    uniqueItems: true
+                    minItems: 1
+                    items:
+                      $ref: '#/components/schemas/NFTActivity'
+                required:
+                  - total
+                  - page
+                  - page_size
+                  - result
+              examples:
+                example-1:
+                  value:
+                    total: 0
+                    page: 0
+                    page_size: 0
+                    result:
+                      - activity_id: string
+                        in_timestamp: string
+                        state: int
+                        collection:
+                          icon: string
+                          id: string
+                          name: string
+                          token_address: string
+                        token_id: int
+                        from_address: string
+                        value: number
+                        gas: number
+                        transaction_hash: string
+            application/xml:
+              schema:
+                type: object
+                properties: {}
+        '400':
+          $ref: '#/components/responses/400'
         '404':
           $ref: '#/components/responses/404'
       operationId: get-portfolios-activity
@@ -400,8 +524,17 @@ paths:
           in: query
           name: chain_id
           required: true
+        - schema:
+            type: string
+          in: query
+          name: user_id
+        - schema:
+            type: string
+          in: query
+          name: address
       tags:
         - Portfolios
+      description: ''
 components:
   schemas:
     User:
@@ -471,9 +604,9 @@ components:
       title: NFT
       type: object
       properties:
-        id:
+        collection_name:
           type: string
-        name:
+        nft_name:
           type: string
         symbol:
           type: string
@@ -483,6 +616,7 @@ components:
           type: string
         in_timestamp:
           type: string
+      description: ''
     Ranking:
       title: Ranking
       type: object
@@ -499,6 +633,82 @@ components:
           type: number
         profit_24H:
           type: number
+    NFTActivity:
+      description: ''
+      type: object
+      x-examples:
+        example-1:
+          activity_id: string
+          in_timestamp: string
+          state: int
+          collection:
+            icon: string
+            id: string
+            name: string
+            token_address: string
+          token_id: int
+          from_address: string
+          value: number
+          gas: number
+          transaction_hash: string
+      properties:
+        activity_id:
+          type: string
+          minLength: 1
+        in_timestamp:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          minLength: 1
+          description: |-
+            0 buy
+            1 sell
+            2 mint
+            3 burn
+            4 send
+            5 receive
+        collection:
+          type: object
+          required:
+            - icon
+            - id
+            - name
+            - token_address
+          properties:
+            icon:
+              type: string
+              minLength: 1
+            id:
+              type: string
+              minLength: 1
+            name:
+              type: string
+              minLength: 1
+            token_address:
+              type: string
+              minLength: 1
+        token_id:
+          type: string
+          minLength: 1
+        from_address:
+          type: string
+          minLength: 1
+        value:
+          type: number
+        gas:
+          type: number
+        transaction_hash:
+          type: string
+          minLength: 1
+      required:
+        - activity_id
+        - in_timestamp
+        - type
+        - collection
+        - token_id
+        - gas
+        - transaction_hash
   responses:
     '400':
       description: Bad Request - 주소가 hex number양식이 아닌 경우
@@ -508,6 +718,10 @@ components:
             properties:
               id:
                 type: string
+          examples:
+            example-1:
+              value:
+                id: error
     '404':
       description: 경로 못찾는 에러 + 데이터 없음
       content:
