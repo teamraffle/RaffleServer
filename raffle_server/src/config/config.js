@@ -43,7 +43,7 @@ module.exports = {
     host: envVars.MARIADB_URL,
     user: envVars.MARIADB_USER,
     pswd: envVars.MARIADB_PSWD,
-    dbName : envVar.MARIADB_DBNAME,
+    dbName : envVars.MARIADB_DBNAME,
   },
   jwt: {
     secret: envVars.JWT_SECRET,
