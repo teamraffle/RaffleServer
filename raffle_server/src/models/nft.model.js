@@ -31,6 +31,6 @@ const createTx= async (data) => {
 
 module.exports = {
     createTx,
-    update,
+    
 };
   

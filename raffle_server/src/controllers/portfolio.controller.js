@@ -7,13 +7,13 @@ const axios = require('axios');
 
 //모랄리스 nft되나 테스트
 const test = catchAsync(async (req, res) => {
-  const nftData = await portfolioService.get_moralis_nft(뭔가넣어);
+  const nftData = await portfolioService.get_moralis_nft();
   res.status(httpStatus.CREATED).send(nftData);
 });
 
 
 const saveNFTTransactions = catchAsync(async (req, res) => {
-  const nftTx = await portfolioService.getNFTTransaction();
+  const nftTx = await portfolioService.getNFTTransaction("0xb8d6faf9f6b67a8c609d11e5099e0732e12cdc15",1);
   res.status(httpStatus.CREATED).send('res');
 });
 // const deleteUser = catchAsync(async (req, res) => {

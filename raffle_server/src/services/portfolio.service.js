@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError');
 const axios = require('axios');
 const config = require('../config/config');
 
-const get_moralis_nft = async (body) => {
+const get_moralis_nft = async(wallet, chain_id)=> {
   var chain_type;
   if(chain_id==1){
     chain_type = 'eth'
