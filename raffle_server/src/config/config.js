@@ -11,6 +11,7 @@ const envVarsSchema = Joi.object()
     MARIADB_URL: Joi.string().required().description('Maria DB url'),
     MARIADB_USER: Joi.string().required().description('Maria DB user'),
     MARIADB_PSWD: Joi.string().required().description('Maria DB pswd'),
+    MARIADB_DBNAME: Joi.string().required().description('Maria DB dbname'),
     JWT_SECRET: Joi.string().required().description('JWT secret key'),
     JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
     JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
@@ -42,6 +43,7 @@ module.exports = {
     host: envVars.MARIADB_URL,
     user: envVars.MARIADB_USER,
     pswd: envVars.MARIADB_PSWD,
+    dbName : envVar.MARIADB_DBNAME,
   },
   jwt: {
     secret: envVars.JWT_SECRET,

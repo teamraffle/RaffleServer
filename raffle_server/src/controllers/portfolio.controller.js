@@ -12,6 +12,10 @@ const test = catchAsync(async (req, res) => {
 });
 
 
+const saveNFTTransactions = catchAsync(async (req, res) => {
+  const nftTx = await portfolioService.get_moralis_nft_transaction();
+  res.status(httpStatus.CREATED).send(nftData);
+});
 // const deleteUser = catchAsync(async (req, res) => {
 //   await userService.deleteUserById(req.params.userId);
 //   res.status(httpStatus.NO_CONTENT).send();
