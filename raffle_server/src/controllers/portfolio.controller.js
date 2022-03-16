@@ -13,8 +13,8 @@ const test = catchAsync(async (req, res) => {
 
 
 const saveNFTTransactions = catchAsync(async (req, res) => {
-  const nftTx = await portfolioService.get_moralis_nft_transaction();
-  res.status(httpStatus.CREATED).send(nftData);
+  const nftTx = await portfolioService.getNFTTransaction();
+  res.status(httpStatus.CREATED).send('res');
 });
 // const deleteUser = catchAsync(async (req, res) => {
 //   await userService.deleteUserById(req.params.userId);
@@ -22,5 +22,6 @@ const saveNFTTransactions = catchAsync(async (req, res) => {
 // });
 
 module.exports = {
-  test
+  test,
+  saveNFTTransactions,
 };

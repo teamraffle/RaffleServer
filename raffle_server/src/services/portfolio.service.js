@@ -1,5 +1,5 @@
 const httpStatus = require('http-status');
-const { User, WalletEth } = require('../models');
+const { NFT } = require('../models');
 const ApiError = require('../utils/ApiError');
 const axios = require('axios');
 const config = require('../config/config');
@@ -14,13 +14,25 @@ const get_moralis_nft = async (body) => {
   }) .then((Response)=>{
     res.status(httpStatus.OK).send(Response.data);
   }) 
-  .catch((Error)=>{console.log(Error)});
-      
-      
+  .catch((Error)=>{console.log(Error)});  
+};
+
+const getNFTTransaction = async (wallet, chain_id) => {
+  var chain_type;
+  if(chain_id==1){
+    chain_type = 'eth'
+  }
+  await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?${chain_type}&format=decimal`,{
+    headers: {
+      'x-api-key': config.moralis.secret
+    }
+  }) .then((Response)=>{
+    //NFT.createTx(Response.data);
+    console.log(Response.data);
+  }) .catch((Error)=>{console.log(Error)});  
 };
 
 module.exports = {
-  createUser,
- 
-  // deleteUserById,
+  get_moralis_nft,
+  getNFTTransaction,
 };
