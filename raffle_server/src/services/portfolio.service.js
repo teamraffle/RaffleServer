@@ -27,7 +27,7 @@ const getNFTTransaction = async (wallet, chain_id) => {
   if(chain_id==1){
     chain_type = 'eth'
   }
-  await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal`,{
+  await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal&direction=both&limit=100`,{
     headers: {
       'x-api-key': config.moralis.secret
     }
