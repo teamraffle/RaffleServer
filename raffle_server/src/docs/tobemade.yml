@@ -222,6 +222,7 @@ paths:
             type: integer
           in: query
           name: chain_id
+          required: true
       description: ''
       tags:
         - Register
