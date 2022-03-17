@@ -25,7 +25,7 @@ const createUser = async (body) => {
 };
 
 const getUserbyWallet = async (query) => {
-  const userAndWallet = await User.isNicknameTaken(query);
+  const userAndWallet = await User.searchByWallet(query);
   if(!userAndWallet){
     throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
   }else{
