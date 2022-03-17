@@ -121,8 +121,6 @@ const updatepatchUserById= async (params,body) => {
 const isNicknameTaken= async (body) => {
     var user = {
         nickname : body.nickname,
-        profile_pic : body.profile_pic,
-        email: body.email
       } 
     
       var rows;

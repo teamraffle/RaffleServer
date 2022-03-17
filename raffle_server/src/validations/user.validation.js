@@ -25,10 +25,11 @@ const getUserbyID = {
 };
 
 
-const getUser = {
-  // params: Joi.object().keys({
-  //   userId: Joi.string().custom(objectId),
-  // }),
+const checkNickname = {
+  query: Joi.object().keys({
+    check_value : Joi.string().required(),
+    chain_id : Joi.number().integer().required(),
+  }),
 };
 
 const updateUser = {
@@ -52,4 +53,5 @@ module.exports = {
   getUserbyID,
   getUserbyWallet,
   updateUser,
+  checkNickname,
 };

@@ -25,12 +25,20 @@ const createUser = async (body) => {
 };
 
 const getUserbyWallet = async (query) => {
-  const userAndWallet = await User.searchByWallet(query);
+  const userAndWallet = await User.isNicknameTaken(query);
   if(!userAndWallet){
     throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
   }else{
     return userAndWallet; 
   }
+}
+
+const checkNickname = async (query) => {
+  const ifTaken = await User.isNicknameTaken({nickname: query.check_value});
+  if(ifTaken){
+    throw new ApiError(httpStatus.CONFLICT, 'Nickname already taken');
+    }
+  return JSON.stringify({result: true});
 }
 
 const getUserbyId = async (params) => {
@@ -49,8 +57,7 @@ const updateUserById = async (params,body) => {
   const nicknamecheck = await User.isNicknameTaken(body);
   console.log(nicknamecheck);
   if(nicknamecheck){
-  throw new ApiError(httpStatus.BAD_REQUEST, 'Nickname already taken');
-
+  throw new ApiError(httpStatus.CONFLICT, 'Nickname already taken');
   }
   const userAndWallet = await User.updatepatchUserById(params,body);
   if(!userAndWallet){
@@ -64,5 +71,6 @@ module.exports = {
   getUserbyWallet,
   getUserbyId,
   updateUserById,
+  checkNickname,
   // deleteUserById,
 };

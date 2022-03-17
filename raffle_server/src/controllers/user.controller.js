@@ -26,6 +26,12 @@ const updateUser = catchAsync(async (req, res) => {
 
 });
 
+const checkNicknameDuplication = catchAsync(async (req, res) => {
+  const ifTaken = await userService.checkNickname(req.query);
+  res.status(httpStatus.OK).send(ifTaken);
+});
+
+
 // const deleteUser = catchAsync(async (req, res) => {
 //   await userService.deleteUserById(req.params.userId);
 //   res.status(httpStatus.NO_CONTENT).send();
@@ -36,5 +42,6 @@ module.exports = {
   getUserbyWallet,
   getUserbyId,
   updateUser,
+  checkNicknameDuplication,
   // deleteUser,
 };
