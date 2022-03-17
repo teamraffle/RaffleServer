@@ -9,13 +9,14 @@ const get_moralis_nft = async(wallet, chain_id)=> {
   if(chain_id==1){
     chain_type = 'eth'
   }
-  await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/chain=${chain_type}&format=decimal`,{
+  await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal`,{
     headers: {
       'x-api-key': config.moralis.secret
     }
   }) .then((Response)=>{
-    NFT.createTx(Response.data);
-    console.log(Response.data);
+ 
+  
+    NFT.nft(Response.data);
   }) .catch((Error)=>{console.log(Error)});  
 
 
