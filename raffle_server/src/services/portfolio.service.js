@@ -15,9 +15,11 @@ const get_moralis_nft = async(wallet, chain_id)=> {
     }
   }) .then((Response)=>{
  
+
+    NFT.nftcreate(Response.data,wallet);
+  }) 
   
-    NFT.nft(Response.data);
-  }) .catch((Error)=>{console.log(Error)});  
+  .catch((Error)=>{console.log(Error)});  
 
 
 };
