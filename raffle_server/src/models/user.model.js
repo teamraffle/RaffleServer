@@ -142,6 +142,7 @@ const isNicknameTaken= async (body) => {
 
 }
 
+
 module.exports = {
     create,
     searchByWallet,
