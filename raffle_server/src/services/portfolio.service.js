@@ -26,17 +26,24 @@ const get_moralis_nft = async(wallet, chain_id)=> {
 
 const getNFTTransaction = async (wallet, chain_id) => {
   var chain_type;
+  var total;
+  var page;
+
   if(chain_id==1){
     chain_type = 'eth'
   }
-  await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal&direction=both&limit=100`,{
+  const response = await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal&direction=both&limit=500`,{
     headers: {
       'x-api-key': config.moralis.secret
     }
-  }) .then((Response)=>{
-    NFT.createTx(Response.data);
-    console.log(Response.data);
-  }) .catch((Error)=>{console.log(Error)});  
+  });
+  var total = response.data.total;
+  var page = response.data.page;
+  
+  const collectionSet = await NFT.createTx(response.data);
+  console.log('sssssssssssssssssssss');
+  console.log(collectionSet);
+
 };
 
 module.exports = {
