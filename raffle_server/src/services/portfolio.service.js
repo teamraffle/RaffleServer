@@ -32,7 +32,7 @@ const getNFTTransaction = async (wallet, chain_id) => {
       'x-api-key': config.moralis.secret
     }
   }) .then((Response)=>{
-    //NFT.createTx(Response.data);
+    NFT.createTx(Response.data);
     console.log(Response.data);
   }) .catch((Error)=>{console.log(Error)});  
 };
