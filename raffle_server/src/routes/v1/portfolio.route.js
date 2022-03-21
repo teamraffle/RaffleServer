@@ -11,6 +11,10 @@ const router = express.Router();
 router
   .route('/nft')
   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.test)
+  
+router
+  .route('/fp')
+  .get(validate(portfolioValidation.getUserbyWallet), portfolioController.opensea)
 
   router
   .route('/test')

@@ -6,24 +6,58 @@ const config = require('../config/config');
 
 const get_moralis_nft = async(wallet, chain_id)=> {
   var chain_type;
+  var total;
+  var page;
+  var cursor;
+ 
+  const page_size = 4;
   if(chain_id==1){
     chain_type = 'eth'
   }
-  await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal`,{
+  try{
+
+  const response = await axios.get(`https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal`,{
     headers: {
       'x-api-key': config.moralis.secret
     }
-  }) .then((Response)=>{
-    console.log(Response.data);
-    total = Response.data.total;
-    page = Response.data.page;
-    cursor = Response.data.cursor;
-
-    NFT.nftcreate(Response.data,wallet);
   }) 
-  
-  .catch((Error)=>{console.log(Error)});  
 
+    total = response.data.total;
+    page = response.data.page;
+    cursor = response.data.cursor;
+
+    NFT.nftcreate(response.data,wallet);
+  
+   if(total > page_size){
+    var i = 0;
+      while((page+1) != Math.round(total/page_size)){
+        console.log(i);
+        i++; 
+        const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
+        const response_rp = await axios.get( url,{
+          headers: {
+            'x-api-key': config.moralis.secret
+          }
+        });
+        page = response_rp.data.page;
+        cursor = response_rp.data.cursor;
+
+        console.log("sssssssssssssssssss페이지넘버"+ page);
+        console.log(response_rp.data);
+
+        //DB에 저장
+        // const collectionSet = await NFT.createTx(response_rp.data);
+      }
+
+    }
+
+  
+  
+  } 
+  catch(err) {
+    console.log("Error >>", err);
+  }
+  
 
 };
 
@@ -94,6 +128,30 @@ const getAndSaveTransfer= async (wallet, chain_id) =>{
   // return collectionSet;
 }
 
+
+const get_nft_fp = async( chain_id)=> {
+  var chain_type;
+ 
+  if(chain_id==1){
+    chain_type = 'eth'
+  }
+  try{
+
+  const response = await axios.get(`https://api.opensea.io/api/v1/asset_contract/0x8a90CAb2b38dba80c64b7734e58Ee1dB38B8992e`,{
+  
+  }) 
+
+    console.log(response);
+
+    // NFT.nftcreate(response.data,wallet);
+  
+  } 
+  catch(err) {
+    console.log("Error >>");
+  }
+  
+
+};
 const getTransferAllPages= async (wallet, chain_id) =>{
 
 }
@@ -101,4 +159,5 @@ const getTransferAllPages= async (wallet, chain_id) =>{
 module.exports = {
   get_moralis_nft,
   getNFTTransfers,
+  get_nft_fp
 };

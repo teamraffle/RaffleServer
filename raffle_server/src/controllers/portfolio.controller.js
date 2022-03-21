@@ -5,7 +5,12 @@ const { portfolioService } = require('../services');
 
 //모랄리스 nft되나 테스트
 const test = catchAsync(async (req, res) => {
-  const nftData = await portfolioService.get_moralis_nft("0xA96e16Cdc8c47e1E1E754af62a36D0d4ac7B7c67",1);
+  const nftData = await portfolioService.get_moralis_nft("0xc95337f787ce1ed9e1c0ae396857eee430ca45f8",1);
+  res.status(httpStatus.CREATED).send(nftData);
+});
+
+const opensea = catchAsync(async (req, res) => {
+  const nftData = await portfolioService.get_nft_fp(1);
   res.status(httpStatus.CREATED).send(nftData);
 });
 
@@ -19,4 +24,5 @@ const saveNFTTransactions = catchAsync(async (req, res) => {
 module.exports = {
   test,
   saveNFTTransactions,
+  opensea
 };
