@@ -4,6 +4,8 @@ const ApiError = require('../utils/ApiError');
 const axios = require('axios');
 const config = require('../config/config');
 
+
+
 const get_moralis_nft = async(wallet, chain_id)=> {
   var chain_type;
   var total;
@@ -129,29 +131,27 @@ const getAndSaveTransfer= async (wallet, chain_id) =>{
 }
 
 
-const get_nft_fp = async( chain_id)=> {
+const get_nft_fp = async(chain_id)=> {
   var chain_type;
+
  
   if(chain_id==1){
     chain_type = 'eth'
   }
-  try{
-
-  const response = await axios.get(`https://api.opensea.io/api/v1/asset_contract/0x8a90CAb2b38dba80c64b7734e58Ee1dB38B8992e`,{
   
-  }) 
+  axios.get('https://api.opensea.io/api/v1/collection/doodles-official'
+     ).
+  then((Response)=>{
 
-    console.log(response);
 
-    // NFT.nftcreate(response.data,wallet);
-  
-  } 
-  catch(err) {
-    console.log("Error >>");
-  }
-  
+    NFT.nft_fp_create(Response.data.collection);
+}).catch((Error)=>{
+    console.log(Error);
+})
 
 };
+
+
 const getTransferAllPages= async (wallet, chain_id) =>{
 
 }
