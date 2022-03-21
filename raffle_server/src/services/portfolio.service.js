@@ -14,7 +14,10 @@ const get_moralis_nft = async(wallet, chain_id)=> {
       'x-api-key': config.moralis.secret
     }
   }) .then((Response)=>{
- 
+    console.log(Response.data);
+    total = Response.data.total;
+    page = Response.data.page;
+    cursor = Response.data.cursor;
 
     NFT.nftcreate(Response.data,wallet);
   }) 

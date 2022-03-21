@@ -12,23 +12,40 @@ const nftcreate= async (data,wallet) => {
     const symbol='\"'+data.result[idx].symbol+'\"';
     const name= '\"'+data.result[idx].name+'\"';
     const contract_type= '\"'+data.result[idx].contract_type+'\"';
-    // const collection_icon='\"'+data.result[idx].token_uri+'\"';
+    const collection_icon='""';
     const splittedAddr = token_address.replace('0x','');
-    var langs = [nft_coll_id, splittedAddr,symbol,name,contract_type];
-    var res = langs.join(',');
+    var nft_collection_string = [nft_coll_id, splittedAddr,symbol,name,contract_type,collection_icon];
+    var res = nft_collection_string.join(',');
     finaltuple+=",("+res+")";
+
+    const nft_item_id = '\"'+uuidv4.v1()+'\"';
+    const token_id='\"'+data.result[idx].token_id+'\"';
+    const owner_of= '\"'+wallet.replace('0x','')+'\"';;
+    const metadata= '""';
+    const block_number='\"'+data.result[idx].block_number+'\"';
+    const frozen= '\"'+data.result[idx].frozen+'\"';
+    var nft_string = [nft_item_id,splittedAddr, token_id,owner_of,metadata,frozen,block_number];
+    var res2 = nft_string.join(',');
+    finaltuple+=",("+res+")";
+    finaltuple2+=",("+res2+")";
+
+console.log(finaltuple2);
+
   };
   console.log(finaltuple.slice(10) );
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type,collection_icon) VALUES '+ finaltuple.slice(10);
+    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type,collection_icon) VALUES '+ finaltuple.slice(10);
 
-    console.log(sql);
+    const sql2 = 'INSERT IGNORE INTO tb_nft_eth (nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number) VALUES '+ finaltuple2.slice(10);
+
+
     const dbRes = await conn.query(sql);
-    
+    const dbRes2 = await conn.query(sql2);
+
     console.log(dbRes);//성공 리턴
-    return wallet_id;
+    return dbRes;
     
   }catch(err) {
     console.log(err);
