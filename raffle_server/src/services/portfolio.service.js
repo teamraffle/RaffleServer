@@ -12,7 +12,7 @@ const get_moralis_nft = async(wallet, chain_id)=> {
   var page;
   var cursor;
  
-  const page_size = 4;
+  const page_size = 9;
   if(chain_id==1){
     chain_type = 'eth'
   }
@@ -29,10 +29,12 @@ const get_moralis_nft = async(wallet, chain_id)=> {
     cursor = response.data.cursor;
 
     NFT.nftcreate(response.data,wallet);
-  
+    var repeat =  Math.ceil(total/page_size)+1;
+    console.log(repeat);
    if(total > page_size){
     var i = 0;
-      while((page+1) != Math.round(total/page_size)){
+      while(repeat--){
+
         console.log(i);
         i++; 
         const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
@@ -43,7 +45,7 @@ const get_moralis_nft = async(wallet, chain_id)=> {
         });
         page = response_rp.data.page;
         cursor = response_rp.data.cursor;
-
+        console.log("page,cursor:",page,cursor);
         console.log("sssssssssssssssssss페이지넘버"+ page);
         console.log(response_rp.data);
 
