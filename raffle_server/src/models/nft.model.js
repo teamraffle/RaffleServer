@@ -58,8 +58,8 @@ const nftcreate= async (data,wallet) => {
 const createTx= async(data) => {
 
 
-  var {finalTuple, collectionSet} = createTx_tuple(data);
-  console.log(finalTuple);
+  const {finalTuple, collectionSet} = createTx_tuple(data);
+  // console.log(finalTuple);
 
   try {
     conn = await pool.getConnection();
@@ -74,7 +74,7 @@ const createTx= async(data) => {
     
   }catch(err) {
     console.log(err);
-    return  collectionSet;
+    return collectionSet;
   }
   finally {
     if (conn) conn.release(); //release to pool
@@ -84,8 +84,8 @@ const createTx= async(data) => {
 }
 
 const createTx_tuple= (data) =>{
-  var finalTuple="";
-  var collectionSet = new Set();
+  let finalTuple="";
+  let collectionSet = new Set();
 
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
@@ -105,9 +105,9 @@ const createTx_tuple= (data) =>{
     const verified='\"'+data.result[idx].verified+'\"';
 
 
-    var sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
+    let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
     value, transaction_type, token_address, token_id, from_address, to_address, amount, verified];
-    var res = sqlData.join(',');
+    let res = sqlData.join(',');
 
     if(idx==0){
       finalTuple+="("+res+")";
@@ -115,7 +115,7 @@ const createTx_tuple= (data) =>{
       finalTuple+=",("+res+")";
     }
 
-    collectionSet.add(transaction_hash);
+    collectionSet.add(data.result[idx].block_hash.replace('0x',''));
   };
 
   console.log(finalTuple);

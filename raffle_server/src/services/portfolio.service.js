@@ -62,30 +62,37 @@ const get_moralis_nft = async(wallet, chain_id)=> {
 };
 
 const getAllNFTTransfers = async (wallet, chain_id) => {
-  var mergedCollectionSet = new Set([...set1, ...set2, ...set3])
-  // console.log('sssssssssssssssssssss');
-  var page=0;
-  const page_size = 5; //500
+  let finalSet = new Set();
+
+  let page=0;
+  const page_size = 2; //500
 
   //0페이지
-  var {collectionSet, total, cursor} = await getAndSaveTransfer(wallet, chain_id, cursor, page_size);
+  var {collectionSet, total, cursor} = await getAndSaveTransfer(wallet, chain_id, '', page_size);
+  finalSet = collectionSet;
+  console.log(finalSet);
+  console.log(cursor);
+
 
   //1~끝페이지
   if(total > page_size){
     page++;
     // console.log('페이지: '+page);
     while( page < Math.ceil(total/page_size)){
-      collectionSet, total, cursor = await getAndSaveTransfer(wallet, chain_id, cursor, page_size);
+      var {collectionSet, total, cursor} = await getAndSaveTransfer(wallet, chain_id, cursor, page_size);
+      finalSet= new Set([...finalSet, ...collectionSet])
+      console.log(finalSet);
       page ++;
     }
   }
 
+  return finalSet;
 };
 
 const getAndSaveTransfer= async (wallet, chain_id, _cursor, page_size) =>{
-  var chain_type;
-  var total;
-  var cursor;
+  let chain_type;
+  let total;
+  let cursor;
   if(_cursor ==undefined){
     cursor = '';
   }else{
