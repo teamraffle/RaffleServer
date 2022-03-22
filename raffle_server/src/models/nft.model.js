@@ -57,26 +57,27 @@ const nftcreate= async (data,wallet) => {
 
 const createTx= async(data) => {
 
-  var finaltuple; 
-  var collectionSet; 
-  finaltuple, collectionSet = createTx_tuple(data);
+
+  var {finalTuple, collectionSet} = createTx_tuple(data);
+  console.log(finalTuple);
+
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified) VALUES '+ finaltuple;
+    const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified) VALUES '+ finalTuple;
 
-    console.log(sql);
+    // console.log(sql);
     const dbRes = await conn.query(sql);
     
-    console.log(dbRes);//성공 리턴
+    // console.log(dbRes);//성공 리턴
     return true;
     
   }catch(err) {
     console.log(err);
-    return collectionSet;
+    return  collectionSet;
   }
   finally {
-      if (conn) conn.release(); //release to pool
+    if (conn) conn.release(); //release to pool
   }
   
 
@@ -117,9 +118,9 @@ const createTx_tuple= (data) =>{
     collectionSet.add(transaction_hash);
   };
 
-  // console.log(finalTuple);
+  console.log(finalTuple);
 
-  return finalTuple, collectionSet;
+  return {finalTuple, collectionSet};
 }
 
 
