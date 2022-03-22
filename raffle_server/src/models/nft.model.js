@@ -128,22 +128,31 @@ const nft_fp_create= async(data) =>{
     var finalTuple="";
   
     const nft_fp_id = '\"'+uuidv4.v1()+'\"';
-    const token_address= '\"'+data.primary_asset_contracts[0].address+'\"';
+    const token_address= '\"'+data.primary_asset_contracts[0].address.replace('0x','')+'\"';
     const fp='\"'+data.stats.floor_price+'\"';
+
+    const collection_icon='\"'+data.image_url+'\"';
     var fp_table_str = [nft_fp_id, token_address, fp];
     var res = fp_table_str.join(',');
     finalTuple+="("+res+")"; // tb_nfr_fp 테이블 저장
 
-
+    
    console.log(finalTuple);
   try {
     conn = await pool.getConnection();
 
     const sql = 'INSERT IGNORE INTO tb_nft_fp_eth (nft_fp_id, token_address, fp) VALUES '+ finalTuple;
 
+    const query ="UPDATE innodb.tb_nft_collection_eth  SET collection_icon ="+collection_icon +"WHERE token_address="+token_address;
 
     const dbRes = await conn.query(sql);
-
+    rows = await conn.query(query, token_address);
+    if(rows[0] == undefined){
+        return false;
+    }else{
+        console.log(rows[0]);
+        return rows[0];//TODO 양식맞추기
+    }
 
     console.log(dbRes);//성공 리턴
     return dbRes;

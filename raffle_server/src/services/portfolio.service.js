@@ -143,7 +143,7 @@ const get_nft_fp = async(chain_id)=> {
      ).
   then((Response)=>{
 
-
+    console.log(Response.data.collection.image_url);
     NFT.nft_fp_create(Response.data.collection);
 }).catch((Error)=>{
     console.log(Error);
