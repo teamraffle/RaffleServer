@@ -10,7 +10,7 @@ const test = catchAsync(async (req, res) => {
 });
 
 const opensea = catchAsync(async (req, res) => {
-  const nftData = await portfolioService.get_nft_fp(1);
+  const nftData = await portfolioService.get_nft_fp("doodles-official",1);
   res.status(httpStatus.CREATED).send(nftData);
 });
 

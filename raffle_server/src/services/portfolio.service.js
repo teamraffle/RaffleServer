@@ -133,7 +133,7 @@ const getAndSaveTransfer= async (wallet, chain_id) =>{
 }
 
 
-const get_nft_fp = async(chain_id)=> {
+const get_nft_fp = async(coll_name,chain_id)=> {
   var chain_type;
 
  
@@ -141,7 +141,7 @@ const get_nft_fp = async(chain_id)=> {
     chain_type = 'eth'
   }
   
-  axios.get('https://api.opensea.io/api/v1/collection/doodles-official'
+  axios.get(`https://api.opensea.io/api/v1/collection/${coll_name}`
      ).
   then((Response)=>{
 
