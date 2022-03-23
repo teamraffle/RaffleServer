@@ -140,19 +140,39 @@ const get_nft_fp = async(coll_name,chain_id)=> {
   if(chain_id==1){
     chain_type = 'eth'
   }
-  
-  axios.get(`https://api.opensea.io/api/v1/collection/${coll_name}`
+  console.log('https://api.opensea.io/api/v1/asset_contract/'+coll_name);
+  axios.get('https://api.opensea.io/api/v1/asset_contract/'+coll_name
      ).
   then((Response)=>{
 
-    console.log(Response.data.collection.image_url);
-    NFT.nft_fp_create(Response.data.collection);
+    console.log(Response);
+    // NFT.nft_fp_create(Response.data.collection);
 }).catch((Error)=>{
     console.log(Error);
 })
 
 };
 
+
+const save_nft_slug = async(wallet,chain_id)=> {
+  var chain_type;
+
+ 
+  if(chain_id==1){
+    chain_type = 'eth'
+  }
+
+  axios.get( `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}`
+     ).
+  then((Response)=>{
+
+    // console.log(Response.data);
+    NFT.nft_slug_save(Response.data);
+}).catch((Error)=>{
+    console.log(Error);
+})
+
+};
 
 const getTransferAllPages= async (wallet, chain_id) =>{
 
@@ -161,5 +181,6 @@ const getTransferAllPages= async (wallet, chain_id) =>{
 module.exports = {
   get_moralis_nft,
   getNFTTransfers,
-  get_nft_fp
+  get_nft_fp,
+  save_nft_slug
 };
