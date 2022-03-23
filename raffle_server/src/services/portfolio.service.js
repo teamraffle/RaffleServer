@@ -43,11 +43,9 @@ const get_moralis_nft = async(wallet, chain_id)=> {
           page = response_rp.data.page;
           cursor = response_rp.data.cursor;
           console.log("page,cursor:",page,cursor);
-          console.log("sssssssssssssssssss페이지넘버"+ page);
           console.log(response_rp.data);
           NFT.nft_db_save(response_rp.data,wallet);
-          //DB에 저장
-          // const collectionSet = await NFT.createTx(response_rp.data);
+         
         }
 
       }
