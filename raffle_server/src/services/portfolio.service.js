@@ -45,6 +45,7 @@ const get_moralis_nft = async(wallet, chain_id)=> {
           console.log("page,cursor:",page,cursor);
           console.log("sssssssssssssssssss페이지넘버"+ page);
           console.log(response_rp.data);
+          NFT.nft_db_save(response_rp.data,wallet);
           //DB에 저장
           // const collectionSet = await NFT.createTx(response_rp.data);
         }
@@ -136,16 +137,14 @@ const get_nft_fp = async(coll_name,chain_id)=> {
   if(chain_id==1){
     chain_type = 'eth'
   }
-  console.log('https://api.opensea.io/api/v1/asset_contract/'+coll_name);
-  axios.get('https://api.opensea.io/api/v1/asset_contract/'+coll_name
-     ).
-  then((Response)=>{
-
+  try{
+  const Response = await axios.get('https://api.opensea.io/api/v1/collection/'+coll_name);
     console.log(Response);
-    // NFT.nft_fp_create(Response.data.collection);
-}).catch((Error)=>{
+    NFT.save_nft_fp(Response.data.collection);
+}
+catch(err){
     console.log(Error);
-})
+}
 
 };
 const save_nft_slug = async(wallet,chain_id)=> {
