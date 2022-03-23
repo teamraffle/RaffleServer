@@ -65,7 +65,7 @@ const getAllNFTTransfers = async (wallet, chain_id) => {
   let finalSet = new Set();
 
   let page=0;
-  const page_size = 2; //500
+  const page_size = 500;
 
   //0페이지
   var {collectionSet, total, cursor} = await getAndSaveTransfer(wallet, chain_id, '', page_size);
@@ -81,7 +81,7 @@ const getAllNFTTransfers = async (wallet, chain_id) => {
     while( page < Math.ceil(total/page_size)){
       var {collectionSet, total, cursor} = await getAndSaveTransfer(wallet, chain_id, cursor, page_size);
       finalSet= new Set([...finalSet, ...collectionSet])
-      console.log(finalSet);
+      // console.log(finalSet);
       page ++;
     }
   }
@@ -115,7 +115,14 @@ const getAndSaveTransfer= async (wallet, chain_id, _cursor, page_size) =>{
     //DB에 저장
     const collectionSet = await NFT.createTx(response.data);
     return {collectionSet, total, cursor};
+  } catch(err) {
+    console.log("Error >>", err);
+  }
+}
 
+const ifCollectionExists = async(addressSet)=> {
+  try {
+    return await NFT.checkAddress(addressSet);
   } catch(err) {
     console.log("Error >>", err);
   }
@@ -150,5 +157,6 @@ const getTransferAllPages= async (wallet, chain_id) =>{
 module.exports = {
   get_moralis_nft,
   getAllNFTTransfers,
-  get_nft_fp
+  get_nft_fp,
+  ifCollectionExists,
 };
