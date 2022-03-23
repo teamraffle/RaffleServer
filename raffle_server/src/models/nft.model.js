@@ -175,9 +175,9 @@ const checkAddress = async(addressSet) =>{
       const sql = "SELECT token_address FROM tb_nft_collection_eth WHERE token_address= '"+address+"'";
       row = await conn.query(sql);
 
-      console.log(row);
+      // console.log(row);
 
-      //없으면 어레이에추가
+      //db에 없으면 어레이에추가
       if(row[0] == undefined){
         missingAddress.push(address)
       }

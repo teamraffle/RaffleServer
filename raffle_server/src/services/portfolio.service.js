@@ -150,13 +150,59 @@ const get_nft_fp = async(coll_name,chain_id)=> {
 };
 
 
-const getTransferAllPages= async (wallet, chain_id) =>{
+const get_nft_collections= async (missingAddresses) =>{
 
+  for (let address of missingAddresses) {
+    await get_collection_opensea(address);
+  }
 }
+
+const get_collection_moralis = async(address) =>{
+  try {
+    // const url  = `https://api.opensea.io/api/v1/collection/${address}`;
+    const url  = `https://api.opensea.io/api/v1/asset/0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb/1/?include_orders=false`;
+
+    const response = await axios.get(url,{
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
+        'sec-fetch-mode': 'cors',
+        'referrer': 'https://api.opensea.io/',
+        'X-Api-Key':'sss',
+      }
+    });
+    console.log(response.data);
+    
+  } catch(err) {
+    console.log("Error >>", err);
+  }
+}
+
+const get_collection_opensea = async(address) =>{
+  try {
+    // const url  = `https://api.opensea.io/api/v1/collection/${address}`;
+    const url  = `https://api.opensea.io/api/v1/asset/0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb/1/?include_orders=false`;
+
+    const response = await axios.get(url,{
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
+        'sec-fetch-mode': 'cors',
+        'referrer': 'https://api.opensea.io/',
+        'X-Api-Key':'sss',
+      }
+    });
+    console.log(response.data);
+    
+  } catch(err) {
+    console.log("Error >>", err);
+  }
+}
+
+
 
 module.exports = {
   get_moralis_nft,
   getAllNFTTransfers,
   get_nft_fp,
   ifCollectionExists,
+  get_nft_collections,
 };

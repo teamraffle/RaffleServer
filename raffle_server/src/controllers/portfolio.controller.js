@@ -30,8 +30,8 @@ const saveNFTTransactions = catchAsync(async (req, res, next) => {
   const missingAddress = await portfolioService.ifCollectionExists(nftCollectionSet);
   console.log(missingAddress);
 
-  //없는 콜렉션 오픈씨에서 추가
-  
+  //TODO 없는 콜렉션 추가
+  await portfolioService.get_nft_collections(missingAddress);
 });
 
 module.exports = {
