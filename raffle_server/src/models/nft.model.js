@@ -250,10 +250,7 @@ module.exports = {
   nftcreate,
   createTx,
   nft_fp_create,
-<<<<<<< HEAD
-  nft_slug_save
-=======
+  nft_slug_save,
   checkAddress,
->>>>>>> ebe396fcf2862650c5125f308ccabf7486dd71b3
 };
   
