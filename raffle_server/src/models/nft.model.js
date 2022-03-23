@@ -155,15 +155,21 @@ const save_nft_fp= async(data) =>{
 
     const dbRes = await conn.query(sql);
     rows = await conn.query(query, token_address);
-    if(rows[0] == undefined){
-        return false;
-    }else{
-        console.log(rows[0]);
-        return rows[0];//TODO 양식맞추기
-    }
+    // if(rows[0] == undefined){
+    //     return false;
+    // }else{
+    //     console.log(rows[0]);
+    //     return rows[0];//TODO 양식맞추기
+    // }
 
-    console.log(dbRes);//성공 리턴
-    return dbRes;
+      // console.log(row);
+
+      //db에 없으면 어레이에추가
+      if(row[0] == undefined){
+        missingAddress.push(address)
+      }
+    
+
     
   }catch(err) {
     console.log(err);
@@ -230,6 +236,7 @@ module.exports = {
   createTx,
   nft_fp_create,
   nft_slug_save,
-  checkaddress,
+  checkAddress,
+
 };
   
