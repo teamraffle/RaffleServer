@@ -5,35 +5,38 @@ const axios = require('axios');
 const config = require('../config/config');
 
 const get_moralis_nft = async (wallet, chain_id) => {
-  var chain_type;
-  var total;
-  var page;
-  var cursor;
+  let chain_type;
+  let total;
+  let cursor='';
+  const page_size = 500;
 
-  const page_size = 9;
+ 
   if (chain_id == 1) {
     chain_type = 'eth';
   }
   try {
+    console.log(  `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`);
     const response = await axios.get(
-      `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal`,
+      `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`,
       {
         headers: {
           'x-api-key': config.moralis.secret,
         },
       }
     );
-
+    console.log(response.data.result[0]);
     total = response.data.total;
     page = response.data.page;
     cursor = response.data.cursor;
+ 
+    await NFT.nft_db_save(response.data, wallet);
+    var repeat = Math.ceil(total / page_size)-1;
+  
 
-    NFT.nftcreate(response.data, wallet);
-    var repeat = Math.ceil(total / page_size) + 1;
     console.log(repeat);
 
     if(total > page_size){
-    
+        console.log("쳐넘음")
         while(repeat--){
           const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
           const response_rp = await axios.get( url,{
@@ -45,7 +48,7 @@ const get_moralis_nft = async (wallet, chain_id) => {
           cursor = response_rp.data.cursor;
           console.log("page,cursor:",page,cursor);
           console.log(response_rp.data);
-          NFT.nft_db_save(response_rp.data,wallet);
+          await NFT.nft_db_save(response_rp.data,wallet);
          
         }
 
@@ -132,7 +135,7 @@ const get_nft_fp = async (coll_name, chain_id) => {
   try {
     const Response = await axios.get('https://api.opensea.io/api/v1/collection/' + coll_name);
     console.log(Response);
-    NFT.save_nft_fp(Response.data.collection);
+    await NFT.save_nft_fp(Response.data.collection);
   } catch (err) {
     console.log(Error);
   }
@@ -143,16 +146,15 @@ const save_nft_slug = async (wallet, chain_id) => {
   if (chain_id == 1) {
     chain_type = 'eth';
   }
-
-  axios
-    .get(`https://api.opensea.io/api/v1/collections?asset_owner=${wallet}`)
-    .then((Response) => {
+try{
+  const response =axios.get(`https://api.opensea.io/api/v1/collections?asset_owner=${wallet}`);
+  
       // console.log(Response.data);
-      NFT.nft_slug_save(Response.data);
-    })
-    .catch((Error) => {
-      console.log(Error);
-    });
+    await NFT.nft_slug_save(response.data);
+    
+  }catch(err) {
+      console.log(err);
+    };
 };
 
 const get_nft_collections = async (missingAddresses) => {

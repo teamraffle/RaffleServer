@@ -30,11 +30,11 @@ const nft_db_save= async (data,wallet) => {
 
 
     if(idx==0){
-      finalTuple+="("+res+")";
-      finalTuple2+="("+res2+")";
+      finaltuple+="("+res+")";
+      finaltuple2+="("+res2+")";
     }else{
-      finalTuple+=",("+res+")";
-      finalTuple2+="("+res2+")";
+      finaltuple+=",("+res+")";
+      finaltuple2+=",("+res2+")";
     }
   };
 
@@ -110,9 +110,9 @@ const createTx_tuple= (data) =>{
     const verified='\"'+data.result[idx].verified+'\"';
 
 
-    var sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
+    let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
     value, transaction_type, token_address, token_id, from_address, to_address, amount, verified];
-    var res = sqlData.join(',');
+    let res = sqlData.join(',');
 
     if(idx==0){
       finalTuple+="("+res+")";
@@ -127,18 +127,7 @@ const createTx_tuple= (data) =>{
 
   console.log(finalTuple);
 
-
-  console.log(rows[0]);
-        return rows[0];//TODO 양식맞추기
-    }
-
-  }catch(err) {
-    console.log(err);
-    return false;
-  }
-  finally {
-      if (conn) conn.release(); //release to pool
-  }
+  return {finalTuple, collectionSet};
 }
 
 
