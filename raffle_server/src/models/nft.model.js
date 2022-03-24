@@ -120,14 +120,25 @@ const createTx_tuple= (data) =>{
       finalTuple+=",("+res+")";
     }
 
-    collectionSet.add(transaction_hash);
+    collectionSet.add(data.result[idx].token_address.replace('0x',''));
 
     
   };
 
-  // console.log(finalTuple);
+  console.log(finalTuple);
 
-  return finalTuple, collectionSet;
+
+  console.log(rows[0]);
+        return rows[0];//TODO 양식맞추기
+    }
+
+  }catch(err) {
+    console.log(err);
+    return false;
+  }
+  finally {
+      if (conn) conn.release(); //release to pool
+  }
 }
 
 
@@ -155,19 +166,12 @@ const save_nft_fp= async(data) =>{
 
     const dbRes = await conn.query(sql);
     rows = await conn.query(query, token_address);
-    // if(rows[0] == undefined){
-    //     return false;
-    // }else{
-    //     console.log(rows[0]);
-    //     return rows[0];//TODO 양식맞추기
-    // }
-
-      // console.log(row);
-
-      //db에 없으면 어레이에추가
-      if(row[0] == undefined){
-        missingAddress.push(address)
-      }
+    if(rows[0] == undefined){
+        return false;
+    }else{
+        console.log(rows[0]);
+        return rows[0];//TODO 양식맞추기
+    }
     
 
     
@@ -229,12 +233,40 @@ finally {
 }
 }
 
+const checkAddress = async(addressSet) =>{
+  var missingAddress = [];
+  try {
+    conn = await pool.getConnection();
 
+    for (let address of addressSet) {
+      console.log('TEST 1', address);
+
+      const sql = "SELECT token_address FROM tb_nft_collection_eth WHERE token_address= '"+address+"'";
+      row = await conn.query(sql);
+
+      console.log(row);
+
+      //없으면 어레이에추가
+      if(row[0] == undefined){
+        missingAddress.push(address)
+      }
+    }
+
+  }catch(err) {
+    console.log(err);
+    return false;
+  }
+  finally {
+      if (conn) conn.release(); //release to pool
+
+      return missingAddress;
+  }
+}
 
 module.exports = {
   nft_db_save,
   createTx,
-  nft_fp_create,
+  save_nft_fp,
   nft_slug_save,
   checkAddress,
 
