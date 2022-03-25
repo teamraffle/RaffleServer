@@ -4,56 +4,49 @@ const ApiError = require('../utils/ApiError');
 const axios = require('axios');
 const config = require('../config/config');
 
-const get_moralis_nft = async (wallet, chain_id) => {
+const get_nftcoll_opensea = async (wallet, chain_id) => {
   let chain_type;
   let total;
-  let cursor='';
-  const page_size = 500;
+  let offset=0;
+  const page_size = 300;
+  //TODO 페이징 처리 필요 오픈씨 커서 없음 
 
- 
-  if (chain_id == 1) {
-    chain_type = 'eth';
-  }
   try {
-    console.log(  `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`);
+    console.log(`https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`);
     const response = await axios.get(
-      `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`,
-      {
-        headers: {
-          'x-api-key': config.moralis.secret,
-        },
-      }
+      `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`,
+      
     );
-    console.log(response.data.result[0]);
+    // console.log(response.data);
     total = response.data.total;
     page = response.data.page;
-    cursor = response.data.cursor;
+    offset = response.data.cursor;
  
     await NFT.nft_db_save(response.data, wallet);
-    var repeat = Math.ceil(total / page_size)-1;
+    // var repeat = Math.ceil(total / page_size)-1;
   
 
-    console.log(repeat);
+    // console.log(repeat);
 
-    if(total > page_size){
-        console.log("쳐넘음")
-        while(repeat--){
-          const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
-          const response_rp = await axios.get( url,{
-            headers: {
-              'x-api-key': config.moralis.secret
-            }
-          });
-          page = response_rp.data.page;
-          cursor = response_rp.data.cursor;
-          console.log("page,cursor:",page,cursor);
-          console.log(response_rp.data);
-          await NFT.nft_db_save(response_rp.data,wallet);
+    // if(total > page_size){
+    //     console.log("쳐넘음")
+    //     while(repeat--){
+    //       const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
+    //       const response_rp = await axios.get( url,{
+    //         headers: {
+    //           'x-api-key': config.moralis.secret
+    //         }
+    //       });
+    //       page = response_rp.data.page;
+    //       cursor = response_rp.data.cursor;
+    //       console.log("page,cursor:",page,cursor);
+    //       console.log(response_rp.data);
+    //       await NFT.nft_db_save(response_rp.data,wallet);
          
-        }
+    //     }
 
 
-      }
+    //   }
     
   } catch (err) {
     console.log('Error >>', err);
@@ -204,7 +197,7 @@ const get_collection_opensea = async (address) => {
 };
 
 module.exports = {
-  get_moralis_nft,
+  get_nftcoll_opensea,
   get_nft_fp,
   save_nft_slug,
   ifCollectionExists,

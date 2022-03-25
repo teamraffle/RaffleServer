@@ -2,52 +2,57 @@ const uuidv4 = require('uuid');
 const pool = require('./plugins/dbHelper');
 let conn;
 
-const nft_db_save= async (data,wallet) => {
+const nft_coll_db_save= async (data,wallet) => {
 
   var finaltuple="";
   var finaltuple2="";
-  for(idx in data.result){
+
+  for(idx in data){
+    if(data[idx].primary_asset_contracts[0]==undefined) //등록되어있지 않은 컨트랙트일경우 넘어가기
+    {
+      continue;
+    }
     const nft_coll_id = '\"'+uuidv4.v1()+'\"';
-    const token_address = '\"'+data.result[idx].token_address+'\"';
-    const symbol='\"'+data.result[idx].symbol+'\"';
-    const name= '\"'+data.result[idx].name+'\"';
-    const contract_type= '\"'+data.result[idx].contract_type+'\"';
-    const collection_icon='""';
-    const splittedAddr = token_address.replace('0x','');
-    var nft_collection_string = [nft_coll_id, splittedAddr,symbol,name,contract_type,collection_icon];
+    const token_address = '\"'+data[idx].primary_asset_contracts[0].address.replace('0x','')+'\"';
+    const symbol='\"'+data[idx].primary_asset_contracts[0].symbol+'\"';
+    const name= '\"'+data[idx].primary_asset_contracts[0].name+'\"';
+    const contract_type= '\"'+data[idx].primary_asset_contracts[0].schema_name+'\"';
+    const collection_icon='\"'+data[idx].primary_asset_contracts[0].image_url+'\"';
+    const slug = '\"'+data[idx].slug+'\"';
+    
+    var nft_collection_string = [nft_coll_id, token_address,symbol,name,contract_type,collection_icon,slug];
+ 
     var res = nft_collection_string.join(',');
 
-
-    const nft_item_id = '\"'+uuidv4.v1()+'\"';
-    const token_id='\"'+data.result[idx].token_id+'\"';
-    const owner_of= '\"'+wallet.replace('0x','')+'\"';;
-    const metadata= '""';
-    const block_number='\"'+data.result[idx].block_number+'\"';
-    const frozen= '\"'+data.result[idx].frozen+'\"';
-    var nft_string = [nft_item_id,splittedAddr, token_id,owner_of,metadata,frozen,block_number];
-    var res2 = nft_string.join(',');
+    // const nft_item_id = '\"'+uuidv4.v1()+'\"';
+    // const token_id='\"'+data.result[idx].token_id+'\"';
+    // const owner_of= '\"'+wallet.replace('0x','')+'\"';;
+    // const metadata= '""';
+    // const block_number='\"'+data.result[idx].block_number+'\"';
+    // const frozen= '\"'+data.result[idx].frozen+'\"';
+    // var nft_string = [nft_item_id,splittedAddr, token_id,owner_of,metadata,frozen,block_number];
+    // var res2 = nft_string.join(',');
  
-
-
     if(idx==0){
       finaltuple+="("+res+")";
-      finaltuple2+="("+res2+")";
+      // finaltuple2+="("+res2+")";
     }else{
       finaltuple+=",("+res+")";
-      finaltuple2+=",("+res2+")";
+      // finaltuple2+="("+res2+")";
     }
   };
+  console.log(finaltuple);
 
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type,collection_icon) VALUES '+ finaltuple;
+    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type,collection_icon,slug) VALUES '+ finaltuple;
 
-    const sql2 = 'INSERT IGNORE INTO tb_nft_eth (nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number) VALUES '+ finaltuple2;
+    // const sql2 = 'INSERT IGNORE INTO tb_nft_eth (nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number) VALUES '+ finaltuple2;
 
 
     const dbRes = await conn.query(sql);
-    const dbRes2 = await conn.query(sql2);
+    // const dbRes2 = await conn.query(sql2);
 
     console.log(dbRes);//성공 리턴
     return dbRes;
@@ -253,7 +258,7 @@ const checkAddress = async(addressSet) =>{
 }
 
 module.exports = {
-  nft_db_save,
+  nft_coll_db_save,
   createTx,
   save_nft_fp,
   nft_slug_save,
