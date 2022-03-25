@@ -17,12 +17,14 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
       `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`,
       
     );
-    console.log(response);
+    
     total = response.data.total;
     page = response.data.page;
     offset = response.data.cursor;
  
-    await NFT.nft_coll_db_save(response.data, wallet);
+    const data= await NFT.nft_coll_db_save(response.data, wallet);
+
+    return data;
     // var repeat = Math.ceil(total / page_size)-1;
   
 

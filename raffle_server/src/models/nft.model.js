@@ -3,7 +3,7 @@ const pool = require('./plugins/dbHelper');
 let conn;
 
 const nft_coll_db_save= async (data,wallet) => {
-
+  var collectionSet = new Set();
   let finaltuple="";
 
   for(idx in data){
@@ -13,6 +13,7 @@ const nft_coll_db_save= async (data,wallet) => {
     }
     const nft_coll_id = '\"'+uuidv4.v1()+'\"';
     const token_address = '\"'+data[idx].primary_asset_contracts[0].address.replace('0x','')+'\"';
+    const return_token_address = data[idx].primary_asset_contracts[0].address.replace('0x','');
     const symbol='\"'+data[idx].primary_asset_contracts[0].symbol+'\"';
     const name= '\"'+data[idx].primary_asset_contracts[0].name+'\"';
     const contract_type= '\"'+data[idx].primary_asset_contracts[0].schema_name+'\"';
@@ -30,8 +31,10 @@ const nft_coll_db_save= async (data,wallet) => {
       finaltuple+=",("+res+")";
 
     }
+
+    collectionSet.add(return_token_address);
   };
-  console.log(finaltuple);
+  
 
   try {
     conn = await pool.getConnection();
@@ -50,6 +53,8 @@ const nft_coll_db_save= async (data,wallet) => {
   }
   finally {
       if (conn) conn.release(); //release to pool
+
+      return collectionSet;
   }
 }
 
