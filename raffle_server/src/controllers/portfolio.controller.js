@@ -23,11 +23,6 @@ const opensea_fp = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(nftData);
 });
 
-const slugsave = catchAsync(async (req, res) => {
-  const nftData = await portfolioService.save_nft_slug("0x8b804fbd998f612c2b98fb81b06d993008d1bf09",1);
-  res.status(httpStatus.CREATED).send(nftData);
-});
-
 
 
 const saveNFTTransactions = catchAsync(async (req, res, next) => {
@@ -55,5 +50,5 @@ module.exports = {
   moralis_nft,
   saveNFTTransactions,
   opensea_fp,
-  slugsave
+ 
 };

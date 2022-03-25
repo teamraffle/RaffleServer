@@ -17,7 +17,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
       `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`,
       
     );
-    // console.log(response.data);
+    console.log(response);
     total = response.data.total;
     page = response.data.page;
     offset = response.data.cursor;
@@ -191,22 +191,7 @@ const get_nft_fp = async (coll_name, chain_id) => {
     console.log(Error);
   }
 };
-const save_nft_slug = async (wallet, chain_id) => {
-  var chain_type;
 
-  if (chain_id == 1) {
-    chain_type = 'eth';
-  }
-try{
-  const response =axios.get(`https://api.opensea.io/api/v1/collections?asset_owner=${wallet}`);
-  
-      // console.log(Response.data);
-    await NFT.nft_slug_save(response.data);
-    
-  }catch(err) {
-      console.log(err);
-    };
-};
 
 const get_nft_collections = async (missingAddresses) => {
   for (let address of missingAddresses) {
@@ -258,7 +243,6 @@ module.exports = {
   get_nftcoll_opensea,
   get_nft_moralis,
   get_nft_fp,
-  save_nft_slug,
   ifCollectionExists,
   get_nft_collections,
   getAllNFTTransfers,

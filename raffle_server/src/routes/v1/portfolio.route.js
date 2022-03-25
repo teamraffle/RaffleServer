@@ -22,10 +22,6 @@ router
   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.opensea_fp)
 
   router
-  .route('/save_nft_slug')
-  .get(validate(portfolioValidation.getUserbyWallet), portfolioController.slugsave)
-
-  router
   .route('/test')
   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.saveNFTTransactions)
 
