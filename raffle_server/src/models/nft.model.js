@@ -53,6 +53,27 @@ const nft_coll_db_save= async (data,wallet) => {
   }
 }
 
+const nft_coll_one_db_save= async (collection_) => {
+
+  try {
+    conn = await pool.getConnection();
+
+    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type) VALUES (?,?,?,?,?);';
+    var values = [uuidv4.v1(), collection_.token_address, collection_.symbol, collection_.name, collection_.contract_type ];
+    const dbRes = await conn.query(sql, values);
+
+    console.log(dbRes);//성공 리턴
+    return dbRes;
+
+  }catch(err) {
+    console.log(err);
+    return false;
+  }
+  finally {
+      if (conn) conn.release(); //release to pool
+  }
+}
+
 const nft_db_save= async (data,wallet) => {
 
   let finaltuple="";
@@ -99,10 +120,7 @@ const nft_db_save= async (data,wallet) => {
 }
 
 const createTx= async(data) => {
-
-  var finaltuple; 
-  var collectionSet; 
-  finaltuple, collectionSet = createTx_tuple(data);
+  var {finaltuple, collectionSet} = createTx_tuple(data);
   try {
     conn = await pool.getConnection();
 
@@ -111,15 +129,14 @@ const createTx= async(data) => {
     console.log(sql);
     const dbRes = await conn.query(sql);
     
-    console.log(dbRes);//성공 리턴
-    return true;
+    console.log(dbRes);//성공 
     
   }catch(err) {
     console.log(err);
-    return collectionSet;
   }
   finally {
-      if (conn) conn.release(); //release to pool
+    if (conn) conn.release(); //release to pool
+    return collectionSet;
   }
   
 
@@ -161,8 +178,8 @@ const createTx_tuple= (data) =>{
 
     
   };
-
-  console.log(finalTuple);
+  // console.log(collectionSet);
+  // console.log(finalTuple);
 
   return {finalTuple, collectionSet};
 }
@@ -216,7 +233,6 @@ const checkAddress = async(addressSet) =>{
   var missingAddress = [];
   try {
     conn = await pool.getConnection();
-
     for (let address of addressSet) {
       console.log('TEST 1', address);
 
@@ -248,6 +264,6 @@ module.exports = {
   createTx,
   save_nft_fp,
   checkAddress,
-
+  nft_coll_one_db_save,
 };
   

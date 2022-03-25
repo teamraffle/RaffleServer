@@ -120,8 +120,12 @@ const getAllNFTTransfers = async (wallet, chain_id) => {
   //0페이지
   var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size);
   finalSet = collectionSet;
-  console.log(finalSet);
-  console.log(cursor);
+  // console.log(finalSet);
+  // console.log(cursor);
+ 
+
+  console.log(collectionSet);
+
 
   //1~끝페이지
   if (total > page_size) {
@@ -195,25 +199,31 @@ const get_nft_fp = async (coll_name, chain_id) => {
 
 const get_nft_collections = async (missingAddresses) => {
   for (let address of missingAddresses) {
-    await get_collection_opensea(address);
+    address = '0x'+address;
+    let collection = await get_collection_moralis(address);
+    await NFT.nft_coll_one_db_save(collection);
   }
 };
 
 const get_collection_moralis = async (address) => {
   try {
-    // const url  = `https://api.opensea.io/api/v1/collection/${address}`;
-    const url = `https://api.opensea.io/api/v1/asset/0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb/1/?include_orders=false`;
-
+    const url = `https://deep-index.moralis.io/api/v2/nft/${address}?chain=eth&format=decimal&limit=1`;
     const response = await axios.get(url, {
       headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
-        'sec-fetch-mode': 'cors',
-        referrer: 'https://api.opensea.io/',
-        'X-Api-Key': 'sss',
+        'x-api-key': config.moralis.secret,
       },
     });
-    console.log(response.data);
+
+    // console.log(response.data.result[0]);
+
+    var collection = {
+      token_address : response.data.result[0].token_address.replace('0x',''),
+      symbol : response.data.result[0].symbol,
+      name: response.data.result[0].name,
+      contract_type : response.data.result[0].contract_type,
+    };
+    return collection;
+
   } catch (err) {
     console.log('Error >>', err);
   }
