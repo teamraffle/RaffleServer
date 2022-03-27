@@ -11,6 +11,7 @@ const nft_coll_db_save= async (data,wallet) => {
     {
       continue;
     }
+    
     const nft_coll_id = '\"'+uuidv4.v1()+'\"';
     const token_address = '\"'+data[idx].primary_asset_contracts[0].address.replace('0x','')+'\"';
     const return_token_address = data[idx].primary_asset_contracts[0].address.replace('0x','');
@@ -24,22 +25,17 @@ const nft_coll_db_save= async (data,wallet) => {
  
     let res = nft_collection_string.join(',');
 
-    if(idx==0){
-      finaltuple+="("+res+")";
- 
-    }else{
-      finaltuple+=",("+res+")";
-
-    }
-
+    finaltuple+=",("+res+")";
     collectionSet.add(return_token_address);
   };
+  if(finaltuple=="") //아예 빈값일 수 있음 그럴때 return하기
+  return 0;
   
-
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type,collection_icon,slug) VALUES '+ finaltuple;
+    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type,collection_icon,slug) VALUES '+ finaltuple.slice(1);
+    // 첫번째 값의 토큰 어드레스 값을 읽을 수 없을때, continue 되기 때문에 idx=0일떄 (+res+) 구조 형성이 안먹혀서 임시방편으로 사용
 
     const dbRes = await conn.query(sql);
 

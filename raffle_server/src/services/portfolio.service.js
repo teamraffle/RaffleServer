@@ -10,7 +10,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
   let offset=0;
   const page_size = 2;
   //TODO 페이징 처리 필요 오픈씨 커서 없음 
-  var collectionSet = new Set();
+  let collectionSet = new Set();
   try {
     const response = await axios.get(
       `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=300`,
@@ -23,7 +23,8 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
     );
 
     const data= await NFT.nft_coll_db_save(response2.data, wallet);
-    collectionSet.add(data);
+    console.log(response);
+    collectionSet = new Set([...collectionSet, ...data]);
     var repeat = Math.ceil(total / page_size)-1;
     offset = page_size;
 
@@ -37,14 +38,21 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           const response_rp = await axios.get(url);
         
           offset = offset+page_size;
-          const data2 = await NFT.nft_coll_db_save(response_rp.data, wallet);
-          collectionSet.add(data2);
+    
+          var dataSet = await NFT.nft_coll_db_save(response_rp.data, wallet);
+          if(dataSet !=0) //비어있지 않다면 추가
+          {
+            collectionSet = new Set([...collectionSet, ...dataSet]);
+          }
+      
          
         }
 
 
       }
-      return collectionSet;
+
+      const union = new Set([...collectionSet]);
+      return union;
     
   } catch (err) {
     console.log('Error >>', err);
