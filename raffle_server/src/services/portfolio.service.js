@@ -12,45 +12,34 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
   //TODO 페이징 처리 필요 오픈씨 커서 없음 
   let collectionSet = new Set();
   try {
+
     const response = await axios.get(
-      `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=300`,
-      
-    ); // 첨엔 일단 최대치로 가져옴 (data 총갯수 알아아얌 얘네 total제공안해줌.)
-    total = response.data.length;
-    const response2 = await axios.get(
       `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`,
       
     );
 
-    const data= await NFT.nft_coll_db_save(response2.data, wallet);
-    console.log(response);
+    const data= await NFT.nft_coll_db_save(response.data, wallet);
     collectionSet = new Set([...collectionSet, ...data]);
-    var repeat = Math.ceil(total / page_size)-1;
     offset = page_size;
 
-    console.log(repeat); //몇번 반복해야하는지
-
-    if(total > page_size){
-
-        while(repeat--){
-       
+        while(true){
+            
           const url  = `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`;
+
           const response_rp = await axios.get(url);
-        
-          offset = offset+page_size;
-    
+          if(Object.keys(response_rp.data).length==0) //빈값이 응답한다면 반복 끝내기
+          {
+           break;
+          }
+          console.log(Object.keys(response_rp.data).length)
           var dataSet = await NFT.nft_coll_db_save(response_rp.data, wallet);
           if(dataSet !=0) //비어있지 않다면 추가
           {
             collectionSet = new Set([...collectionSet, ...dataSet]);
           }
-      
-         
+          offset = offset+page_size; 
         }
-
-
-      }
-
+      
       const union = new Set([...collectionSet]);
       return union;
     
