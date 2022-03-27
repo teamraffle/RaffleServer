@@ -8,47 +8,43 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
   let chain_type;
   let total;
   let offset=0;
-  const page_size = 300;
+  const page_size = 2;
   //TODO 페이징 처리 필요 오픈씨 커서 없음 
-
+  var collectionSet = new Set();
   try {
-    console.log(`https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`);
     const response = await axios.get(
+      `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=300`,
+      
+    ); // 첨엔 일단 최대치로 가져옴 (data 총갯수 알아아얌 얘네 total제공안해줌.)
+    total = response.data.length;
+    const response2 = await axios.get(
       `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`,
       
     );
-    
-    total = response.data.total;
-    page = response.data.page;
-    offset = response.data.cursor;
- 
-    const data= await NFT.nft_coll_db_save(response.data, wallet);
 
-    return data;
-    // var repeat = Math.ceil(total / page_size)-1;
-  
+    const data= await NFT.nft_coll_db_save(response2.data, wallet);
+    collectionSet.add(data);
+    var repeat = Math.ceil(total / page_size)-1;
+    offset = page_size;
 
-    // console.log(repeat);
+    console.log(repeat); //몇번 반복해야하는지
 
-    // if(total > page_size){
-    //     console.log("쳐넘음")
-    //     while(repeat--){
-    //       const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
-    //       const response_rp = await axios.get( url,{
-    //         headers: {
-    //           'x-api-key': config.moralis.secret
-    //         }
-    //       });
-    //       page = response_rp.data.page;
-    //       cursor = response_rp.data.cursor;
-    //       console.log("page,cursor:",page,cursor);
-    //       console.log(response_rp.data);
-    //       await NFT.nft_db_save(response_rp.data,wallet);
+    if(total > page_size){
+
+        while(repeat--){
+       
+          const url  = `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`;
+          const response_rp = await axios.get(url);
+        
+          offset = offset+page_size;
+          const data2 = await NFT.nft_coll_db_save(response_rp.data, wallet);
+          collectionSet.add(data2);
          
-    //     }
+        }
 
 
-    //   }
+      }
+      return collectionSet;
     
   } catch (err) {
     console.log('Error >>', err);

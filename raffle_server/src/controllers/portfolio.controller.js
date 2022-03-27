@@ -7,7 +7,7 @@ const { portfolioService } = require('../services');
 const opensea_nftcoll = catchAsync(async (req, res) => {
 
   const nftData = await portfolioService.get_nftcoll_opensea("0xb8303eb54c8054c7d7a5567ff74d26b01a0f44e5",1); //콜렉션 리턴
-  console.log(nftData);
+  console.log(nftData); 
   res.status(httpStatus.CREATED).send(nftData);
 });
 
