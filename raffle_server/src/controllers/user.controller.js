@@ -4,37 +4,37 @@ const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { userService, nftService } = require('../services');
 
-const createUser = catchAsync(async (req, res) => {
-  const userId = await userService.createUser(req.body);
+const create_user = catchAsync(async (req, res) => {
+  const userId = await userService.create_user(req.body);
   res.status(httpStatus.CREATED).send(userId);
 
-  await getAndSaveFirstData(req.body);
+  await get_and_save_first_data(req.body);
 });
 
-const getUserbyWallet = catchAsync(async (req, res) => {
-  const userAndWallet = await userService.getUserbyWallet(req.query);
+const get_user_by_wallet = catchAsync(async (req, res) => {
+  const userAndWallet = await userService.get_user_by_wallet(req.query);
   res.status(httpStatus.OK).send(userAndWallet);
 });
 
-const getUserbyId = catchAsync(async (req, res) => {
-  const userAndWallet = await userService.getUserbyId(req.params);
+const get_user_by_id = catchAsync(async (req, res) => {
+  const userAndWallet = await userService.get_user_by_id(req.params);
   res.status(httpStatus.OK).send(userAndWallet);
 
 });
 
-const updateUser = catchAsync(async (req, res) => {
-  const user = await userService.updateUserById(req.params, req.body);
+const update_user = catchAsync(async (req, res) => {
+  const user = await userService.update_user_by_id(req.params, req.body);
   res.status(httpStatus.OK).send(user);
 
 });
 
-const checkNicknameDuplication = catchAsync(async (req, res) => {
-  const ifTaken = await userService.checkNickname(req.query);
+const check_nickname_duplication = catchAsync(async (req, res) => {
+  const ifTaken = await userService.check_nickname(req.query);
   res.status(httpStatus.OK).send(ifTaken);
 });
 
 
-const getAndSaveFirstData = async (address) => {
+const get_and_save_first_data = async (address) => {
   try {
     
     // 지갑주소의 NFT 콜렉션 db에 저장
@@ -53,9 +53,9 @@ const getAndSaveFirstData = async (address) => {
 
 
 module.exports = {
-  createUser,
-  getUserbyWallet,
-  getUserbyId,
-  updateUser,
-  checkNicknameDuplication,
+  create_user,
+  get_user_by_wallet,
+  get_user_by_id,
+  update_user,
+  check_nickname_duplication,
 };

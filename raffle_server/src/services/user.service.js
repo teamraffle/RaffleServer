@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const { User, WalletEth } = require('../models');
 const ApiError = require('../utils/ApiError');
 
-const createUser = async (body) => {
+const create_user = async (body) => {
  
   const walletId = await WalletEth.create(body);
   if(!walletId){//지갑이 만들어지지 않았다면
@@ -24,7 +24,7 @@ const createUser = async (body) => {
  
 };
 
-const getUserbyWallet = async (query) => {
+const get_user_by_wallet = async (query) => {
   const userAndWallet = await User.isNicknameTaken(query);
   if(!userAndWallet){
     throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
@@ -33,7 +33,7 @@ const getUserbyWallet = async (query) => {
   }
 }
 
-const checkNickname = async (query) => {
+const check_nickname = async (query) => {
   const ifTaken = await User.isNicknameTaken({nickname: query.check_value});
   if(ifTaken){
     throw new ApiError(httpStatus.CONFLICT, 'Nickname already taken');
@@ -41,7 +41,7 @@ const checkNickname = async (query) => {
   return JSON.stringify({result: true});
 }
 
-const getUserbyId = async (params) => {
+const get_user_by_id = async (params) => {
   //TODO 닉넴중복여부확인
 
   const userAndWallet = await User.searchById(params);
@@ -52,11 +52,11 @@ const getUserbyId = async (params) => {
   }
 }
 
-const updateUserById = async (params,body) => {
+const update_user_by_id = async (params,body) => {
   
-  const nicknamecheck = await User.isNicknameTaken(body);
-  console.log(nicknamecheck);
-  if(nicknamecheck){
+  const nicknameCheck = await User.isNicknameTaken(body);
+  console.log(nicknameCheck);
+  if(nicknameCheck){
   throw new ApiError(httpStatus.CONFLICT, 'Nickname already taken');
   }
   const userAndWallet = await User.updatepatchUserById(params,body);
@@ -67,10 +67,10 @@ const updateUserById = async (params,body) => {
   }
 }
 module.exports = {
-  createUser,
-  getUserbyWallet,
-  getUserbyId,
-  updateUserById,
-  checkNickname,
+  create_user,
+  get_user_by_wallet,
+  get_user_by_id,
+  update_user_by_id,
+  check_nickname,
   // deleteUserById,
 };
