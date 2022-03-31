@@ -21,9 +21,9 @@ const router = express.Router();
 //   .route('/fp')
 //   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.opensea_fp)
 
-//   router
-//   .route('/test')
-//   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.saveNFTTransactions)
+  router
+  .route('/test')
+  .get(validate(portfolioValidation.getUserbyWallet), portfolioController.saveNFTTransactions)
 
 
 module.exports = router;

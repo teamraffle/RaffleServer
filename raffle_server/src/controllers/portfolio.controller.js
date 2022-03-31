@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { portfolioService } = require('../services');
+const { nftService } = require('../services');
 
 // //모랄리스 nft되나 테스트
 // const opensea_nftcoll = catchAsync(async (req, res) => {
@@ -25,30 +25,21 @@ const { portfolioService } = require('../services');
 
 
 
-// const saveNFTTransactions = catchAsync(async (req, res, next) => {
+const saveNFTTransactions = catchAsync(async (req, res, next) => {
   
 
-//   res.status(httpStatus.CREATED).send('res');
+  res.status(httpStatus.CREATED).send('res');
 
-//   const nftCollectionSet = await portfolioService.get_all_NFT_transfers("0xA96e16Cdc8c47e1E1E754af62a36D0d4ac7B7c67",1);//예원지갑인듯
-//   // const nftCollectionSet = await portfolioService.getAllNFTTransfers("0xb8d6faf9f6b67a8c609d11e5099e0732e12cdc15",1);//고래지갑
-//   // 고래지갑2 : 0x8b804fbd998f612c2b98fb81b06d993008d1bf09
-//     // console.log(nftCollectionSet);
+  const nftCollectionSet = await nftService.get_all_NFT_transfers("0xA96e16Cdc8c47e1E1E754af62a36D0d4ac7B7c67",1);//예원지갑인듯
+  // const nftCollectionSet = await portfolioService.getAllNFTTransfers("0xb8d6faf9f6b67a8c609d11e5099e0732e12cdc15",1);//고래지갑
+  // 고래지갑2 : 0x8b804fbd998f612c2b98fb81b06d993008d1bf09
+    // console.log(nftCollectionSet);
 
-//   //TODO 트랜스퍼 set 목록에서 이미 저장한 set목록 빼기
-//           // https://www.tutorialspoint.com/Subtract-two-Sets-in-Javascript
-//   //우리 DB에서 해당 주소 콜렉션 있나 확인
-//   const missingAddress = await portfolioService.check_collection_exists(nftCollectionSet);
-//   console.log(missingAddress);
-
- 
-//   //TODO 없는 콜렉션 추가
-//   await portfolioService.get_nftcoll_moralis,(missingAddress);
-// });
+});
 
 module.exports = {
-  opensea_nftcoll,
-  moralis_nft,
+  // opensea_nftcoll,
+  // moralis_nft,
   saveNFTTransactions,
-  opensea_fp,
+  // opensea_fp,
 };
