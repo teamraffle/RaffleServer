@@ -121,11 +121,12 @@ const nft_db_save= async (data,wallet) => {
 }
 
 const createTx= async(data) => {
-  var {finaltuple, collectionSet} = createTx_tuple(data);
+  let {finalTuple, collectionSet} = createTx_tuple(data);
+ 
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified) VALUES '+ finaltuple;
+    const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified) VALUES '+ finalTuple;
 
     console.log(sql);
     const dbRes = await conn.query(sql);
@@ -144,8 +145,8 @@ const createTx= async(data) => {
 }
 
 const createTx_tuple= (data) =>{
-  var finalTuple="";
-  var collectionSet = new Set();
+  var _finalTuple="";
+  var _collectionSet = new Set();
 
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
@@ -170,19 +171,21 @@ const createTx_tuple= (data) =>{
     let res = sqlData.join(',');
 
     if(idx==0){
-      finalTuple+="("+res+")";
+      _finalTuple+="("+res+")";
     }else{
-      finalTuple+=",("+res+")";
+      _finalTuple+=",("+res+")";
     }
 
-    collectionSet.add(data.result[idx].token_address.replace('0x',''));
+    _collectionSet.add(data.result[idx].token_address.replace('0x',''));
 
     
   };
-  // console.log(collectionSet);
-  // console.log(finalTuple);
 
-  return {finalTuple, collectionSet};
+  
+  // console.log(_collectionSet);
+  // console.log(_finalTuple);
+
+  return {finalTuple : _finalTuple, collectionSet : _collectionSet};
 }
 
 

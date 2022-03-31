@@ -69,7 +69,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
       }
       
     );
-    console.log(response.data);
+    // console.log(response.data);
     total = response.data.total;
     page = response.data.page;
     offset = response.data.cursor;
@@ -78,10 +78,10 @@ const get_nft_moralis = async (wallet, chain_id) => {
     var repeat = Math.ceil(total / page_size)-1;
   
 
-    console.log(repeat);
+    // console.log(repeat);
 
     if(total > page_size){
-        console.log("쳐넘음")
+        // console.log("쳐넘음")
         while(repeat--){
           const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
           const response_rp = await axios.get( url,{
@@ -149,7 +149,11 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
 
   if (chain_id == 1) {
     chain_type = 'eth';
+    if (wallet.length ==40){
+      wallet = '0x'+wallet
+    }
   }
+
   try {
     const url = `https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal&direction=both&limit=${page_size}&cursor=${cursor}`;
     const response = await axios.get(url, {
@@ -244,6 +248,17 @@ const get_collection_opensea = async (address) => {
   }
 };
 
+function remove_SetA_from_SetB (a, b) {
+  if (!a instanceof Set || !b instanceof Set) {
+     console.log("The given objects are not of type Set");
+     return null;
+  }
+  let newSet = new Set();
+  b.forEach(elem => newSet.add(elem));
+  a.forEach(elem => newSet.delete(elem));
+  return newSet;
+}
+
 module.exports = {
   get_nftcoll_opensea,
   get_nftcoll_moralis,
@@ -251,4 +266,5 @@ module.exports = {
   get_nft_fp,
   check_collection_exists,
   get_all_NFT_transfers,
+  remove_SetA_from_SetB,
 };
