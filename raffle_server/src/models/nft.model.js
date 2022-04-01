@@ -143,7 +143,15 @@ const createTx= async(data) => {
   
 
 }
+const classify_action= (value,from_address,to_address) => {
+  let action; //(0~5가지수)
+  
+  //여기다가 조건문 6개 하면 되지않을지
 
+
+  
+  return action;
+}
 const createTx_tuple= (data) =>{
   var _finalTuple="";
   var _collectionSet = new Set();
@@ -165,9 +173,10 @@ const createTx_tuple= (data) =>{
     const amount='\"'+data.result[idx].amount+'\"';
     const verified='\"'+data.result[idx].verified+'\"';
 
+    const action ='\"'+ classify_action(value,from_address,to_address)+'\"';
 
     let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
-    value, transaction_type, token_address, token_id, from_address, to_address, amount, verified];
+    value, transaction_type, token_address, token_id, from_address, to_address, amount, verified,action];
     let res = sqlData.join(',');
 
     if(idx==0){
