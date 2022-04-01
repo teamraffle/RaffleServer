@@ -144,10 +144,29 @@ const createTx= async(data,wallet) => {
 
 }
 const classify_action= (value,from_address,to_address,wallet) => {
-  let action; //(0~5가지수)
+  let action; //(0~5가지수) 0 buy 1mint 2sell 3burn 4send 5receive
+
   
   //여기다가 조건문 6개 하면 되지않을지
 
+  if(wallet==to_address && value!=0 ){ //buy
+    action=0;
+  }
+  if(from_address=="0x0000000000000000000000000000000000000000" ){ //mint
+    action=1;
+  }
+  if(wallet==from_address && value!=0){ //sold
+    action=2;
+  }
+  if(to_address=="0x0000000000000000000000000000000000000000"){ //burn
+    action=3;
+  }
+  if(wallet==from_address && value==0 ){ //send
+    action=4;
+  }
+  if(wallet==to_address && value==0  ){ //receive
+    action=5;
+  }
 
   
   return action;
