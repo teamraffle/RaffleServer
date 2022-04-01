@@ -165,7 +165,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
     total = response.data.total;
     cursor = response.data.cursor;
     //DB에 저장
-    const collectionSet = await NFT.createTx(response.data);
+    const collectionSet = await NFT.createTx(response.data,wallet);
     return { collectionSet, total, cursor };
   } catch (err) {
     console.log('Error >>', err);

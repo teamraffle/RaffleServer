@@ -120,9 +120,9 @@ const nft_db_save= async (data,wallet) => {
   }
 }
 
-const createTx= async(data) => {
-  let {finalTuple, collectionSet} = createTx_tuple(data);
- 
+const createTx= async(data,wallet) => {
+  let {finalTuple, collectionSet} = createTx_tuple(data,wallet);
+  console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
 
@@ -143,7 +143,7 @@ const createTx= async(data) => {
   
 
 }
-const classify_action= (value,from_address,to_address) => {
+const classify_action= (value,from_address,to_address,wallet) => {
   let action; //(0~5가지수)
   
   //여기다가 조건문 6개 하면 되지않을지
@@ -152,7 +152,7 @@ const classify_action= (value,from_address,to_address) => {
   
   return action;
 }
-const createTx_tuple= (data) =>{
+const createTx_tuple= (data,wallet) =>{
   var _finalTuple="";
   var _collectionSet = new Set();
 
@@ -173,7 +173,9 @@ const createTx_tuple= (data) =>{
     const amount='\"'+data.result[idx].amount+'\"';
     const verified='\"'+data.result[idx].verified+'\"';
 
-    const action ='\"'+ classify_action(value,from_address,to_address)+'\"';
+
+    const action ='\"'+ classify_action(data.result[idx].value,data.result[idx].from_address,data.result[idx].to_address,wallet)+'\"';
+    //여기서는 " "넣어서 보내면 불편하니 그냥 보내기 그리고 0x변환도 안해야 비교하니 빠르니 그냥 보내기
 
     let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
     value, transaction_type, token_address, token_id, from_address, to_address, amount, verified,action];
