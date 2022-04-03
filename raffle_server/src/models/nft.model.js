@@ -126,7 +126,7 @@ const createTx= async(data,wallet) => {
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified) VALUES '+ finalTuple;
+    const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
 
     console.log(sql);
     const dbRes = await conn.query(sql);
@@ -144,13 +144,35 @@ const createTx= async(data,wallet) => {
 
 }
 const classify_action= (value,from_address,to_address,wallet) => {
-  let action; //(0~5가지수)
-  
+  let action; //(0~5가지수) 0 buy 1mint 2sell 3burn 4send 5receive
+
+  let wallet2 = wallet.toLowerCase(); //찍어보니 모랄리스는 다 소문자화 되어있어서 변환해야함.
   //여기다가 조건문 6개 하면 되지않을지
+  if(wallet2==to_address && value!="0" ){ //buy
+    action=0;
+    return action;
+  }
+  if(from_address=="0x0000000000000000000000000000000000000000" ){ //mint
+    action=1;
+    return action;
+  }
+  if(wallet2==from_address && value!="0" ){ //sold
+    action=2;
+    return action;
+  }
+  if(to_address=="0x0000000000000000000000000000000000000000"){ //burn
+    action=3;
+    return action;
+  }
+  if(wallet2==from_address && value=="0" ){ //send
+    action=4;
+    return action;
+  }
+  if(wallet2==to_address && value=="0"  ){ //receive
+    action=5;
+    return action;
+  }
 
-
-  
-  return action;
 }
 const createTx_tuple= (data,wallet) =>{
   var _finalTuple="";
@@ -174,7 +196,7 @@ const createTx_tuple= (data,wallet) =>{
     const verified='\"'+data.result[idx].verified+'\"';
 
 
-    const action ='\"'+ classify_action(data.result[idx].value,data.result[idx].from_address,data.result[idx].to_address,wallet)+'\"';
+    const action ='\"'+  classify_action(data.result[idx].value,data.result[idx].from_address,data.result[idx].to_address,wallet)+'\"';
     //여기서는 " "넣어서 보내면 불편하니 그냥 보내기 그리고 0x변환도 안해야 비교하니 빠르니 그냥 보내기
 
     let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
