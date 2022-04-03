@@ -23,7 +23,15 @@ const ethWallet = (value, helpers) => {
   return value;
 };
 
+const ethWalletOrUUID = (value, helpers) => {
+  if (value.length != 36 || value.length != 42) {
+    return helpers.message('Invalid ID nor invalid hex number at address');
+  }
+  return value;
+};
+
 module.exports = {
   ethWallet,
   UUID,
+  ethWalletOrUUID,
 };

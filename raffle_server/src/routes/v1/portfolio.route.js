@@ -8,22 +8,11 @@ const portfolioController = require('../../controllers/portfolio.controller');
 
 const router = express.Router();
 
-// router
-//   .route('/nft_coll')
-//   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.opensea_nftcoll)
-  
-//   router
-//   .route('/nft')
-//   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.moralis_nft)
+router
+  .route('/:user_id_or_address')
+  .get(validate(portfolioValidation.getPortfolio), portfolioController.get_portfolio)
 
 
-// router
-//   .route('/fp')
-//   .get(validate(portfolioValidation.getUserbyWallet), portfolioController.opensea_fp)
-
-  router
-  .route('/test')
-  .get(validate(portfolioValidation.getUserbyWallet), portfolioController.saveNFTTransactions)
 
 
 module.exports = router;
