@@ -4,7 +4,10 @@ info:
   version: '1.0'
   description: ''
 servers:
-  - url: 'https://nftranks.xyz:3033'
+  - url: 'http://localhost:3033'
+    description: local
+  - description: server
+    url: 'https://nftranks.xyz:3033'
 paths:
   '/users/{user_id}':
     parameters:
@@ -40,7 +43,6 @@ paths:
           $ref: '#/components/responses/404'
       operationId: get-users-user_id
       description: Retrieve the information of the user with the matching user ID.
-      parameters: []
       tags:
         - Users
     patch:
@@ -82,11 +84,9 @@ paths:
                 nickname:
                   type: string
         description: Patch user properties to update.
-      parameters: []
       tags:
         - Users
   /users:
-    parameters: []
     get:
       summary: Get User Info by wallet Address
       responses:
@@ -142,7 +142,6 @@ paths:
         '404':
           $ref: '#/components/responses/404'
       description: 새로 유저 만듬(신규가입)
-      parameters: []
       tags:
         - Users
       requestBody:
@@ -182,7 +181,6 @@ paths:
           application/xml:
             schema:
               type: object
-              properties: {}
         description: ''
   /register/nickname:
     get:
@@ -211,6 +209,8 @@ paths:
           $ref: '#/components/responses/400'
         '404':
           $ref: '#/components/responses/404'
+        '409':
+          description: Conflict 이미 닉네임있음
       operationId: get-users-nickname
       parameters:
         - schema:
@@ -225,7 +225,6 @@ paths:
       description: ''
       tags:
         - Register
-    parameters: []
   '/rankings/{standard}':
     parameters:
       - schema:
@@ -269,7 +268,7 @@ paths:
           description: Should be hex number
       tags:
         - Rankings
-  '/portfolios/{user_id_or_address}':
+  '/portfolios/basic/{user_id_or_address}':
     parameters:
       - schema:
           type: string
@@ -286,9 +285,83 @@ paths:
               schema:
                 description: ''
                 type: object
+                x-examples:
+                  example-1:
+                    updated_at: string
+                    user:
+                      nickname: string
+                      user_id: string
+                      badge: 0
+                    portfolio:
+                      nft_count: 0
+                      collection_count: 0
+                      ave_holding_period: 0
+                      most_collection: 0
+                      most_collection_icon: 0
+                      'est_market_value ': 0
+                      est_market_value _7d: 0
+                      holding_value: 0
+                      earning_rate: 0
+                      earning_rate_7d: 0
+                      gas_fee: 0
+                      buy_volume: 0
+                      buy_volume_7d: 0
+                      sell_volume: 0
+                      related_addr_count: 0
+                      related_addr_dia_count: 0
+                      activity_count: 0
+                      activity_count_7d: 0
                 properties:
+                  updated_at:
+                    type: string
+                    minLength: 1
+                  user:
+                    type: object
+                    required:
+                      - nickname
+                      - user_id
+                      - badge
+                    properties:
+                      nickname:
+                        type: string
+                        minLength: 1
+                      user_id:
+                        type: string
+                        minLength: 1
+                      badge:
+                        type: number
                   portfolio:
                     $ref: '#/components/schemas/Portfolio'
+                required:
+                  - updated_at
+                  - user
+              examples:
+                example-1:
+                  value:
+                    updated_at: string
+                    user:
+                      nickname: string
+                      user_id: string
+                      badge: 0
+                    portfolio:
+                      nft_count: 0
+                      collection_count: 0
+                      ave_holding_period: 0
+                      most_collection: 0
+                      most_collection_icon: 0
+                      'est_market_value ': 0
+                      est_market_value _7d: 0
+                      holding_value: 0
+                      earning_rate: 0
+                      earning_rate_7d: 0
+                      gas_fee: 0
+                      buy_volume: 0
+                      buy_volume_7d: 0
+                      sell_volume: 0
+                      related_addr_count: 0
+                      related_addr_dia_count: 0
+                      activity_count: 0
+                      activity_count_7d: 0
         '404':
           $ref: '#/components/responses/404'
       operationId: get-portfolios-user-id-or-address
@@ -495,7 +568,6 @@ paths:
             application/xml:
               schema:
                 type: object
-                properties: {}
         '400':
           $ref: '#/components/responses/400'
         '404':
@@ -561,7 +633,6 @@ components:
         - chain_id
         - address
         - user_id
-        - status
     Wallet:
       title: Wallet
       type: object
@@ -579,27 +650,49 @@ components:
         - address
         - chainId
     Portfolio:
-      title: Portfolio
+      description: ''
       type: object
+      x-examples: {}
       properties:
-        id:
-          type: string
-        nft_holdings:
-          type: integer
-        collections_holdings:
-          type: integer
-        holding_value:
-          type: number
-        av_holding_period:
-          type: number
-        total_gas_fee:
-          type: number
-        buy_volume:
-          type: number
-        sell_volume:
-          type: number
-        profit:
-          type: number
+        portfolio:
+          type: object
+          properties:
+            nft_count:
+              type: number
+            collection_count:
+              type: number
+            ave_holding_period:
+              type: number
+            most_collection:
+              type: number
+            most_collection_icon:
+              type: number
+            'est_market_value ':
+              type: number
+            est_market_value _7d:
+              type: number
+            holding_value:
+              type: number
+            earning_rate:
+              type: number
+            earning_rate_7d:
+              type: number
+            gas_fee:
+              type: number
+            buy_volume:
+              type: number
+            buy_volume_7d:
+              type: number
+            sell_volume:
+              type: number
+            related_addr_count:
+              type: number
+            related_addr_dia_count:
+              type: number
+            activity_count:
+              type: number
+            activity_count_7d:
+              type: number
     NFT:
       title: NFT
       type: object

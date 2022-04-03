@@ -13,7 +13,10 @@ const swaggerDef = {
   },
   servers: [
     {
-      url: `http://localhost:${config.port}/v1`,
+      url: `https://nftranks.xyz:${config.port}/v1`, name: "Server"
+    },
+    {
+      url: `http://localhost:${config.port}/v1`, name: "Local Test"
     },
   ],
 };
