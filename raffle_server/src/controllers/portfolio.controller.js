@@ -6,8 +6,8 @@ const { nftService,portfolioService } = require('../services');
 
 const get_portfolio = catchAsync(async (req, res, next) => {
   
-  await portfolioService.user_info(req.query);
-  res.status(httpStatus.CREATED).send('res');
+  const nickname= await portfolioService.user_info(req.query);
+  res.status(httpStatus.OK).send(nickname);
 
   
 });
