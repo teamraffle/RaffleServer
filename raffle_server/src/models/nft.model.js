@@ -58,12 +58,13 @@ const nft_coll_one_db_save= async (collection_) => {
 
   try {
     conn = await pool.getConnection();
+    console.log(collection_);//성공 리턴
 
-    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type) VALUES (?,?,?,?,?);';
-    var values = [uuidv4.v1(), collection_.token_address, collection_.symbol, collection_.name, collection_.contract_type ];
+    const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type, collection_icon, slug) VALUES (?,?,?,?,?,?,?);';
+    var values = [uuidv4.v1(), collection_.token_address, collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
     const dbRes = await conn.query(sql, values);
 
-    // console.log(dbRes);//성공 리턴
+    console.log(dbRes);//성공 리턴
     return dbRes;
 
   }catch(err) {

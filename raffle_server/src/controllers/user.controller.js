@@ -60,7 +60,7 @@ const get_and_save_first_data = async (address, chain_id) => {
 };
 
 const test = catchAsync(async (req, res) => {
-  console.log(await nftService.get_collection_opensea('0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'));
+  let transfer_coll_set = await nftService.get_all_NFT_transfers('0xfFa914c83D851b9Fe372e4bA6A6E131373AA16ab', 1);
   res.status(httpStatus.OK).send('open');
 });
 

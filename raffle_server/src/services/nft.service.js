@@ -115,13 +115,7 @@ const get_all_NFT_transfers = async (wallet, chain_id) => {
   //0페이지
   var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size);
   finalSet = collectionSet;
-  // console.log(finalSet);
-  // console.log(cursor);
  
-
-  // console.log(collectionSet);
-
-
   //1~끝페이지
   if (total > page_size) {
     page++;
@@ -199,7 +193,7 @@ const get_nft_fp = async (coll_name, chain_id) => {
 const get_and_save_nftcoll = async (missingAddresses) => {
   for (let address of missingAddresses) {
     address = '0x'+address;
-    let collection = await get_collection_moralis(address);
+    let collection = await get_collection_opensea(address);
     await NFT.nft_coll_one_db_save(collection);
   }
 };
@@ -248,6 +242,7 @@ const get_collection_opensea = async (address) => {
       name: response.data.name,
       contract_type : response.data.schema_name,
       slug: response.data.collection.slug,
+      collection_icon : response.data.image_url,
     };
     return collection;
 
