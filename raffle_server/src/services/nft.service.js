@@ -230,25 +230,24 @@ const get_collection_moralis = async (address) => {
 
 const get_collection_opensea = async (address) => {
   try {
-    const url  = `https://api.opensea.io/api/v1/collection/${address}`;
-    // const url = `https://api.opensea.io/api/v1/asset/0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb/1/?include_orders=false`;
-
+    const url  = `https://api.opensea.io/api/v1/asset_contract/${address}`;
     const response = await axios.get(url, {
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
         'sec-fetch-mode': 'cors',
         referrer: 'https://api.opensea.io/',
         'X-Api-Key': config.opensea.secret,
       },
     });
-    console.log(response.data);
+    // console.log(response.data);
 
     var collection = {
-      // token_address : response.data.result[0].token_address.replace('0x',''),
-      // symbol : response.data.result[0].symbol,
-      // name: response.data.result[0].name,
-      // contract_type : response.data.result[0].contract_type,
+      token_address : response.data.address.replace('0x',''),
+      symbol : response.data.symbol,
+      name: response.data.name,
+      contract_type : response.data.schema_name,
+      slug: response.data.collection.slug,
     };
     return collection;
 
@@ -270,6 +269,7 @@ function remove_SetA_from_SetB (a, b) {
 
 module.exports = {
   get_nftcoll_opensea,
+  get_collection_opensea,
   get_and_save_nftcoll,
   get_nft_moralis,
   get_nft_fp,
