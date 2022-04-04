@@ -72,7 +72,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
     // console.log(response.data);
     total = response.data.total;
     page = response.data.page;
-    offset = response.data.cursor;
+    cursor = response.data.cursor;
  
     await NFT.nft_db_save(response.data, wallet);
     var repeat = Math.ceil(total / page_size)-1;
@@ -91,8 +91,8 @@ const get_nft_moralis = async (wallet, chain_id) => {
           });
           page = response_rp.data.page;
           cursor = response_rp.data.cursor;
-          console.log("page,cursor:",page,cursor);
-          console.log(response_rp.data);
+          // console.log("page,cursor:",page,cursor);
+          // console.log(response_rp.data);
           await NFT.nft_db_save(response_rp.data,wallet);
          
         }
