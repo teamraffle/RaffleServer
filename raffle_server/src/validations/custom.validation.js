@@ -24,7 +24,9 @@ const ethWallet = (value, helpers) => {
 };
 
 const ethWalletOrUUID = (value, helpers) => {
-  if (value.length != 36 || value.length != 42) {
+  console.log(value.length)
+  if (value.length != 36 && value.length != 42) {
+ 
     return helpers.message('Invalid ID nor invalid hex number at address');
   }
   return value;

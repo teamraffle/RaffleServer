@@ -9,7 +9,7 @@ const portfolioController = require('../../controllers/portfolio.controller');
 const router = express.Router();
 
 router
-  .route('/basic/:user_id_or_address')
+  .route('/basic')
   .get(validate(portfolioValidation.getPortfolio), portfolioController.get_portfolio)
 
 
