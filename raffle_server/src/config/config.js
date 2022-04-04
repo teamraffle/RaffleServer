@@ -65,5 +65,8 @@ module.exports = {
   },
   moralis: {
     secret : envVars.MORALIS_SECRET
+  },
+  opensea: {
+    secret : envVars.OPENSEA_SECRET
   }
 };
