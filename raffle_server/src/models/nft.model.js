@@ -98,7 +98,6 @@ const nft_db_save= async (data,wallet) => {
       finaltuple+=",("+res+")";
     }
   };
-  console.log(finaltuple);
 
   try {
     conn = await pool.getConnection();
@@ -128,7 +127,6 @@ const createTx= async(data,wallet) => {
 
     const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
 
-    console.log(sql);
     const dbRes = await conn.query(sql);
     
     console.log(dbRes);//성공 
@@ -235,8 +233,7 @@ const save_nft_fp= async(data) =>{
     var res = fp_table_str.join(',');
     finalTuple+="("+res+")"; // tb_nfr_fp 테이블 저장
 
-    
-   console.log(finalTuple);
+
   try {
     conn = await pool.getConnection();
 
@@ -271,12 +268,12 @@ const checkAddress = async(addressSet) =>{
   try {
     conn = await pool.getConnection();
     for (let address of addressSet) {
-      console.log('TEST 1', address);
+      // console.log('TEST 1', address);
 
       const sql = "SELECT token_address FROM tb_nft_collection_eth WHERE token_address= '"+address+"'";
       row = await conn.query(sql);
 
-      console.log(row);
+      // console.log(row);
 
       //없으면 어레이에추가
       if(row[0] == undefined){

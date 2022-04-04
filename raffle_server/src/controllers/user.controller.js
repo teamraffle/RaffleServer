@@ -51,7 +51,7 @@ const get_and_save_first_data = async (address, chain_id) => {
     // db에 무종복 세트가 있는지 확인
     const missingAddress = await nftService.check_collection_exists(coll_set_duplicate_removed);
     // 저장되지 않은 NFT 콜렉션 추가로 검색해 db에 저장
-    await nftService.get_nftcoll_moralis(missingAddress);
+    await nftService.get_and_save_nftcoll(missingAddress);
 
 
   } catch (err) {
