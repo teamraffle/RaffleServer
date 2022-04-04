@@ -9,9 +9,9 @@ const userController = require('../../controllers/user.controller');
 
 
 router
-.route('/:user_id')
-.get(validate(userValidation.getUserbyID), userController.get_user_by_id)
-.patch(validate(userValidation.updateUser), userController.update_user)
+  .route('/:user_id')
+  .get(validate(userValidation.getUserbyID), userController.get_user_by_id)
+  .patch(validate(userValidation.updateUser), userController.update_user)
 
 
 router

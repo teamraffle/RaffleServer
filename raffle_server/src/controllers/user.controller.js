@@ -59,6 +59,11 @@ const get_and_save_first_data = async (address, chain_id) => {
   }
 };
 
+const test = catchAsync(async (req, res) => {
+  console.log(await nftService.get_collection_opensea('0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'));
+  res.status(httpStatus.OK).send('open');
+});
+
 
 
 
@@ -68,4 +73,5 @@ module.exports = {
   get_user_by_id,
   update_user,
   check_nickname_duplication,
+  test,
 };
