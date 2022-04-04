@@ -31,7 +31,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           {
            break;
           }
-          console.log(Object.keys(response_rp.data).length)
+          // console.log(Object.keys(response_rp.data).length)
           var dataSet = await NFT.nft_coll_db_save(response_rp.data, wallet);
           if(dataSet !=0) //비어있지 않다면 추가
           {
@@ -72,7 +72,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
     // console.log(response.data);
     total = response.data.total;
     page = response.data.page;
-    offset = response.data.cursor;
+    cursor = response.data.cursor;
  
     await NFT.nft_db_save(response.data, wallet);
     var repeat = Math.ceil(total / page_size)-1;
@@ -91,8 +91,8 @@ const get_nft_moralis = async (wallet, chain_id) => {
           });
           page = response_rp.data.page;
           cursor = response_rp.data.cursor;
-          console.log("page,cursor:",page,cursor);
-          console.log(response_rp.data);
+          // console.log("page,cursor:",page,cursor);
+          // console.log(response_rp.data);
           await NFT.nft_db_save(response_rp.data,wallet);
          
         }
@@ -119,7 +119,7 @@ const get_all_NFT_transfers = async (wallet, chain_id) => {
   // console.log(cursor);
  
 
-  console.log(collectionSet);
+  // console.log(collectionSet);
 
 
   //1~끝페이지
@@ -161,7 +161,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
         'x-api-key': config.moralis.secret,
       },
     });
-    console.log(response.data);
+    // console.log(response.data);
     total = response.data.total;
     cursor = response.data.cursor;
     //DB에 저장
@@ -188,7 +188,7 @@ const get_nft_fp = async (coll_name, chain_id) => {
   }
   try {
     const Response = await axios.get('https://api.opensea.io/api/v1/collection/' + coll_name);
-    console.log(Response);
+    // console.log(Response);
     await NFT.save_nft_fp(Response.data.collection);
   } catch (err) {
     console.log(Error);
@@ -258,7 +258,7 @@ const get_collection_opensea = async (address) => {
 
 function remove_SetA_from_SetB (a, b) {
   if (!a instanceof Set || !b instanceof Set) {
-     console.log("The given objects are not of type Set");
+    //  console.log("The given objects are not of type Set");
      return null;
   }
   let newSet = new Set();

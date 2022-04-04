@@ -20,7 +20,7 @@ const create= async (body) => {
         const wallet_id = uuidv4.v1();
         const dbRes = await conn.query(sql, [wallet_id, 1,  splittedAddr]);
         
-        console.log(dbRes);//성공 리턴
+        // console.log(dbRes);//성공 리턴
         return wallet_id;
         
       }catch(err) {
@@ -45,7 +45,7 @@ const findIdByAddress= async (body) => {
         var splittedAddr = wallet.address.replace('0x','');
         const dbRes = await conn.query(sql, splittedAddr);
         
-        console.log(dbRes[0].wallet_id);//성공 리턴
+        // console.log(dbRes[0].wallet_id);//성공 리턴
         
         return dbRes[0].wallet_id;
         
