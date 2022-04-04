@@ -3,7 +3,9 @@ const pool = require('./plugins/dbHelper');
 let conn;
 
 const nft_coll_db_save= async (data,wallet) => {
+  
   var collectionSet = new Set();
+  var slugSet = new Set();
   let finaltuple="";
 
   for(idx in data){
@@ -27,6 +29,7 @@ const nft_coll_db_save= async (data,wallet) => {
 
     finaltuple+=",("+res+")";
     collectionSet.add(return_token_address);
+    slugSet.add(data[idx].slug);
   };
   if(finaltuple=="") //아예 빈값일 수 있음 그럴때 return하기
   return 0;
@@ -50,7 +53,7 @@ const nft_coll_db_save= async (data,wallet) => {
   finally {
       if (conn) conn.release(); //release to pool
 
-      return collectionSet;
+      return {collectionSet,slugSet};
   }
 }
 

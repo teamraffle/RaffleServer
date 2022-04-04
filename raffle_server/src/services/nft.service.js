@@ -10,7 +10,8 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
   let offset=0;
   const page_size = 300;
 
-  let collectionSet = new Set();
+  let collectionSet = new Set(); //token_address 리턴
+  let slugSet = new Set(); //slug 리턴
   try {
 
     const response = await axios.get(
@@ -19,7 +20,9 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
     );
 
     const data= await NFT.nft_coll_db_save(response.data, wallet);
-    collectionSet = new Set([...collectionSet, ...data]);
+  
+    collectionSet = new Set([...collectionSet, ...data.collectionSet]);
+    slugSet = new Set([...slugSet, ...data.slugSet]);
     offset = page_size;
 
         while(true){
@@ -35,13 +38,13 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           var dataSet = await NFT.nft_coll_db_save(response_rp.data, wallet);
           if(dataSet !=0) //비어있지 않다면 추가
           {
-            collectionSet = new Set([...collectionSet, ...dataSet]);
+            collectionSet = new Set([...collectionSet, ...dataSet.collectionSet]);
+            slugSet = new Set([...slugSet, ...dataSet.slugSet]);
           }
           offset = offset+page_size; 
         }
-      
-      const union = new Set([...collectionSet]);
-      return union;
+     
+      return {coll_set: collectionSet, slug_set: slugSet};
     
   } catch (err) {
     console.log('Error >>', err);
@@ -174,18 +177,18 @@ const check_collection_exists = async (addressSet) => {
   }
 };
 
-const get_nft_fp = async (coll_name, chain_id) => {
-  var chain_type;
-
-  if (chain_id == 1) {
-    chain_type = 'eth';
-  }
+const get_nft_fp = async(slug_set) => {
+  console.log(slug_set)
+  
+  for(let idx of slug_set){
+  // console.log("https://api.opensea.io/api/v1/collection/" + idx)
   try {
-    const Response = await axios.get('https://api.opensea.io/api/v1/collection/' + coll_name);
+    const Response = await axios.get('https://api.opensea.io/api/v1/collection/' + idx);
     // console.log(Response);
     await NFT.save_nft_fp(Response.data.collection);
   } catch (err) {
     console.log(Error);
+  }
   }
 };
 

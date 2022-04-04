@@ -37,21 +37,24 @@ const check_nickname_duplication = catchAsync(async (req, res) => {
 const get_and_save_first_data = async (address, chain_id) => {
   try {
     
-    // 지갑주소의 NFT 콜렉션 db에 저장
-    const coll_set = await nftService.get_nftcoll_opensea(address, chain_id);
-    // 지갑주소의 NFT db에 저장
-    await nftService.get_nft_moralis(address , chain_id);
-    // 지갑주소의 transfer db에 저장
-    let transfer_coll_set = await nftService.get_all_NFT_transfers(address, chain_id);
-    // 트랜스퍼 콜렉션 - 지갑주소 nft 콜렉션 = 무종복 세트
-    // console.log(coll_set);
-    // console.log(transfer_coll_set);
+    // 지갑주소의 NFT 콜렉션 db에 저장85
+    const {coll_set, slug_set} = await nftService.get_nftcoll_opensea(address, chain_id);
+    console.log(coll_set) //token_address 반환
+    // console.log(slug_set) //slug 반환
+    
+    await nftService.get_nft_fp(slug_set);
+    // await nftService.get_nft_moralis(address , chain_id);
+    // // 지갑주소의 transfer db에 저장
+    // let transfer_coll_set = await nftService.get_all_NFT_transfers(address, chain_id);
+    // // 트랜스퍼 콜렉션 - 지갑주소 nft 콜렉션 = 무종복 세트
+    // // console.log(coll_set);
+    // // console.log(transfer_coll_set);
 
-    let coll_set_duplicate_removed = nftService.remove_SetA_from_SetB(coll_set, transfer_coll_set);
-    // db에 무종복 세트가 있는지 확인
-    const missingAddress = await nftService.check_collection_exists(coll_set_duplicate_removed);
-    // 저장되지 않은 NFT 콜렉션 추가로 검색해 db에 저장
-    await nftService.get_and_save_nftcoll(missingAddress);
+    // let coll_set_duplicate_removed = nftService.remove_SetA_from_SetB(coll_set, transfer_coll_set);
+    // // db에 무종복 세트가 있는지 확인
+    // const missingAddress = await nftService.check_collection_exists(coll_set_duplicate_removed);
+    // // 저장되지 않은 NFT 콜렉션 추가로 검색해 db에 저장
+    // await nftService.get_and_save_nftcoll(missingAddress);
 
 
   } catch (err) {
