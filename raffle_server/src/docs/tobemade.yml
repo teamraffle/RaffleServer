@@ -222,7 +222,6 @@ paths:
             type: integer
           in: query
           name: chain_id
-          required: true
       description: ''
       tags:
         - Register
@@ -269,13 +268,7 @@ paths:
           description: Should be hex number
       tags:
         - Rankings
-  '/portfolios/basic/{user_id_or_address}':
-    parameters:
-      - schema:
-          type: string
-        name: user_id_or_address
-        in: path
-        required: true
+  /portfolios/basic:
     get:
       summary: Check if user exist by wallet
       responses:
@@ -384,9 +377,14 @@ paths:
           in: query
           name: chain_id
           required: true
+        - schema:
+            type: string
+          in: query
+          name: user_id_or_address
+          required: true
       tags:
         - Portfolios
-  '/portfolios/nft/{user_id_or_address}':
+  /portfolios/nft:
     get:
       parameters:
         - schema:
@@ -409,6 +407,11 @@ paths:
             type: integer
           in: query
           name: chain_id
+          required: true
+        - schema:
+            type: string
+          in: query
+          name: user_id_or_address
           required: true
       description: NFT탭 재정렬/리프레시할때 사용
       responses:
@@ -448,19 +451,9 @@ paths:
       summary: ''
       tags:
         - Portfolios
-    parameters:
-      - schema:
-          type: string
-        name: user_id_or_address
-        in: path
-        required: true
-  '/portfolios/stats/{user_id_or_address}':
-    parameters:
-      - schema:
-          type: string
-        name: user_id_or_address
-        in: path
-        required: true
+    parameters: []
+  /portfolios/stats:
+    parameters: []
     get:
       summary: Check if user exist by wallet
       responses:
@@ -497,15 +490,15 @@ paths:
           in: query
           name: chain_id
           required: true
+        - schema:
+            type: string
+          in: query
+          name: user_id_or_address
+          required: true
       tags:
         - Portfolios
-  '/portfolios/activity/{user_id_or_address}':
-    parameters:
-      - schema:
-          type: string
-        name: user_id_or_address
-        in: path
-        required: true
+  /portfolios/activity:
+    parameters: []
     get:
       summary: Check if user exist by wallet
       responses:
@@ -605,6 +598,11 @@ paths:
             type: string
           in: query
           name: address
+        - schema:
+            type: string
+          in: query
+          name: user_id_or_address
+          required: true
       tags:
         - Portfolios
       description: ''
