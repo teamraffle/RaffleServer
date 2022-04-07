@@ -107,8 +107,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
   }
 };
 
- let map1 = new Map();
- let arr1= [];
+
 
 const get_all_NFT_transfers = async (wallet, chain_id) => {
   let finalSet = new Set();
@@ -154,6 +153,8 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
     }
   }
 
+  let map_ave_date = new Map();
+
   try {
     const url = `https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal&direction=both&limit=${page_size}&cursor=${cursor}`;
     const response = await axios.get(url, {
@@ -164,17 +165,21 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
     // console.log(response.data);
     total = response.data.total;
     cursor = response.data.cursor;
+    //평균홀딩기간
+    const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
+    console.log("됏냐"+arr_ave_date);
     //DB에 저장
-    const collectionSet = await NFT.createTx(response.data, wallet);
-    //테스트
-    iter_holding_date(response.data);
+    const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet);
+    
     return { collectionSet, total, cursor };
   } catch (err) {
     console.log('Error >>', err);
   }
 };
 
-const iter_holding_date = async(data) =>{
+const get_ave_holding_date = async(data, map_ave_date) =>{
+  let arr_ave_date= [];
+
   //out 된 nft의 평균기간
   for(idx in data.result){
 
@@ -182,35 +187,32 @@ const iter_holding_date = async(data) =>{
     const token_id= data.result[idx].token_id;
     const block_timestamp= data.result[idx].block_timestamp;
 
-    get_holding_date(map1, arr1, token_address, token_id, block_timestamp);
+    get_holding_date(map_ave_date, arr_ave_date, token_address, token_id, block_timestamp);
   };
 
   //현재홀딩중인 NFT의 평균기간
-  map1.forEach(
-    add_all
-  );
+  for (let value of map_ave_date.values()){
+    console.log(value);
+    const out_time = Date.now();
+    const in_time = new Date(value.block_timestamp);
+    //타임스탬프간 시간 계산
+    const diffTime = Math.abs(out_time - in_time);
+    const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    console.log(holding_date + " days-");
+    //날짜 어레이에 추가
+    arr_ave_date.push(holding_date)
+  }
+ 
+ 
+  console.log('완성 리스트 : %O', arr_ave_date );
 
  
-  console.log('완성 리스트 : %O', arr1 );
+  return average(arr_ave_date);
 
 }
+const average = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
 
-function add_all(value, key, map) {
-  console.log(`m[${key}] = ${value}`);
-
-  const out_time = Date.now();
-  const in_time = new Date(value.block_timestamp);
-  //타임스탬프간 시간 계산
-  const diffTime = Math.abs(out_time - in_time);
-  const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
-  console.log(holding_date + " days-");
-    //날짜 어레이에 추가
-  arr1.push(holding_date)
-
-}
-
-//TODO portfolio.service에 위치해야함
 const get_holding_date = async (nftMap, timeArray, token_address, token_id, timestamp) => {
   const key = token_address.toString() +token_id.toString();
   console.log('홀딩'+timestamp);

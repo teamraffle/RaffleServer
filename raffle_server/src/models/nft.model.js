@@ -124,15 +124,18 @@ const nft_db_save= async (data,wallet) => {
   }
 }
 
-const createTx= async(data,wallet) => {
+const createTx_and_portfolio= async(data,wallet, arr_ave_date) => {
   let {finalTuple, collectionSet} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const sql_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const sql_portfolio = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
 
-    const dbRes = await conn.query(sql);
+    
+    const dbRes = await conn.query(sql_transfer);
+    const dbRes2 = await conn.query(sql_portfolio);
     
     // console.log(dbRes);//성공 
     
@@ -300,7 +303,7 @@ const checkAddress = async(addressSet) =>{
 module.exports = {
   nft_coll_db_save,
   nft_db_save,
-  createTx,
+  createTx_and_portfolio,
   save_nft_fp,
   checkAddress,
   nft_coll_one_db_save,
