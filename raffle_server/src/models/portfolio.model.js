@@ -41,13 +41,30 @@ const get_user= async (query) => {
             return false;
         }else{
 
-        rows[0].address=wallet.address;
-        rows[0].nft_count =rows2[0]['COUNT( * )']; 
-        rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)']; 
-        rows[0].most_collection=rows4[0].name;
-        rows[0].most_collection_icon=rows4[0].collection_icon;
-        
-            return rows[0];//TODO 양식맞추기
+        // json 반환용 -> 나중에
+        // rows[0].address=wallet.address;
+        // rows[0].nft_count=rows2[0]['COUNT( * )']; 
+        // rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)']; 
+        // rows[0].most_collection=rows4[0].name;
+        // rows[0].most_collection_icon=rows4[0].collection_icon;
+
+        const wallet_address=wallet.address.replace('0x','');
+        const nft_holdings=rows2[0]['COUNT( * )']; 
+        const collections_holdings=rows3[0]['COUNT(DISTINCT token_address)']; 
+        const most_collection_name=rows4[0].name;
+        const most_collection_icon=rows4[0].collection_icon;
+
+        const insert_portfolio = `INSERT INTO tb_portfolio_eth 
+         (portfolio_id,wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
+         VALUES 
+         (?,?,?,?,?,?,?,?,?,?,?,?,?
+          )`;
+         
+        const portfolio_id = uuidv4.v1();
+        const dbRes = await conn.query(insert_portfolio, [portfolio_id, wallet_address, nft_holdings,collections_holdings,0,most_collection_name,most_collection_icon,0,0,0,0,0,0]);
+
+
+            return portfolio_id;//TODO 양식맞추기
         }
       }
     } finally {
