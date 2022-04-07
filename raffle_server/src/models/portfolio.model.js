@@ -4,12 +4,12 @@ const logger = require('../config/logger');
 const pool = require('./plugins/dbHelper');
 let conn;
 
-const get_user= async (query) => {
+const get_user= async (wallet, chain_id) => {
     //TODO
     //우리 디비에서 유저정보가져와주기
     var wallet ={
-      address : query.user_id_or_address,
-      chain_id : query.chain_id
+      address : wallet,
+      chain_id : chain_id
     }
     var rows;
     var rows2;
