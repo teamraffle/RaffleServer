@@ -53,19 +53,16 @@ const get_user= async (query) => {
         const collections_holdings=rows3[0]['COUNT(DISTINCT token_address)']; 
         const most_collection_name=rows4[0].name;
         const most_collection_icon=rows4[0].collection_icon;
-
-        const insert_portfolio = `INSERT INTO tb_portfolio_eth 
-         (portfolio_id,wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
-         VALUES 
+        "UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ user_id+ "'";
+        ;}
+        const update_portfolio = `UPDATE tb_portfolio_eth SET (nft_holdings,collections_holdings,most_collection_name,most_collection_icon) = 
          (?,?,?,?,?,?,?,?,?,?,?,?,?
           )`;
          
         const portfolio_id = uuidv4.v1();
-        const dbRes = await conn.query(insert_portfolio, [portfolio_id, wallet_address, nft_holdings,collections_holdings,0,most_collection_name,most_collection_icon,0,0,0,0,0,0]);
-
-
+        const dbRes = await conn.query(update_portfolio, [nft_holdings,collections_holdings,most_collection_name,most_collection_icon]);
             return portfolio_id;//TODO 양식맞추기
-        }
+        
       }
     } finally {
         if (conn) conn.release();
