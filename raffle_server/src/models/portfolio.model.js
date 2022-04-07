@@ -4,12 +4,12 @@ const logger = require('../config/logger');
 const pool = require('./plugins/dbHelper');
 let conn;
 
-const get_user= async (query) => {
+const get_user= async (wallet,chain_id) => {
     //TODO
     //우리 디비에서 유저정보가져와주기
     var wallet ={
-      address : query.user_id_or_address,
-      chain_id : query.chain_id
+      address : wallet,
+      chain_id : chain_id
     }
     var rows;
     var rows2;
@@ -57,7 +57,9 @@ const get_user= async (query) => {
         const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=? where wallet_address=?`;
    
         const dbRes = await conn.query(update_portfolio, [nft_holdings,collections_holdings,most_collection_name,most_collection_icon,wallet_address]);
-            return dbRes;//TODO 양식맞추기
+            
+        
+        return dbRes;//TODO 양식맞추기
         
       }
     }
@@ -66,8 +68,43 @@ const get_user= async (query) => {
     }    
 }
 
+const get_portfolio= async (query) => {
+  //TODO
+  //우리 디비에서 유저정보가져와주기
+  var wallet ={
+    address : query.user_id_or_address
+  }
+  var rows;
+  const splittedAddr = wallet.address.replace('0x','');
+  try {
+    conn = await pool.getConnection();
+
+    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
+  
+      //첫번째 쿼리, 두개 조인해서 닉네임 가져오기
+      //두번째 쿼리, 일단 해당 사용자 값 nft 갯수 가져오기
+      
+    
+      const query ="SELECT * FROM tb_portfolio_eth WHERE wallet_address=?"
+      console.log(query)
+      rows = await conn.query(query, splittedAddr);
+
+      console.log(rows[0])
+      if(rows[0] == undefined ){
+          return false;
+      }else{
+
+      return rows[0];//TODO 양식맞추기
+      
+    }
+  
+  } finally {
+      if (conn) conn.release();
+  }    
+}
 
 module.exports = {
-  get_user
+  get_user,
+  get_portfolio
 };
   
