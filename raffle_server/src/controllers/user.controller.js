@@ -52,6 +52,7 @@ const get_and_save_first_data = async (address, chain_id) => {
     const missingAddress = await nftService.check_collection_exists(coll_set_duplicate_removed);
     // 저장되지 않은 NFT 콜렉션 추가로 검색해 db에 저장
     await nftService.get_and_save_nftcoll(missingAddress);
+    //console.log("FINISHED")
 
 
   } catch (err) {
