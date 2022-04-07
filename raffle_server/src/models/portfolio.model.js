@@ -14,6 +14,7 @@ const get_user= async (query) => {
     var rows;
     var rows2;
     var rows3;
+    var rows4;
     const splittedAddr = wallet.address.replace('0x','');
     try {
       conn = await pool.getConnection();
@@ -27,19 +28,25 @@ const get_user= async (query) => {
         const query ="SELECT tb_user.nickname,tb_user.profile_pic FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id  WHERE tb_wallet_eth.address=?"
         const query2 ="SELECT COUNT( * ) FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?"
         const query3 ="SELECT COUNT(DISTINCT token_address) FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?";
-        console.log(query3)
+        const query4 ="SELECT name,collection_icon FROM tb_nft_collection_eth WHERE token_address=(SELECT token_address AS counted FROM tb_nft_eth WHERE tb_nft_eth.owner_of="+'"'+splittedAddr+'"'+"GROUP BY token_address ORDER BY counted DESC LIMIT 1)";
+        console.log(query4)
         rows = await conn.query(query, splittedAddr);
         rows2 = await conn.query(query2, splittedAddr);
         rows3 = await conn.query(query3,splittedAddr); 
-        if(rows[0] == undefined ||rows2[0] == undefined ||rows3[0] == undefined){
+        rows4 = await conn.query(query4); 
+ 
+         
+        console.log(rows4[0])
+        if(rows[0] == undefined ||rows2[0] == undefined ||rows3[0] == undefined  ||rows4[0] == undefined){
             return false;
         }else{
 
         rows[0].address=wallet.address;
-        console.log(rows3);
-        console.log(rows3[0]['COUNT( * )']);
         rows[0].nft_count =rows2[0]['COUNT( * )']; 
         rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)']; 
+        rows[0].most_collection=rows4[0].name;
+        rows[0].most_collection_icon=rows4[0].collection_icon;
+        
             return rows[0];//TODO 양식맞추기
         }
       }
