@@ -130,14 +130,21 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date) => {
   try {
     conn = await pool.getConnection();
 
-    const sql_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
-    const sql_portfolio = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
 
+    const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
+    (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
+    VALUES 
+    (?,?,?,?,?,?,?,?,?,?,?,?)`;
     
-    const dbRes = await conn.query(sql_transfer);
-    const dbRes2 = await conn.query(sql_portfolio);
+
+    var splittedAddr = wallet.replace('0x','');
     
-    // console.log(dbRes);//성공 
+
+    const dbRes = await conn.query(sql_insert_transfer);
+    const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',0,0,0,0,0,0]);
+    
+    console.log(dbRes2);//성공 
     
   }catch(err) {
     console.log(err);

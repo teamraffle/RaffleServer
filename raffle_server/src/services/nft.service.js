@@ -167,9 +167,9 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
     cursor = response.data.cursor;
     //평균홀딩기간
     const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
-    console.log("됏냐"+arr_ave_date);
+    
     //DB에 저장
-    const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet);
+    const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date);
     
     return { collectionSet, total, cursor };
   } catch (err) {
