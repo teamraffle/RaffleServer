@@ -46,17 +46,25 @@ const get_and_save_first_data = async (address, chain_id) => {
     await nftService.get_nft_moralis(address , chain_id);
     // 지갑주소의 transfer db에 저장
     let transfer_coll_set = await nftService.get_all_NFT_transfers(address, chain_id);
-    // 트랜스퍼 콜렉션 - 지갑주소 nft 콜렉션 = 무종복 세트
-    // console.log(coll_set);
-    // console.log(transfer_coll_set);
-
+    // 트랜스퍼 콜렉션 - 지갑주소 nft 콜렉션 = 무중복 세트
     let coll_set_duplicate_removed = nftService.remove_SetA_from_SetB(coll_set, transfer_coll_set);
-    // db에 무종복 세트가 있는지 확인
+    // db에 무중복 세트가 있는지 확인
     const missingAddress = await nftService.check_collection_exists(coll_set_duplicate_removed);
     // 저장되지 않은 NFT 콜렉션 추가로 검색해 db에 저장
     await nftService.get_and_save_nftcoll(missingAddress);
     //console.log("FINISHED")
 
+
+  } catch (err) {
+    console.log('Error >>', err);
+  }
+};
+
+const analyze_first_data = async () => {
+  try {
+    //TODO 
+    //여기에서 실행하려면 trasfer 값 매핑한 것-> 키 (콜렉션 어드레스 + ) 밸류(시간)이 인풋으로 들어와야함.
+    //근데 원래 trasfer 페이징해서 들고오는데... 그걸 한번에 다 메모리 리턴하는게 맞나?
 
   } catch (err) {
     console.log('Error >>', err);
