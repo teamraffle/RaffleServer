@@ -81,7 +81,6 @@ const get_nft_moralis = async (wallet, chain_id) => {
     var repeat = Math.ceil(total / page_size)-1;
   
 
-    // console.log(repeat);
 
     if(total > page_size){
         // console.log("쳐넘음")
@@ -108,12 +107,16 @@ const get_nft_moralis = async (wallet, chain_id) => {
   }
 };
 
+ let map1 = new Map();
+ let arr1= [];
 
 const get_all_NFT_transfers = async (wallet, chain_id) => {
   let finalSet = new Set();
 
   let page = 0;
   const page_size = 500;
+
+ 
 
   //0페이지
   var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size);
@@ -162,12 +165,79 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
     total = response.data.total;
     cursor = response.data.cursor;
     //DB에 저장
-    const collectionSet = await NFT.createTx(response.data,wallet);
+    const collectionSet = await NFT.createTx(response.data, wallet);
+    //테스트
+    iter_holding_date(response.data);
     return { collectionSet, total, cursor };
   } catch (err) {
     console.log('Error >>', err);
   }
 };
+
+const iter_holding_date = async(data) =>{
+  //out 된 nft의 평균기간
+  for(idx in data.result){
+
+    const token_address= data.result[idx].token_address.replace('0x','');
+    const token_id= data.result[idx].token_id;
+    const block_timestamp= data.result[idx].block_timestamp;
+
+    get_holding_date(map1, arr1, token_address, token_id, block_timestamp);
+  };
+
+  //현재홀딩중인 NFT의 평균기간
+  map1.forEach(
+    add_all
+  );
+
+ 
+  console.log('완성 리스트 : %O', arr1 );
+
+}
+
+function add_all(value, key, map) {
+  console.log(`m[${key}] = ${value}`);
+
+  const out_time = Date.now();
+  const in_time = new Date(value.block_timestamp);
+  //타임스탬프간 시간 계산
+  const diffTime = Math.abs(out_time - in_time);
+  const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+  console.log(holding_date + " days-");
+    //날짜 어레이에 추가
+  arr1.push(holding_date)
+
+}
+
+//TODO portfolio.service에 위치해야함
+const get_holding_date = async (nftMap, timeArray, token_address, token_id, timestamp) => {
+  const key = token_address.toString() +token_id.toString();
+  console.log('홀딩'+timestamp);
+
+  if(nftMap.has(key)){
+    const out_time = new Date(nftMap.get(key).block_timestamp);
+    const in_time = new Date(timestamp);
+
+    console.log(out_time);
+    console.log(in_time);
+    //타임스탬프간 시간 계산
+    const diffTime = Math.abs(out_time - in_time);
+    const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    console.log(holding_date + " days");
+    //날짜 어레이에 추가
+    timeArray.push(holding_date)
+
+    //맵에서 지움
+    nftMap.delete(key)
+
+  }else{
+    nftMap.set(key, {block_timestamp: timestamp})//이게 판매일 가능성 높음 최신부터 들어오기때문에
+  }
+
+};
+
 
 const check_collection_exists = async (addressSet) => {
   try {
@@ -188,7 +258,7 @@ const get_nft_fp = async(slug_set) => {
     await NFT.save_nft_fp(Response.data.collection);
   } catch (err) {
     console.log(Error);
-  }
+    }
   }
 };
 
