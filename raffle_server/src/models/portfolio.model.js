@@ -76,6 +76,8 @@ const get_portfolio= async (query) => {
   var wallet ={
     address : query.user_id_or_address
   }
+  var total = {};
+  
   var rows;
   const splittedAddr = wallet.address.replace('0x','');
   try {
@@ -88,15 +90,19 @@ const get_portfolio= async (query) => {
       
     
       const query ="SELECT * FROM tb_portfolio_eth WHERE wallet_address=?"
-      console.log(query)
-      rows = await conn.query(query, splittedAddr);
 
-      console.log(rows[0])
+      rows = await conn.query(query, splittedAddr);
+  
+      total.updated_at=rows[0].create_timestamp;
+      total.portfolio=rows[0];
+      
+      delete total.portfolio.create_timestamp;
+
       if(rows[0] == undefined ){
           return false;
       }else{
 
-      return rows[0];//TODO 양식맞추기
+      return total;//TODO 양식맞추기
       
     }
   
