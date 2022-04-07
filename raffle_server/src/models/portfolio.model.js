@@ -5,6 +5,8 @@ const pool = require('./plugins/dbHelper');
 let conn;
 
 const get_user= async (wallet,chain_id) => {
+
+
     //TODO
     //우리 디비에서 유저정보가져와주기
     var wallet ={

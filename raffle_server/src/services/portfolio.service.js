@@ -3,6 +3,7 @@ const { Portfolio } = require('../models');
 const ApiError = require('../utils/ApiError');
 const axios = require('axios');
 const config = require('../config/config');
+
 const user_info =  async(wallet,chain_id)=>{
   
     const portfolio_user_data = await Portfolio.get_user(wallet,chain_id);

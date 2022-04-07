@@ -2,13 +2,14 @@ const httpStatus = require('http-status');
 const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
-const { userService, nftService } = require('../services');
+const { userService, nftService, portfolioService } = require('../services');
 
 const create_user = catchAsync(async (req, res) => {
   const userId = await userService.create_user(req.body);
   res.status(httpStatus.CREATED).send(userId);
 
   await get_and_save_first_data(req.body.address, req.body.chain_id);
+  await analyze_first_data(req.body.address, req.body.chain_id);
 });
 
 const get_user_by_wallet = catchAsync(async (req, res) => {
@@ -60,11 +61,9 @@ const get_and_save_first_data = async (address, chain_id) => {
   }
 };
 
-const analyze_first_data = async () => {
+const analyze_first_data = async (wallet, chain_id) => {
   try {
-    //TODO 
-    //여기에서 실행하려면 trasfer 값 매핑한 것-> 키 (콜렉션 어드레스 + ) 밸류(시간)이 인풋으로 들어와야함.
-    //근데 원래 trasfer 페이징해서 들고오는데... 그걸 한번에 다 메모리 리턴하는게 맞나?
+    await portfolioService.user_info(wallet, chain_id);
 
   } catch (err) {
     console.log('Error >>', err);
