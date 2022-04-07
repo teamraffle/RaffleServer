@@ -1,10 +1,19 @@
+const axios = require('axios');
 const express = require('express');
+const { header } = require('express/lib/request');
+const validate = require('../../middlewares/validate');
+const portfolioValidation = require('../../validations/portfolio.validation');
+const portfolioController = require('../../controllers/portfolio.controller');
+
 
 const router = express.Router();
 
-router.get('/', function (req, res) {
-  res.send('p');
-})
+router
+  .route('/basic')
+  .get(validate(portfolioValidation.getPortfolio), portfolioController.get_portfolio)
+
+
+
 
 module.exports = router;
 

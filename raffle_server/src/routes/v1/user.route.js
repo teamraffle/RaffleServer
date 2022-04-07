@@ -9,15 +9,15 @@ const userController = require('../../controllers/user.controller');
 
 
 router
-.route('/:user_id')
-.get(validate(userValidation.getUserbyID), userController.getUserbyId)
-.patch(validate(userValidation.updateUser), userController.updateUser)
+  .route('/:user_id')
+  .get(validate(userValidation.getUserbyID), userController.get_user_by_id)
+  .patch(validate(userValidation.updateUser), userController.update_user)
 
 
 router
   .route('/')
-  .post(validate(userValidation.createUser), userController.createUser) 
-  .get(validate(userValidation.getUserbyWallet), userController.getUserbyWallet)
+  .post(validate(userValidation.createUser), userController.create_user) 
+  .get(validate(userValidation.getUserbyWallet), userController.get_user_by_wallet)
 
 
 module.exports = router;

@@ -56,7 +56,7 @@ const searchByWallet= async (query) => {
         if(rows[0] == undefined){
             return false;
         }else{
-            console.log(rows[0]);
+            // console.log(rows[0]);
             return rows[0];//TODO 양식맞추기
         }
       }
@@ -145,6 +145,7 @@ const isNicknameTaken= async (body) => {
     }  
 
 }
+
 
 module.exports = {
     create,

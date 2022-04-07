@@ -7,7 +7,7 @@ const userController = require('../../controllers/user.controller');
 
 router
   .route('/nickname')
-  .get(validate(userValidation.checkNickname), userController.checkNicknameDuplication)
+  .get(validate(userValidation.checkNickname), userController.check_nickname_duplication)
 
 
 module.exports = router;
