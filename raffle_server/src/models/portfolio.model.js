@@ -53,17 +53,14 @@ const get_user= async (query) => {
         const collections_holdings=rows3[0]['COUNT(DISTINCT token_address)']; 
         const most_collection_name=rows4[0].name;
         const most_collection_icon=rows4[0].collection_icon;
-        "UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ user_id+ "'";
-        ;}
-        const update_portfolio = `UPDATE tb_portfolio_eth SET (nft_holdings,collections_holdings,most_collection_name,most_collection_icon) = 
-         (?,?,?,?,?,?,?,?,?,?,?,?,?
-          )`;
-         
-        const portfolio_id = uuidv4.v1();
-        const dbRes = await conn.query(update_portfolio, [nft_holdings,collections_holdings,most_collection_name,most_collection_icon]);
-            return portfolio_id;//TODO 양식맞추기
+       
+        const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=? where wallet_address=?`;
+   
+        const dbRes = await conn.query(update_portfolio, [nft_holdings,collections_holdings,most_collection_name,most_collection_icon,wallet_address]);
+            return dbRes;//TODO 양식맞추기
         
       }
+    }
     } finally {
         if (conn) conn.release();
     }    
