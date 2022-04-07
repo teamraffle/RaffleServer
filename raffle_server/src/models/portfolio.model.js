@@ -36,10 +36,10 @@ const get_user= async (query) => {
         }else{
 
         rows[0].address=wallet.address;
-        console.log(rows[0]);
+        console.log(rows3);
         console.log(rows3[0]['COUNT( * )']);
         rows[0].nft_count =rows2[0]['COUNT( * )']; 
-        rows[0].collection_count  =rows3[0]['COUNT(DISTINCT token_address)']; 
+        rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)']; 
             return rows[0];//TODO 양식맞추기
         }
       }
