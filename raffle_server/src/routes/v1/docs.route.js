@@ -18,4 +18,8 @@ router.get(
   })
 );
 
+
+router.get('/health', function (req, res) {
+  res.send('helthy');
+})
 module.exports = router;
