@@ -31,14 +31,13 @@ const get_user= async (wallet,chain_id) => {
         const query2 ="SELECT COUNT( * ) FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?"
         const query3 ="SELECT COUNT(DISTINCT token_address) FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?";
         const query4 ="SELECT name,collection_icon FROM tb_nft_collection_eth WHERE token_address=(SELECT token_address AS counted FROM tb_nft_eth WHERE tb_nft_eth.owner_of="+'"'+splittedAddr+'"'+"GROUP BY token_address ORDER BY counted DESC LIMIT 1)";
-        console.log(query4)
+        
         rows = await conn.query(query, splittedAddr);
         rows2 = await conn.query(query2, splittedAddr);
         rows3 = await conn.query(query3,splittedAddr); 
         rows4 = await conn.query(query4); 
  
          
-        console.log(rows4[0])
         if(rows[0] == undefined ||rows2[0] == undefined ||rows3[0] == undefined  ||rows4[0] == undefined){
             return false;
         }else{
@@ -49,7 +48,7 @@ const get_user= async (wallet,chain_id) => {
         // rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)']; 
         // rows[0].most_collection=rows4[0].name;
         // rows[0].most_collection_icon=rows4[0].collection_icon;
-        console.log("hii",rows2[0]);
+    
         const wallet_address=wallet.address.replace('0x','');
         const nft_holdings=rows2[0]['COUNT( * )']; 
         const collections_holdings=rows3[0]['COUNT(DISTINCT token_address)']; 

@@ -55,7 +55,7 @@ const get_user_by_id = async (params) => {
 const update_user_by_id = async (params,body) => {
   
   const nicknameCheck = await User.isNicknameTaken(body);
-  console.log(nicknameCheck);
+
   if(nicknameCheck){
   throw new ApiError(httpStatus.CONFLICT, 'Nickname already taken');
   }

@@ -40,7 +40,6 @@ const searchByWallet= async (query) => {
         address : query.address,
         chain_id : query.chain_id
       }
-      console.log(wallet);
     
     var rows;
     try {
@@ -49,7 +48,7 @@ const searchByWallet= async (query) => {
       //TODO 체인아이디 따라 디비테이블 분기 넣을것 
       if(wallet.chain_id==1){
         const splittedAddr = wallet.address.replace('0x','');
-        console.log(splittedAddr);
+      
         const query ="SELECT tb_wallet_eth.chain_id, tb_wallet_eth.address, tb_user.user_id, tb_user.nickname, tb_user.profile_pic, tb_user.status  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
         rows = await conn.query(query, splittedAddr);
         if(rows[0] == undefined){
@@ -130,7 +129,6 @@ const isNicknameTaken= async (body) => {
     if(user.nickname){
     try {
       conn = await pool.getConnection();
-      console.log(user.nickname);
   
         const query ="SELECT nickname FROM tb_user WHERE nickname =?"
         rows = await conn.query(query, user.nickname);

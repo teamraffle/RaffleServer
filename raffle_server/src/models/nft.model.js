@@ -67,13 +67,11 @@ const nft_coll_one_db_save= async (collection_) => {
 
   try {
     conn = await pool.getConnection();
-    console.log(collection_);//성공 리턴
 
     const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type, collection_icon, slug) VALUES (?,?,?,?,?,?,?);';
     var values = [uuidv4.v1(), collection_.token_address, collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
     const dbRes = await conn.query(sql, values);
 
-    console.log(dbRes);//성공 리턴
     return dbRes;
 
   }catch(err) {
@@ -86,7 +84,6 @@ const nft_coll_one_db_save= async (collection_) => {
 }
 
 const nft_db_save= async (data,wallet,fp_total) => {
-  console.log("here:"+data.result.length)
   let finaltuple="";
 
   for(idx in data.result){
@@ -136,8 +133,6 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
   // console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
-    console.log("jer",typeof(fp_total));
-    console.log("jer",typeof(buy_sell.buy_volume));
     const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
 
@@ -147,7 +142,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
       VALUES 
       (?,?,?,?,?,?,?,?,?,?,?,?)`;
       var splittedAddr = wallet.replace('0x','');
-      console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
+      // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
       const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
       // console.log(dbRes2);//성공 
     }
@@ -172,12 +167,9 @@ const createTx = async(data,wallet, arr_ave_date) => {
   // console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
-    console.log("트젝만",typeof(fp_total));
-    console.log("트젝만",typeof(buy_sell.buy_volume));
     const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
     
-    console.log(dbRes);//성공 
     
   }catch(err) {
     console.log(err);

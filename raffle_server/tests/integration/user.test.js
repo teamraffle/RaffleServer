@@ -7,7 +7,7 @@ const httpStatus = require('http-status');
 const app = require('../../src/app');
 const setupTestDB = require('../utils/setupTestDB');
 const { User } = require('../../src/models');
-const { userOne, walletOne, insertUser } = require('../fixtures/user.fixture');
+const { userEmpty, userSmall, walletEmpty, walletSmall, insertUser } = require('../fixtures/user.fixture');
 // const { userOneAccessToken, adminAccessToken } = require('../fixtures/token.fixture');
 
 setupTestDB();
@@ -21,8 +21,7 @@ describe('User routes', () => {
         const zero = faker.datatype.number();
         faker.seed('eead9b11-b7f8-11ec-8244-a5e121af7480');
         const uuid_wallet = faker.datatype.uuid();
-        faker.seed('0xB999D5cb1868368766c41c0F455a9243B2688CF3');
-        const address = faker.datatype.string();
+        const address = '0xaa6e16Cdc8c47e1E1E754af62a36D0d4ac7B7caa';
 
         newUser = {
             user_id: faker.datatype.uuid(),
@@ -43,20 +42,26 @@ describe('User routes', () => {
     });
 
     test('should return 201 and successfully create new user if data is ok', async () => {
-      await insertUser(userOne, 1);
+      input = {
+        chain_id : 1,
+        address : walletSmall.address,
+        nickname : userSmall.nickname,
+        email: userSmall.email,
+        profile_pic : userSmall.profile_pic
+      }
+        
+    //   await insertUser(input, 1);
 
-      const res = await request(app)
+    const res = await request(app)
         .post('/v1/users')
-        .send(newUser)
+        .send(input)
         .expect(httpStatus.CREATED);
 
-      expect(res.body).toEqual({
-        id: expect.anything(),
-        name: newUser.name,
-        email: newUser.email,
-        role: newUser.role,
-        isEmailVerified: false,
-      });
+    expect(res.body).toEqual({
+        user_id: expect.anything()
+    });
+
+
 
     //   const dbUser = await User.findById(res.body.id);
     //   expect(dbUser).toBeDefined();

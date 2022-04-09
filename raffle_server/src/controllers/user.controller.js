@@ -69,9 +69,7 @@ const get_and_save_first_data = async (address, chain_id) => {
       } else {
         has_transfers = false;
       }
-
-      console.log('됏냐 has_nft_now %o',has_nft_now);
-      console.log('됏냐 has_transfers %o',has_transfers);
+      
       if(!has_nft_now && !has_transfers){
         is_worthy_wallet = false;
       }

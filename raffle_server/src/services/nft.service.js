@@ -276,20 +276,20 @@ const get_ave_holding_date = async(data, map_ave_date) =>{
 
   //현재홀딩중인 NFT의 평균기간
   for (let value of map_ave_date.values()){
-    console.log(value);
+  
     const out_time = Date.now();
     const in_time = new Date(value.block_timestamp);
     //타임스탬프간 시간 계산
     const diffTime = Math.abs(out_time - in_time);
     const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-    console.log(holding_date + " days-");
+    // console.log(holding_date + " days-");
     //날짜 어레이에 추가
     arr_ave_date.push(holding_date)
   }
  
  
-  console.log('완성 리스트 : %O', arr_ave_date );
+  // console.log('완성 리스트 : %O', arr_ave_date );
 
  
   return average(arr_ave_date);
@@ -299,19 +299,17 @@ const average = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
 
 const get_holding_date = async (nftMap, timeArray, token_address, token_id, timestamp) => {
   const key = token_address.toString() +token_id.toString();
-  console.log('홀딩'+timestamp);
+  // console.log('홀딩'+timestamp);
 
   if(nftMap.has(key)){
     const out_time = new Date(nftMap.get(key).block_timestamp);
     const in_time = new Date(timestamp);
 
-    console.log(out_time);
-    console.log(in_time);
     //타임스탬프간 시간 계산
     const diffTime = Math.abs(out_time - in_time);
     const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-    console.log(holding_date + " days");
+    // console.log(holding_date + " days");
     //날짜 어레이에 추가
     timeArray.push(holding_date)
 
