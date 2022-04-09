@@ -19,6 +19,10 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
       
     );
 
+    if(response.data.length<1){
+      return {has_nft_now : false};
+    }
+
     const data= await NFT.nft_coll_db_save(response.data, wallet);
   
     collectionSet = new Set([...collectionSet, ...data.collectionSet]);
@@ -45,7 +49,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           offset = offset+page_size; 
         }
      
-      return {coll_set: collectionSet, slug_set: slugSet};
+      return {has_nft_now : false, coll_set: collectionSet, slug_set: slugSet};
     
   } catch (err) {
     console.log('Error >>', err);
@@ -112,11 +116,8 @@ const get_nft_moralis = async (wallet, chain_id) => {
 
 const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
   let finalSet = new Set();
-
   let page = 0;
   const page_size = 500;
-
- 
 
   //0페이지
   var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size,fp_total);
@@ -135,6 +136,81 @@ const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
   }
 
   return finalSet;
+};
+
+const get_all_NFT_transfers_no_fp = async (wallet, chain_id) => {
+  let finalSet = new Set();
+
+  let page = 0;
+  const page_size = 500;
+
+
+  //0페이지
+  var { collectionSet, total, cursor } = await getAndSaveTransfer_noFP(wallet, chain_id, '', page_size);
+  finalSet = collectionSet;
+ 
+  //1~끝페이지
+  if (total > page_size) {
+    page++;
+    // console.log('페이지: '+page);
+    while (page < Math.ceil(total / page_size)) {
+      var { collectionSet, total, cursor } = await getAndSaveTransfer_noFP(wallet, chain_id, cursor, page_size);
+      finalSet = new Set([...finalSet, ...collectionSet]);
+      // console.log(finalSet);
+      page++;
+    }
+  }
+
+  return finalSet;
+};
+
+const getAndSaveTransfer_noFP = async (wallet, chain_id, _cursor, page_size) => {
+  let chain_type;
+  let total;
+  let cursor;
+  if (_cursor == undefined) {
+    cursor = '';
+  } else {
+    cursor = _cursor;
+  }
+
+  if (chain_id == 1) {
+    chain_type = 'eth';
+    if (wallet.length ==40){
+      wallet = '0x'+wallet
+    }
+  }
+
+  let map_ave_date = new Map();
+
+  try {
+    const url = `https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal&direction=both&limit=${page_size}&cursor=${cursor}`;
+    const response = await axios.get(url, {
+      headers: {
+        'x-api-key': config.moralis.secret,
+      },
+    });
+    // console.log(response.data);
+    total = response.data.total;
+    cursor = response.data.cursor;
+    if(response.data.result.length>0){
+      //평균홀딩기간
+      const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
+      
+      //DB에 저장
+      const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date);
+
+    return { collectionSet, total, cursor };
+
+    }else{
+      const collectionSet = {}
+      return { collectionSet, total, cursor };
+    }
+    
+    
+  } catch (err) {
+    console.log('Error >>', err);
+  }
 };
 
 const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total) => {
@@ -166,13 +242,20 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total)
     // console.log(response.data);
     total = response.data.total;
     cursor = response.data.cursor;
-    //평균홀딩기간
-    const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
+    if(response.data.result.length>0){
+      //평균홀딩기간
+      const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
+          
+      //DB에 저장
+      const collectionSet = await NFT.createTx(response.data, wallet, arr_ave_date);
+      return { collectionSet, total, cursor };
+
+    }else{
+      const collectionSet = {}
+      return { collectionSet, total, cursor };
+
+    }
     
-    //DB에 저장
-    const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date, fp_total);
-    
-    return { collectionSet, total, cursor };
   } catch (err) {
     console.log('Error >>', err);
   }
@@ -347,5 +430,6 @@ module.exports = {
   get_nft_fp,
   check_collection_exists,
   get_all_NFT_transfers,
+  get_all_NFT_transfers_no_fp,
   remove_SetA_from_SetB,
 };

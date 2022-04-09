@@ -11,9 +11,6 @@ router.get('/about', function (req, res) {
 
   
 
-router.route('/opn')
-  .get(userController.test)
-
 
 
 module.exports = router;

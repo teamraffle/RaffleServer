@@ -132,7 +132,6 @@ const nft_db_save= async (data,wallet,fp_total) => {
 
 const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
 
-  
   let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
@@ -140,20 +139,19 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
     console.log("jer",typeof(fp_total));
     console.log("jer",typeof(buy_sell.buy_volume));
     const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
-
-    const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
-    (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
-    VALUES 
-    (?,?,?,?,?,?,?,?,?,?,?,?)`;
-    
-
-    var splittedAddr = wallet.replace('0x','');
-    
-    console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
     const dbRes = await conn.query(sql_insert_transfer);
-    const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
+
+    if(typeof fp_total !== 'undefined'){
+      const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
+      (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
+      VALUES 
+      (?,?,?,?,?,?,?,?,?,?,?,?)`;
+      var splittedAddr = wallet.replace('0x','');
+      console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
+      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
+      // console.log(dbRes2);//성공 
+    }
     
-    console.log(dbRes2);//성공 
     
   }catch(err) {
     console.log(err);
@@ -165,6 +163,33 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
   
 
 }
+
+
+const createTx = async(data,wallet, arr_ave_date) => {
+
+  
+  let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
+  // console.log("wallet"+wallet)
+  try {
+    conn = await pool.getConnection();
+    console.log("트젝만",typeof(fp_total));
+    console.log("트젝만",typeof(buy_sell.buy_volume));
+    const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const dbRes = await conn.query(sql_insert_transfer);
+    
+    console.log(dbRes);//성공 
+    
+  }catch(err) {
+    console.log(err);
+  }
+  finally {
+    if (conn) conn.release(); //release to pool
+    return collectionSet;
+  }
+  
+
+}
+
 const classify_action= (value,from_address,to_address,wallet) => {
   let action; //(0~5가지수) 0 buy 1mint 2sell 3burn 4send 5receive
 
@@ -330,6 +355,7 @@ const checkAddress = async(addressSet) =>{
 module.exports = {
   nft_coll_db_save,
   nft_db_save,
+  createTx,
   createTx_and_portfolio,
   save_nft_fp,
   checkAddress,
