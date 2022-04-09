@@ -11,7 +11,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
   const page_size = 300;
 
   let collectionSet = new Set(); //token_address 리턴
-  let slugSet = new Set(); //slug 리턴
+  let slugSet = {} //slug 리턴
   try {
 
     const response = await axios.get(
@@ -22,7 +22,9 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
     const data= await NFT.nft_coll_db_save(response.data, wallet);
   
     collectionSet = new Set([...collectionSet, ...data.collectionSet]);
-    slugSet = new Set([...slugSet, ...data.slugSet]);
+    // slugSet = new Set([...slugSet, ...data.slugSet]);
+    Object.assign(slugSet, data.slugSet);
+    console.log("her",slugSet);
     offset = page_size;
 
         while(true){
@@ -109,7 +111,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
 
 
 
-const get_all_NFT_transfers = async (wallet, chain_id) => {
+const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
   let finalSet = new Set();
 
   let page = 0;
@@ -118,7 +120,7 @@ const get_all_NFT_transfers = async (wallet, chain_id) => {
  
 
   //0페이지
-  var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size);
+  var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size,fp_total);
   finalSet = collectionSet;
  
   //1~끝페이지
@@ -126,7 +128,7 @@ const get_all_NFT_transfers = async (wallet, chain_id) => {
     page++;
     // console.log('페이지: '+page);
     while (page < Math.ceil(total / page_size)) {
-      var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, cursor, page_size);
+      var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, cursor, page_size,fp_total);
       finalSet = new Set([...finalSet, ...collectionSet]);
       // console.log(finalSet);
       page++;
@@ -136,7 +138,7 @@ const get_all_NFT_transfers = async (wallet, chain_id) => {
   return finalSet;
 };
 
-const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
+const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total) => {
   let chain_type;
   let total;
   let cursor;
@@ -169,7 +171,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
     const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
     
     //DB에 저장
-    const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date);
+    const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date, fp_total);
     
     return { collectionSet, total, cursor };
   } catch (err) {
@@ -250,20 +252,21 @@ const check_collection_exists = async (addressSet) => {
 };
 
 const get_nft_fp = async(slug_set) => {
-  console.log(slug_set)
-  
-  for(let idx of slug_set){
+  let fp_total=0;
+  for(let idx in slug_set){
   // console.log("https://api.opensea.io/api/v1/collection/" + idx)
   try {
     const Response = await axios.get('https://api.opensea.io/api/v1/collection/' + idx);
-    // console.log(Response);
     await NFT.save_nft_fp(Response.data.collection);
+    let fp =Response.data.collection.stats.floor_price * slug_set[idx];
+    fp_total+=fp;
+
   } catch (err) {
     console.log(Error);
     }
   }
+  return fp_total;
 };
-
 
 const get_and_save_nftcoll = async (missingAddresses) => {
   for (let address of missingAddresses) {
