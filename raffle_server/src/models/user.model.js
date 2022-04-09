@@ -35,7 +35,6 @@ const create= async (body, wallet_id) => {
 }
 
 const searchByWallet= async (query) => {
-  console.log("????????????????????");
 
     var wallet ={
         address : query.address,

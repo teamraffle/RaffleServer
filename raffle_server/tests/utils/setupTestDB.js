@@ -1,22 +1,16 @@
-//=========================
-//TODO: Mariadb 로 대체할것
-//=========================
+const pool = require('../../src/models/plugins/dbHelper');
 
-// const mongoose = require('mongoose');
-// const config = require('../../src/config/config');
+const setupTestDB = () => {
+  let conn;
 
-// const setupTestDB = () => {
-//   beforeAll(async () => {
-//     await mongoose.connect(config.mongoose.url, config.mongoose.options);
-//   });
+  beforeAll(async () => {
+    conn = await pool.getConnection();
+  });
 
-//   beforeEach(async () => {
-//     await Promise.all(Object.values(mongoose.connection.collections).map(async (collection) => collection.deleteMany()));
-//   });
+  afterAll(async () => {
+    await conn.release();
+  });
+};
 
-//   afterAll(async () => {
-//     await mongoose.disconnect();
-//   });
-// };
-
-// module.exports = setupTestDB;
+module.exports = setupTestDB
+;
