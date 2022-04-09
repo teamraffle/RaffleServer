@@ -132,13 +132,17 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
   let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
-  console.log("왜냐공")
 
     conn = await pool.getConnection();
     const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
+    console.log('ㅇㅇㅇㅇ1');//성공 
+    console.log(fp_total);//성공 
+    
+  
+    if(fp_total !== 'undefined'){
+      console.log('ㅇㅇㅇㅇ');//성공 
 
-    if(typeof fp_total !== 'undefined'){
       const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
       (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
       VALUES 

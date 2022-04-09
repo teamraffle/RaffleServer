@@ -49,7 +49,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           offset = offset+page_size; 
         }
      
-      return {has_nft_now : false, coll_set: collectionSet, slug_set: slugSet};
+      return {has_nft_now : true, coll_set: collectionSet, slug_set: slugSet};
     
   } catch (err) {
     console.log('Error >>', err);
@@ -247,7 +247,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total)
       const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
           
       //DB에 저장
-      const collectionSet = await NFT.createTx(response.data, wallet, arr_ave_date);
+      const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date, fp_total);
       return { collectionSet, total, cursor };
 
     }else{
