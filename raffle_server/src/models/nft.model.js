@@ -132,6 +132,8 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
   let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
+  console.log("왜냐공")
+
     conn = await pool.getConnection();
     const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
@@ -144,14 +146,13 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
       var splittedAddr = wallet.replace('0x','');
       // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
       const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
-      // console.log(dbRes2);//성공 
+      console.log(dbRes2);//성공 
     }
     
     
   }catch(err) {
     console.log(err);
-  }
-  finally {
+  }finally {
     if (conn) conn.release(); //release to pool
     return collectionSet;
   }

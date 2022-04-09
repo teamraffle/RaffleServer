@@ -42,28 +42,24 @@ describe('User routes', () => {
     });
 
     test('should return 201 and successfully create new user if data is ok', async () => {
-      input = {
-        chain_id : 1,
-        address : walletSmall.address,
-        nickname : userSmall.nickname,
-        email: userSmall.email,
-        profile_pic : userSmall.profile_pic
-      }
+        input = {
+            chain_id : 1,
+            address : walletSmall.address,
+            nickname : userSmall.nickname,
+            email: userSmall.email,
+            profile_pic : userSmall.profile_pic
+        }
         
-    //   await insertUser(input, 1);
+        const res = await request(app)
+            .post('/v1/users')
+            .send(input)
+            .expect(httpStatus.CREATED);
 
-    const res = await request(app)
-        .post('/v1/users')
-        .send(input)
-        .expect(httpStatus.CREATED);
+        expect(res.body).toEqual({
+            user_id: expect.anything()
+        });
 
-    expect(res.body).toEqual({
-        user_id: expect.anything()
-    });
-
-
-
-    //   const dbUser = await User.findById(res.body.id);
+    //   const dbUser = await User.findById(res.body.user_id);
     //   expect(dbUser).toBeDefined();
     //   expect(dbUser.password).not.toBe(newUser.password);
     //   expect(dbUser).toMatchObject({ name: newUser.name, email: newUser.email, role: newUser.role, isEmailVerified: false });
@@ -121,17 +117,6 @@ describe('User routes', () => {
     //     .expect(httpStatus.BAD_REQUEST);
     // });
 
-    // test('should return 400 error if password length is less than 8 characters', async () => {
-    //   await insertUsers([admin]);
-    //   newUser.password = 'passwo1';
-
-    //   await request(app)
-    //     .post('/v1/users')
-    //     .set('Authorization', `Bearer ${adminAccessToken}`)
-    //     .send(newUser)
-    //     .expect(httpStatus.BAD_REQUEST);
-    // });
-
     // test('should return 400 error if password does not contain both letters and numbers', async () => {
     //   await insertUsers([admin]);
     //   newUser.password = 'password';
@@ -151,16 +136,6 @@ describe('User routes', () => {
     //     .expect(httpStatus.BAD_REQUEST);
     // });
 
-    // test('should return 400 error if role is neither user nor admin', async () => {
-    //   await insertUsers([admin]);
-    //   newUser.role = 'invalid';
-
-    //   await request(app)
-    //     .post('/v1/users')
-    //     .set('Authorization', `Bearer ${adminAccessToken}`)
-    //     .send(newUser)
-    //     .expect(httpStatus.BAD_REQUEST);
-    // });
   });
 
 //   describe('GET /v1/users', () => {
