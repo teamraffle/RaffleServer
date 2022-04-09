@@ -49,7 +49,7 @@ const get_user= async (wallet,chain_id) => {
         // rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)']; 
         // rows[0].most_collection=rows4[0].name;
         // rows[0].most_collection_icon=rows4[0].collection_icon;
-
+        console.log("hii",rows2[0]);
         const wallet_address=wallet.address.replace('0x','');
         const nft_holdings=rows2[0]['COUNT( * )']; 
         const collections_holdings=rows3[0]['COUNT(DISTINCT token_address)']; 

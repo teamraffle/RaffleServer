@@ -24,7 +24,6 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
     collectionSet = new Set([...collectionSet, ...data.collectionSet]);
     // slugSet = new Set([...slugSet, ...data.slugSet]);
     Object.assign(slugSet, data.slugSet);
-    console.log("her",slugSet);
     offset = page_size;
 
         while(true){
@@ -41,7 +40,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           if(dataSet !=0) //비어있지 않다면 추가
           {
             collectionSet = new Set([...collectionSet, ...dataSet.collectionSet]);
-            slugSet = new Set([...slugSet, ...dataSet.slugSet]);
+            Object.assign(slugSet, data.slugSet);
           }
           offset = offset+page_size; 
         }
