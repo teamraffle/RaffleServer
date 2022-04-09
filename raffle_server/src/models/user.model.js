@@ -127,10 +127,12 @@ const isNicknameTaken= async (body) => {
       } 
     
       var rows;
+    if(user.nickname){
     try {
       conn = await pool.getConnection();
+      console.log(user.nickname);
   
-        const query ="SELECT nickname FROM tb_user WHERE nickname = ?"
+        const query ="SELECT nickname FROM tb_user WHERE nickname =?"
         rows = await conn.query(query, user.nickname);
         if(rows[0] == undefined){
             return false;
@@ -141,7 +143,10 @@ const isNicknameTaken= async (body) => {
         }
     } finally {
         if (conn) conn.release();
-    }  
+    } }
+    else{
+      return false;
+    }
 
 }
 

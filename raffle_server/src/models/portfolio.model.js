@@ -49,7 +49,7 @@ const get_user= async (wallet,chain_id) => {
         // rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)']; 
         // rows[0].most_collection=rows4[0].name;
         // rows[0].most_collection_icon=rows4[0].collection_icon;
-
+        console.log("hii",rows2[0]);
         const wallet_address=wallet.address.replace('0x','');
         const nft_holdings=rows2[0]['COUNT( * )']; 
         const collections_holdings=rows3[0]['COUNT(DISTINCT token_address)']; 
@@ -84,16 +84,16 @@ const get_portfolio= async (query) => {
     conn = await pool.getConnection();
 
     //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-  
-      //첫번째 쿼리, 두개 조인해서 닉네임 가져오기
-      //두번째 쿼리, 일단 해당 사용자 값 nft 갯수 가져오기
-      
+        
     
-      const query ="SELECT * FROM tb_portfolio_eth WHERE wallet_address=?"
+      const portfolio_query ="SELECT * FROM tb_portfolio_eth WHERE wallet_address=?"
+      const user_query ="SELECT tb_user.nickname,tb_user.user_id,tb_user.profile_pic FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id  WHERE tb_wallet_eth.address=?"
 
-      rows = await conn.query(query, splittedAddr);
+      rows = await conn.query(portfolio_query, splittedAddr);
+      rows2 = await conn.query(user_query, splittedAddr);
   
       total.updated_at=rows[0].create_timestamp;
+      total.user=rows2[0];
       total.portfolio=rows[0];
       
       delete total.portfolio.create_timestamp;
