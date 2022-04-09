@@ -125,7 +125,7 @@ const nft_db_save= async (data,wallet) => {
 }
 
 const createTx_and_portfolio= async(data,wallet, arr_ave_date) => {
-  let {finalTuple, collectionSet} = createTx_tuple(data,wallet);
+  let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
@@ -142,7 +142,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date) => {
     
 
     const dbRes = await conn.query(sql_insert_transfer);
-    const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',0,0,0,0,0,0]);
+    const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',0,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
     
     console.log(dbRes2);//성공 
     
@@ -190,6 +190,9 @@ const classify_action= (value,from_address,to_address,wallet) => {
 const createTx_tuple= (data,wallet) =>{
   var _finalTuple="";
   var _collectionSet = new Set();
+  var _buysell = {};
+  let buy_volume=0;
+  let sell_volume=0;
 
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
@@ -208,10 +211,16 @@ const createTx_tuple= (data,wallet) =>{
     const amount='\"'+data.result[idx].amount+'\"';
     const verified='\"'+data.result[idx].verified+'\"';
 
-
     const action ='\"'+  classify_action(data.result[idx].value,data.result[idx].from_address,data.result[idx].to_address,wallet)+'\"';
     //여기서는 " "넣어서 보내면 불편하니 그냥 보내기 그리고 0x변환도 안해야 비교하니 빠르니 그냥 보내기
-
+    console.log("action 값 확인 :",action,"action data 확인",typeof(action));
+    if(action=='"0"'){
+      buy_volume+=parseInt(data.result[idx].value);
+    }
+    if(action=='"2"'){
+      sell_volume+=parseInt(data.result[idx].value);
+    }
+  
     let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
     value, transaction_type, token_address, token_id, from_address, to_address, amount, verified,action];
     let res = sqlData.join(',');
@@ -226,12 +235,14 @@ const createTx_tuple= (data,wallet) =>{
 
     
   };
+  _buysell.buy_volume=buy_volume;
+  _buysell.sell_volume=sell_volume;
 
-  
+  console.log(_buysell);  
   // console.log(_collectionSet);
   // console.log(_finalTuple);
 
-  return {finalTuple : _finalTuple, collectionSet : _collectionSet};
+  return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell : _buysell };
 }
 
 
