@@ -92,16 +92,15 @@ const get_portfolio= async (query) => {
       rows = await conn.query(portfolio_query, splittedAddr);
       rows2 = await conn.query(user_query, splittedAddr);
   
-      total.updated_at=rows[0].create_timestamp;
-      total.user=rows2[0];
-      total.portfolio=rows[0];
-      
-      delete total.portfolio.create_timestamp;
 
       if(rows[0] == undefined ){
           return false;
       }else{
-
+        total.updated_at=rows[0].create_timestamp;
+        total.user=rows2[0];
+        total.portfolio=rows[0];
+        
+        delete total.portfolio.create_timestamp;
       return total;//TODO 양식맞추기
       
     }
