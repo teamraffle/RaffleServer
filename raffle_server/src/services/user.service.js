@@ -18,7 +18,7 @@ const create_user = async (body) => {
   }
   const userID = await User.create(body, walletId);
   const msg ={
-    userID : userID
+    user_id : userID
   }
   return msg;
  
