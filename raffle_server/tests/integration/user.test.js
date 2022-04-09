@@ -1,147 +1,162 @@
 //=========================
 //TODO: Mariadb 로 대체할것
 //=========================
-// const request = require('supertest');
-// const faker = require('faker');
-// const httpStatus = require('http-status');
-// const app = require('../../src/app');
-// // const setupTestDB = require('../utils/setupTestDB');
-// const { User } = require('../../src/models');
-// const { userOne, userTwo, admin, insertUsers } = require('../fixtures/user.fixture');
+const request = require('supertest');
+const { faker } = require('@faker-js/faker');
+const httpStatus = require('http-status');
+const app = require('../../src/app');
+const setupTestDB = require('../utils/setupTestDB');
+const { User } = require('../../src/models');
+const { userOne, walletOne, insertUser } = require('../fixtures/user.fixture');
 // const { userOneAccessToken, adminAccessToken } = require('../fixtures/token.fixture');
 
-// // setupTestDB();
+setupTestDB();
 
-// describe('User routes', () => {
-//   describe('POST /v1/users', () => {
-//     let newUser;
+describe('User routes', () => {
+  describe('POST /v1/users', () => {
+    let newUser;
 
-//     beforeEach(() => {
-//       newUser = {
-//         name: faker.name.findName(),
-//         email: faker.internet.email().toLowerCase(),
-//         password: 'password1',
-//         role: 'user',
-//       };
-//     });
+    beforeEach(() => {
+        faker.seed(0);
+        const zero = faker.datatype.number();
+        faker.seed('eead9b11-b7f8-11ec-8244-a5e121af7480');
+        const uuid_wallet = faker.datatype.uuid();
+        faker.seed('0xB999D5cb1868368766c41c0F455a9243B2688CF3');
+        const address = faker.datatype.string();
 
-//     test('should return 201 and successfully create new user if data is ok', async () => {
-//       await insertUsers([admin]);
+        newUser = {
+            user_id: faker.datatype.uuid(),
+            wallet_id : uuid_wallet,
+            nickname: faker.name.findName(),
+            profile_pic: faker.image.avatar(),
+            status: zero,
+            email: faker.internet.email().toLowerCase(),
+            create_timestamp :faker.date.past(),
+            update_timestamp : faker.date.past()
+        };
+          
+        newWallet = {
+            wallet_id : uuid_wallet,
+            address : address, 
+            create_timestamp : faker.date.past()
+        };
+    });
 
-//       const res = await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.CREATED);
+    test('should return 201 and successfully create new user if data is ok', async () => {
+      await insertUser(userOne, 1);
 
-//       expect(res.body).not.toHaveProperty('password');
-//       expect(res.body).toEqual({
-//         id: expect.anything(),
-//         name: newUser.name,
-//         email: newUser.email,
-//         role: newUser.role,
-//         isEmailVerified: false,
-//       });
+      const res = await request(app)
+        .post('/v1/users')
+        .send(newUser)
+        .expect(httpStatus.CREATED);
 
-//       const dbUser = await User.findById(res.body.id);
-//       expect(dbUser).toBeDefined();
-//       expect(dbUser.password).not.toBe(newUser.password);
-//       expect(dbUser).toMatchObject({ name: newUser.name, email: newUser.email, role: newUser.role, isEmailVerified: false });
-//     });
+      expect(res.body).toEqual({
+        id: expect.anything(),
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        isEmailVerified: false,
+      });
 
-//     test('should be able to create an admin as well', async () => {
-//       await insertUsers([admin]);
-//       newUser.role = 'admin';
+    //   const dbUser = await User.findById(res.body.id);
+    //   expect(dbUser).toBeDefined();
+    //   expect(dbUser.password).not.toBe(newUser.password);
+    //   expect(dbUser).toMatchObject({ name: newUser.name, email: newUser.email, role: newUser.role, isEmailVerified: false });
+    });
 
-//       const res = await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.CREATED);
+    // test('should be able to create an admin as well', async () => {
+    //   await insertUsers([admin]);
+    //   newUser.role = 'admin';
 
-//       expect(res.body.role).toBe('admin');
+    //   const res = await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${adminAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.CREATED);
 
-//       const dbUser = await User.findById(res.body.id);
-//       expect(dbUser.role).toBe('admin');
-//     });
+    //   expect(res.body.role).toBe('admin');
 
-//     test('should return 401 error if access token is missing', async () => {
-//       await request(app).post('/v1/users').send(newUser).expect(httpStatus.UNAUTHORIZED);
-//     });
+    //   const dbUser = await User.findById(res.body.id);
+    //   expect(dbUser.role).toBe('admin');
+    // });
 
-//     test('should return 403 error if logged in user is not admin', async () => {
-//       await insertUsers([userOne]);
+    // test('should return 401 error if access token is missing', async () => {
+    //   await request(app).post('/v1/users').send(newUser).expect(httpStatus.UNAUTHORIZED);
+    // });
 
-//       await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${userOneAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.FORBIDDEN);
-//     });
+    // test('should return 403 error if logged in user is not admin', async () => {
+    //   await insertUsers([userOne]);
 
-//     test('should return 400 error if email is invalid', async () => {
-//       await insertUsers([admin]);
-//       newUser.email = 'invalidEmail';
+    //   await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${userOneAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.FORBIDDEN);
+    // });
 
-//       await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.BAD_REQUEST);
-//     });
+    // test('should return 400 error if email is invalid', async () => {
+    //   await insertUsers([admin]);
+    //   newUser.email = 'invalidEmail';
 
-//     test('should return 400 error if email is already used', async () => {
-//       await insertUsers([admin, userOne]);
-//       newUser.email = userOne.email;
+    //   await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${adminAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.BAD_REQUEST);
+    // });
 
-//       await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.BAD_REQUEST);
-//     });
+    // test('should return 400 error if email is already used', async () => {
+    //   await insertUsers([admin, userOne]);
+    //   newUser.email = userOne.email;
 
-//     test('should return 400 error if password length is less than 8 characters', async () => {
-//       await insertUsers([admin]);
-//       newUser.password = 'passwo1';
+    //   await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${adminAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.BAD_REQUEST);
+    // });
 
-//       await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.BAD_REQUEST);
-//     });
+    // test('should return 400 error if password length is less than 8 characters', async () => {
+    //   await insertUsers([admin]);
+    //   newUser.password = 'passwo1';
 
-//     test('should return 400 error if password does not contain both letters and numbers', async () => {
-//       await insertUsers([admin]);
-//       newUser.password = 'password';
+    //   await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${adminAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.BAD_REQUEST);
+    // });
 
-//       await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.BAD_REQUEST);
+    // test('should return 400 error if password does not contain both letters and numbers', async () => {
+    //   await insertUsers([admin]);
+    //   newUser.password = 'password';
 
-//       newUser.password = '1111111';
+    //   await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${adminAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.BAD_REQUEST);
 
-//       await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.BAD_REQUEST);
-//     });
+    //   newUser.password = '1111111';
 
-//     test('should return 400 error if role is neither user nor admin', async () => {
-//       await insertUsers([admin]);
-//       newUser.role = 'invalid';
+    //   await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${adminAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.BAD_REQUEST);
+    // });
 
-//       await request(app)
-//         .post('/v1/users')
-//         .set('Authorization', `Bearer ${adminAccessToken}`)
-//         .send(newUser)
-//         .expect(httpStatus.BAD_REQUEST);
-//     });
-//   });
+    // test('should return 400 error if role is neither user nor admin', async () => {
+    //   await insertUsers([admin]);
+    //   newUser.role = 'invalid';
+
+    //   await request(app)
+    //     .post('/v1/users')
+    //     .set('Authorization', `Bearer ${adminAccessToken}`)
+    //     .send(newUser)
+    //     .expect(httpStatus.BAD_REQUEST);
+    // });
+  });
 
 //   describe('GET /v1/users', () => {
 //     test('should return 200 and apply the default query options', async () => {
@@ -625,4 +640,4 @@
 //         .expect(httpStatus.BAD_REQUEST);
 //     });
 //   });
-// });
+});
