@@ -135,8 +135,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  userID:
+                  user_id:
                     type: string
+              examples:
+                example-1:
+                  value:
+                    user_id: string
         '400':
           description: Conflict - 지갑주소나 닉네임이 겹침
         '404':
@@ -222,7 +226,6 @@ paths:
             type: integer
           in: query
           name: chain_id
-      description: ''
       tags:
         - Register
   '/rankings/{standard}':
@@ -270,7 +273,7 @@ paths:
         - Rankings
   /portfolios/basic:
     get:
-      summary: Check if user exist by wallet
+      summary: Get basic information of portfolio
       responses:
         '200':
           description: OK
@@ -360,18 +363,6 @@ paths:
           $ref: '#/components/responses/404'
       operationId: get-portfolios-user-id-or-address
       parameters:
-        - schema:
-            type: integer
-          in: query
-          name: offset
-        - schema:
-            type: integer
-          in: query
-          name: limit
-        - schema:
-            type: string
-          in: query
-          name: cursor
         - schema:
             type: string
           in: query
@@ -605,7 +596,6 @@ paths:
           required: true
       tags:
         - Portfolios
-      description: ''
 components:
   schemas:
     User:
@@ -657,15 +647,15 @@ components:
           type: object
           properties:
             nft_count:
-              type: number
+              type: integer
             collection_count:
-              type: number
+              type: integer
             ave_holding_period:
               type: number
-            most_collection:
-              type: number
+            most_collection_name:
+              type: string
             most_collection_icon:
-              type: number
+              type: string
             'est_market_value ':
               type: number
             est_market_value _7d:
