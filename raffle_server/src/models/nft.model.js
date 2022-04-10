@@ -97,7 +97,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
     const frozen= '\"'+data.result[idx].frozen+'\"';
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number];
     let res = nft_string.join(',');
-    console.log(idx+":"+token_id);
+    // console.log(idx+":"+token_id);
     
     if(idx==0){
       finaltuple+="("+res+")";
@@ -136,12 +136,9 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
     conn = await pool.getConnection();
     const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
-    console.log('ㅇㅇㅇㅇ1');//성공 
-    console.log(fp_total);//성공 
-    
+   
   
     if(fp_total !== 'undefined'){
-      console.log('ㅇㅇㅇㅇ');//성공 
 
       const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
       (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
@@ -150,7 +147,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
       var splittedAddr = wallet.replace('0x','');
       // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
       const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
-      console.log(dbRes2);//성공 
+      // console.log(dbRes2);//성공 
     }
     
     
