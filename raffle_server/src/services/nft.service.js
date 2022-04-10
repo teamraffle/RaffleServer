@@ -177,7 +177,7 @@ const getAndSaveTransfer_noFP = async (wallet, chain_id, _cursor, page_size) => 
   if (chain_id == 1) {
     chain_type = 'eth';
     if (wallet.length ==40){
-      wallet = '0x'+wallet
+      wallet = wallet
     }
   }
 
@@ -226,7 +226,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total)
   if (chain_id == 1) {
     chain_type = 'eth';
     if (wallet.length ==40){
-      wallet = '0x'+wallet
+      wallet = wallet
     }
   }
 
@@ -267,7 +267,7 @@ const get_ave_holding_date = async(data, map_ave_date) =>{
   //out 된 nft의 평균기간
   for(idx in data.result){
 
-    const token_address= data.result[idx].token_address.replace('0x','');
+    const token_address= data.result[idx].token_address;
     const token_id= data.result[idx].token_id;
     const block_timestamp= data.result[idx].block_timestamp;
 
@@ -350,7 +350,7 @@ const get_nft_fp = async(slug_set) => {
 
 const get_and_save_nftcoll = async (missingAddresses) => {
   for (let address of missingAddresses) {
-    address = '0x'+address;
+    address = address;
     let collection = await get_collection_opensea(address);
     await NFT.nft_coll_one_db_save(collection);
   }
@@ -368,7 +368,7 @@ const get_collection_moralis = async (address) => {
     // console.log(response.data.result[0]);
 
     var collection = {
-      token_address : response.data.result[0].token_address.replace('0x',''),
+      token_address : response.data.result[0].token_address,
       symbol : response.data.result[0].symbol,
       name: response.data.result[0].name,
       contract_type : response.data.result[0].contract_type,
@@ -395,7 +395,7 @@ const get_collection_opensea = async (address) => {
     // console.log(response.data);
 
     var collection = {
-      token_address : response.data.address.replace('0x',''),
+      token_address : response.data.address,
       symbol : response.data.symbol,
       name: response.data.name,
       contract_type : response.data.schema_name,
