@@ -96,29 +96,36 @@ const updatepatchUserById= async (params,body) => {
 
   var rows;
   var rows2;
+  var query;
 
 
   const idcheck = "SELECT user_id FROM tb_user WHERE user_id =?";
   rows = await conn.query(idcheck,user_id);
  
 
-  if(rows==undefined){
+  if(rows[0]==undefined){
     return false;
   }
 
   try {
-    const query =`UPDATE tb_user SET nickname=?,profile_pic=? WHERE tb_user.user_id=?`;
-    rows2 = await conn.query(query, [nickname,profile_pic,user_id]);
-    conn = await pool.getConnection();
+    if(typeof profile_pic =="undefined"){
+      query ="UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ user_id+ "'";
+      ;}
+    else if(typeof nickname =="undefined")
+    { 
+    query ="UPDATE tb_user SET profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
+    }
+    else{
+      query ="UPDATE tb_user SET nickname='"+nickname +"',profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-      if(rows == undefined){
-          return false;
-      }else{
-          logger.info(rows2[0]);
-          return true;//TODO 양식맞추기
-      }
-    
+    }
+    rows2 = await conn.query(query,user_id);
+    if(rows2 == undefined){
+      return false;
+  }else{
+      logger.info(rows2[0]);
+      return true;//TODO 양식맞추기
+  }
   } finally {
       if (conn) conn.release();
   }    
