@@ -140,31 +140,35 @@ describe('User routes', () => {
 
   });
 
-//   describe('GET /v1/users', () => {
-//     test('should return 200 and apply the default query options', async () => {
+  describe('GET /v1/users', () => {
+    test('should return 200 and apply the default query options', async () => {
 
-//       const res = await request(app)
-//         .get('/v1/users')
-//         .send()
-//         .expect(httpStatus.OK);
+      const res = await request(app)
+        .get('/v1/users')
+        .query(
+            {
+                chain_id : 1,
+                address: walletSmall.address,
+            }
+        )
+        .send()
+        .expect(httpStatus.OK);
+      
+      expect(res.body).toEqual({
+        user_id: userSmall.user_id,
+        nickname: userSmall.nickname,
+        profile_pic : userSmall.profile_pic,
+        email: userSmall.email,
+        status: userSmall.status,
+        wallet: {
+            wallet_id :  expect.anything(),
+            address : walletSmall.address,
+            chain_id: 0
+        }
+      });
+    });
 
-//       expect(res.body).toEqual({
-//         results: expect.any(Array),
-//         page: 1,
-//         limit: 10,
-//         totalPages: 1,
-//         totalResults: 3,
-//       });
-//       expect(res.body.results).toHaveLength(3);
-//       expect(res.body.results[0]).toEqual({
-//         id: userOne._id.toHexString(),
-//         name: userOne.name,
-//         email: userOne.email,
-//         role: userOne.role,
-//         isEmailVerified: userOne.isEmailVerified,
-//       });
-//     });
-
+    // expect(res.body.results).toHaveLength(3);
 //     // test('should return 401 if access token is missing', async () => {
 //     //   await insertUsers([userOne, userTwo, admin]);
 
@@ -346,7 +350,7 @@ describe('User routes', () => {
 //     //   expect(res.body.results).toHaveLength(1);
 //     //   expect(res.body.results[0].id).toBe(admin._id.toHexString());
 //     // });
-//   });
+  });
 
   describe('GET /v1/users/:userId', () => {
     test('should return 200 and the user object if data is ok', async () => {
@@ -356,12 +360,16 @@ describe('User routes', () => {
         .expect(httpStatus.OK);
 
       expect(res.body).toEqual({
-        createDate : expect.anything(),
         user_id: userSmall.user_id,
         nickname: userSmall.nickname,
+        profile_pic : userSmall.profile_pic,
         email: userSmall.email,
         status: userSmall.status,
-        profile_pic : userSmall.profile_pic
+        wallet: {
+            wallet_id :  expect.anything(),
+            address : walletSmall.address,
+            chain_id: 0
+        }
       });
     });
 
