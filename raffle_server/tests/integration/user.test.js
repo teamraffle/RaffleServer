@@ -137,14 +137,14 @@ describe('User routes', () => {
         wallet: {
             wallet_id :  expect.anything(),
             address : walletSmall.address,
-            chain_id: 0
+            chain_id: 1
         }
       });
     });
 
     test('should return 400 because wallet address type is wrong', async () => {
 
-        const res = await request(app)
+        await request(app)
           .get('/v1/users')
           .query(
               {
@@ -153,32 +153,22 @@ describe('User routes', () => {
               }
           )
           .send()
-          .expect(httpStatus.OK);
-        
-          await request(app)
-            .post('/v1/users')
-            .send(input)
-            .expect(httpStatus.BAD_REQUEST);
+          .expect(httpStatus.BAD_REQUEST);
     
     });
 
     test('should return 404 because no user was found', async () => {
 
-        const res = await request(app)
+        await request(app)
           .get('/v1/users')
           .query(
               {
                   chain_id : 1,
-                  address: newUser.address,
+                  address: newWallet.address,
               }
           )
           .send()
-          .expect(httpStatus.OK);
-        
-          await request(app)
-            .post('/v1/users')
-            .send(input)
-            .expect(httpStatus.NOT_FOUND);
+          .expect(httpStatus.NOT_FOUND);
       });
 
   });
@@ -199,7 +189,7 @@ describe('User routes', () => {
         wallet: {
             wallet_id :  expect.anything(),
             address : walletSmall.address,
-            chain_id: 0
+            chain_id: 1
         }
       });
     });
