@@ -11,7 +11,7 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
   const page_size = 300;
 
   let collectionSet = new Set(); //token_address 리턴
-  let slugSet = new Set(); //slug 리턴
+  let slugSet = {} //slug 리턴
   try {
 
     const response = await axios.get(
@@ -19,10 +19,15 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
       
     );
 
+    if(response.data.length<1){
+      return {has_nft_now : false};
+    }
+
     const data= await NFT.nft_coll_db_save(response.data, wallet);
   
     collectionSet = new Set([...collectionSet, ...data.collectionSet]);
-    slugSet = new Set([...slugSet, ...data.slugSet]);
+    // slugSet = new Set([...slugSet, ...data.slugSet]);
+    Object.assign(slugSet, data.slugSet);
     offset = page_size;
 
         while(true){
@@ -39,12 +44,12 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           if(dataSet !=0) //비어있지 않다면 추가
           {
             collectionSet = new Set([...collectionSet, ...dataSet.collectionSet]);
-            slugSet = new Set([...slugSet, ...dataSet.slugSet]);
+            Object.assign(slugSet, data.slugSet);
           }
           offset = offset+page_size; 
         }
      
-      return {coll_set: collectionSet, slug_set: slugSet};
+      return {has_nft_now : true, coll_set: collectionSet, slug_set: slugSet};
     
   } catch (err) {
     console.log('Error >>', err);
@@ -109,16 +114,13 @@ const get_nft_moralis = async (wallet, chain_id) => {
 
 
 
-const get_all_NFT_transfers = async (wallet, chain_id) => {
+const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
   let finalSet = new Set();
-
   let page = 0;
   const page_size = 500;
 
- 
-
   //0페이지
-  var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size);
+  var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, '', page_size,fp_total);
   finalSet = collectionSet;
  
   //1~끝페이지
@@ -126,7 +128,7 @@ const get_all_NFT_transfers = async (wallet, chain_id) => {
     page++;
     // console.log('페이지: '+page);
     while (page < Math.ceil(total / page_size)) {
-      var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, cursor, page_size);
+      var { collectionSet, total, cursor } = await getAndSaveTransfer(wallet, chain_id, cursor, page_size,fp_total);
       finalSet = new Set([...finalSet, ...collectionSet]);
       // console.log(finalSet);
       page++;
@@ -136,7 +138,33 @@ const get_all_NFT_transfers = async (wallet, chain_id) => {
   return finalSet;
 };
 
-const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
+const get_all_NFT_transfers_no_fp = async (wallet, chain_id) => {
+  let finalSet = new Set();
+
+  let page = 0;
+  const page_size = 500;
+
+
+  //0페이지
+  var { collectionSet, total, cursor } = await getAndSaveTransfer_noFP(wallet, chain_id, '', page_size);
+  finalSet = collectionSet;
+ 
+  //1~끝페이지
+  if (total > page_size) {
+    page++;
+    // console.log('페이지: '+page);
+    while (page < Math.ceil(total / page_size)) {
+      var { collectionSet, total, cursor } = await getAndSaveTransfer_noFP(wallet, chain_id, cursor, page_size);
+      finalSet = new Set([...finalSet, ...collectionSet]);
+      // console.log(finalSet);
+      page++;
+    }
+  }
+
+  return finalSet;
+};
+
+const getAndSaveTransfer_noFP = async (wallet, chain_id, _cursor, page_size) => {
   let chain_type;
   let total;
   let cursor;
@@ -149,7 +177,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
   if (chain_id == 1) {
     chain_type = 'eth';
     if (wallet.length ==40){
-      wallet = '0x'+wallet
+      wallet = wallet
     }
   }
 
@@ -165,13 +193,69 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size) => {
     // console.log(response.data);
     total = response.data.total;
     cursor = response.data.cursor;
-    //평균홀딩기간
-    const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
-    
-    //DB에 저장
-    const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date);
-    
+    if(response.data.result.length>0){
+      //평균홀딩기간
+      const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
+      
+      //DB에 저장
+      const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date);
+
     return { collectionSet, total, cursor };
+
+    }else{
+      const collectionSet = {}
+      return { collectionSet, total, cursor };
+    }
+    
+    
+  } catch (err) {
+    console.log('Error >>', err);
+  }
+};
+
+const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total) => {
+  let chain_type;
+  let total;
+  let cursor;
+  if (_cursor == undefined) {
+    cursor = '';
+  } else {
+    cursor = _cursor;
+  }
+
+  if (chain_id == 1) {
+    chain_type = 'eth';
+    if (wallet.length ==40){
+      wallet = wallet
+    }
+  }
+
+  let map_ave_date = new Map();
+
+  try {
+    const url = `https://deep-index.moralis.io/api/v2/${wallet}/nft/transfers?chain=${chain_type}&format=decimal&direction=both&limit=${page_size}&cursor=${cursor}`;
+    const response = await axios.get(url, {
+      headers: {
+        'x-api-key': config.moralis.secret,
+      },
+    });
+    // console.log(response.data);
+    total = response.data.total;
+    cursor = response.data.cursor;
+    if(response.data.result.length>0){
+      //평균홀딩기간
+      const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
+          
+      //DB에 저장
+      const collectionSet = await NFT.createTx_and_portfolio(response.data, wallet, arr_ave_date, fp_total);
+      return { collectionSet, total, cursor };
+
+    }else{
+      const collectionSet = {}
+      return { collectionSet, total, cursor };
+
+    }
+    
   } catch (err) {
     console.log('Error >>', err);
   }
@@ -183,7 +267,7 @@ const get_ave_holding_date = async(data, map_ave_date) =>{
   //out 된 nft의 평균기간
   for(idx in data.result){
 
-    const token_address= data.result[idx].token_address.replace('0x','');
+    const token_address= data.result[idx].token_address;
     const token_id= data.result[idx].token_id;
     const block_timestamp= data.result[idx].block_timestamp;
 
@@ -192,20 +276,20 @@ const get_ave_holding_date = async(data, map_ave_date) =>{
 
   //현재홀딩중인 NFT의 평균기간
   for (let value of map_ave_date.values()){
-    console.log(value);
+  
     const out_time = Date.now();
     const in_time = new Date(value.block_timestamp);
     //타임스탬프간 시간 계산
     const diffTime = Math.abs(out_time - in_time);
     const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-    console.log(holding_date + " days-");
+    // console.log(holding_date + " days-");
     //날짜 어레이에 추가
     arr_ave_date.push(holding_date)
   }
  
  
-  console.log('완성 리스트 : %O', arr_ave_date );
+  // console.log('완성 리스트 : %O', arr_ave_date );
 
  
   return average(arr_ave_date);
@@ -215,19 +299,17 @@ const average = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
 
 const get_holding_date = async (nftMap, timeArray, token_address, token_id, timestamp) => {
   const key = token_address.toString() +token_id.toString();
-  console.log('홀딩'+timestamp);
+  // console.log('홀딩'+timestamp);
 
   if(nftMap.has(key)){
     const out_time = new Date(nftMap.get(key).block_timestamp);
     const in_time = new Date(timestamp);
 
-    console.log(out_time);
-    console.log(in_time);
     //타임스탬프간 시간 계산
     const diffTime = Math.abs(out_time - in_time);
     const holding_date = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-    console.log(holding_date + " days");
+    // console.log(holding_date + " days");
     //날짜 어레이에 추가
     timeArray.push(holding_date)
 
@@ -250,24 +332,25 @@ const check_collection_exists = async (addressSet) => {
 };
 
 const get_nft_fp = async(slug_set) => {
-  console.log(slug_set)
-  
-  for(let idx of slug_set){
+  let fp_total=0;
+  for(let idx in slug_set){
   // console.log("https://api.opensea.io/api/v1/collection/" + idx)
   try {
     const Response = await axios.get('https://api.opensea.io/api/v1/collection/' + idx);
-    // console.log(Response);
     await NFT.save_nft_fp(Response.data.collection);
+    let fp =Response.data.collection.stats.floor_price * slug_set[idx];
+    fp_total+=fp;
+
   } catch (err) {
     console.log(Error);
     }
   }
+  return fp_total;
 };
-
 
 const get_and_save_nftcoll = async (missingAddresses) => {
   for (let address of missingAddresses) {
-    address = '0x'+address;
+    address = address;
     let collection = await get_collection_opensea(address);
     await NFT.nft_coll_one_db_save(collection);
   }
@@ -285,7 +368,7 @@ const get_collection_moralis = async (address) => {
     // console.log(response.data.result[0]);
 
     var collection = {
-      token_address : response.data.result[0].token_address.replace('0x',''),
+      token_address : response.data.result[0].token_address,
       symbol : response.data.result[0].symbol,
       name: response.data.result[0].name,
       contract_type : response.data.result[0].contract_type,
@@ -312,7 +395,7 @@ const get_collection_opensea = async (address) => {
     // console.log(response.data);
 
     var collection = {
-      token_address : response.data.address.replace('0x',''),
+      token_address : response.data.address,
       symbol : response.data.symbol,
       name: response.data.name,
       contract_type : response.data.schema_name,
@@ -345,5 +428,6 @@ module.exports = {
   get_nft_fp,
   check_collection_exists,
   get_all_NFT_transfers,
+  get_all_NFT_transfers_no_fp,
   remove_SetA_from_SetB,
 };

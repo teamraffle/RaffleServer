@@ -27,6 +27,7 @@ const envVarsSchema = Joi.object()
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     MORALIS_SECRET: Joi.string().description('Moralis secret key'),
+    ETHERSCAN_SECRET: Joi.string().description('Etherscan secret key'),
   })
   .unknown();
 
@@ -68,5 +69,8 @@ module.exports = {
   },
   opensea: {
     secret : envVars.OPENSEA_SECRET
+  },
+  etherscan: {
+    secret : envVars.ETHERSCAN_SECRET
   }
 };

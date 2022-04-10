@@ -11,3 +11,10 @@ router
 
 
 module.exports = router;
+
+/**
+ * @swagger
+ * tags:
+ *   name: Register
+ *   description: Help register process
+ */

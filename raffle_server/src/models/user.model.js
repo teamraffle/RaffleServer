@@ -15,13 +15,13 @@ const create= async (body, wallet_id) => {
         conn = await pool.getConnection();
         const sql = `INSERT INTO tb_user
         (
-            user_id, wallet_id, nickname, profile_pic
+            user_id, wallet_id, nickname, profile_pic,email
         ) VALUES (
-            ?, ?, ?, ?
+            ?, ?, ?, ?, ?
         )`
         
         const user_id = uuidv4.v1();
-        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profile_pic]);
+        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profile_pic,user.email]);
         logger.info(dbRes);//성공 리턴
         return user_id;
     
@@ -35,28 +35,25 @@ const create= async (body, wallet_id) => {
 }
 
 const searchByWallet= async (query) => {
-  console.log("????????????????????");
 
-    var wallet ={
-        address : query.address,
-        chain_id : query.chain_id
-      }
-      console.log(wallet);
-    
     var rows;
+    var rows2;
     try {
       conn = await pool.getConnection();
       
       //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-      if(wallet.chain_id==1){
-        const splittedAddr = wallet.address.replace('0x','');
-        console.log(splittedAddr);
-        const query ="SELECT tb_wallet_eth.chain_id, tb_wallet_eth.address, tb_user.user_id, tb_user.nickname, tb_user.profile_pic, tb_user.status  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
-        rows = await conn.query(query, splittedAddr);
+      if(query.chain_id==1){
+        const splittedAddr = query.address;
+      
+        const sqlquery ="SELECT tb_user.user_id,tb_user.nickname,tb_user.profile_pic, tb_user.status,tb_user.email  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
+
+        const sqlquery2 ="SELECT tb_wallet_eth.wallet_id,tb_wallet_eth.address, tb_wallet_eth.chain_id  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
+        rows = await conn.query(sqlquery, splittedAddr);
+        rows2 = await conn.query(sqlquery2, splittedAddr);
         if(rows[0] == undefined){
             return false;
         }else{
-            // console.log(rows[0]);
+            rows[0].wallet=rows2[0];
             return rows[0];//TODO 양식맞추기
         }
       }
@@ -67,14 +64,22 @@ const searchByWallet= async (query) => {
 const searchById= async (params) => {
   var user_id = params.user_id;
   var rows;
+  var rows2;
+
+
   try {
     conn = await pool.getConnection();
 
-      const query ="SELECT tb_wallet_eth.chain_id, tb_wallet_eth.address, tb_user.user_id, tb_user.nickname, tb_user.profile_pic, tb_user.status  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_user.user_id=?"
+      const query ="SELECT tb_user.user_id,tb_user.nickname,tb_user.profile_pic, tb_user.status,tb_user.email FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_user.user_id=?"
+
+      const query2 ="SELECT tb_wallet_eth.wallet_id,tb_wallet_eth.address, tb_wallet_eth.chain_id FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_user.user_id=?"
+
       rows = await conn.query(query, user_id);
-      if(rows == undefined){
+      rows2 = await conn.query(query2, user_id);
+      if(rows[0] == undefined){
           return false;
       }else{
+          rows[0].wallet=rows2[0]
           logger.info(rows[0]);
           return rows[0];//TODO 양식맞추기
       }
@@ -131,7 +136,6 @@ const isNicknameTaken= async (body) => {
     if(user.nickname){
     try {
       conn = await pool.getConnection();
-      console.log(user.nickname);
   
         const query ="SELECT nickname FROM tb_user WHERE nickname =?"
         rows = await conn.query(query, user.nickname);

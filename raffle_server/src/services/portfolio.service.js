@@ -12,9 +12,8 @@ const user_info =  async(wallet,chain_id)=>{
     }else{
         return portfolio_user_data;
     }
- 
-
 }
+
 const get_user_info = async(query)=>{
 
     const portfolio_user_data = await Portfolio.get_portfolio(query);

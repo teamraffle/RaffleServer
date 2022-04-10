@@ -5,8 +5,10 @@ let conn;
 const nft_coll_db_save= async (data,wallet) => {
   
   var collectionSet = new Set();
-  var slugSet = new Set();
+  var slugSet ={};
+  var check = [];
   let finaltuple="";
+
 
   for(idx in data){
     if(data[idx].primary_asset_contracts[0]==undefined) //등록되어있지 않은 컨트랙트일경우 넘어가기
@@ -15,13 +17,14 @@ const nft_coll_db_save= async (data,wallet) => {
     }
     
     const nft_coll_id = '\"'+uuidv4.v1()+'\"';
-    const token_address = '\"'+data[idx].primary_asset_contracts[0].address.replace('0x','')+'\"';
-    const return_token_address = data[idx].primary_asset_contracts[0].address.replace('0x','');
+    const token_address = '\"'+data[idx].primary_asset_contracts[0].address+'\"';
+    const return_token_address = data[idx].primary_asset_contracts[0].address;
     const symbol='\"'+data[idx].primary_asset_contracts[0].symbol+'\"';
     const name= '\"'+data[idx].primary_asset_contracts[0].name+'\"';
     const contract_type= '\"'+data[idx].primary_asset_contracts[0].schema_name+'\"';
     const collection_icon='\"'+data[idx].primary_asset_contracts[0].image_url+'\"';
     const slug = '\"'+data[idx].slug+'\"';
+   
     
     let nft_collection_string = [nft_coll_id, token_address,symbol,name,contract_type,collection_icon,slug];
  
@@ -29,7 +32,10 @@ const nft_coll_db_save= async (data,wallet) => {
 
     finaltuple+=",("+res+")";
     collectionSet.add(return_token_address);
-    slugSet.add(data[idx].slug);
+   
+    slugSet[data[idx].slug]=data[idx].owned_asset_count;
+
+  
   };
   if(finaltuple=="") //아예 빈값일 수 있음 그럴때 return하기
   return 0;
@@ -52,7 +58,7 @@ const nft_coll_db_save= async (data,wallet) => {
   }
   finally {
       if (conn) conn.release(); //release to pool
-
+  
       return {collectionSet,slugSet};
   }
 }
@@ -61,13 +67,11 @@ const nft_coll_one_db_save= async (collection_) => {
 
   try {
     conn = await pool.getConnection();
-    console.log(collection_);//성공 리턴
 
     const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type, collection_icon, slug) VALUES (?,?,?,?,?,?,?);';
     var values = [uuidv4.v1(), collection_.token_address, collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
     const dbRes = await conn.query(sql, values);
 
-    console.log(dbRes);//성공 리턴
     return dbRes;
 
   }catch(err) {
@@ -79,22 +83,21 @@ const nft_coll_one_db_save= async (collection_) => {
   }
 }
 
-const nft_db_save= async (data,wallet) => {
-  console.log("here:"+data.result.length)
+const nft_db_save= async (data,wallet,fp_total) => {
   let finaltuple="";
 
   for(idx in data.result){
 
     const nft_item_id = '\"'+uuidv4.v1()+'\"';
     const token_id='\"'+data.result[idx].token_id+'\"';
-    const owner_of= '\"'+wallet.replace('0x','')+'\"';;
+    const owner_of= '\"'+wallet+'\"';;
     const metadata= '""';
     const block_number='\"'+data.result[idx].block_number+'\"';
-    const token_address='\"'+data.result[idx].token_address.replace('0x','')+'\"';
+    const token_address='\"'+data.result[idx].token_address+'\"';
     const frozen= '\"'+data.result[idx].frozen+'\"';
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number];
     let res = nft_string.join(',');
-    console.log(idx+":"+token_id);
+    // console.log(idx+":"+token_id);
     
     if(idx==0){
       finaltuple+="("+res+")";
@@ -124,27 +127,51 @@ const nft_db_save= async (data,wallet) => {
   }
 }
 
-const createTx_and_portfolio= async(data,wallet, arr_ave_date) => {
-  let {finalTuple, collectionSet} = createTx_tuple(data,wallet);
+const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
+
+  let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
+  // console.log("wallet"+wallet)
+  try {
+
+    conn = await pool.getConnection();
+    const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const dbRes = await conn.query(sql_insert_transfer);
+   
+  
+    if(fp_total !== 'undefined'){
+
+      const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
+      (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
+      VALUES 
+      (?,?,?,?,?,?,?,?,?,?,?,?)`;
+      var splittedAddr = wallet;
+      // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
+      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
+      // console.log(dbRes2);//성공 
+    }
+    
+    
+  }catch(err) {
+    console.log(err);
+  }finally {
+    if (conn) conn.release(); //release to pool
+    return collectionSet;
+  }
+  
+
+}
+
+
+const createTx = async(data,wallet, arr_ave_date) => {
+
+  
+  let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
-
     const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
-
-    const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
-    (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
-    VALUES 
-    (?,?,?,?,?,?,?,?,?,?,?,?)`;
-    
-
-    var splittedAddr = wallet.replace('0x','');
-    
-
     const dbRes = await conn.query(sql_insert_transfer);
-    const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',0,0,0,0,0,0]);
     
-    console.log(dbRes2);//성공 
     
   }catch(err) {
     console.log(err);
@@ -156,6 +183,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date) => {
   
 
 }
+
 const classify_action= (value,from_address,to_address,wallet) => {
   let action; //(0~5가지수) 0 buy 1mint 2sell 3burn 4send 5receive
 
@@ -190,28 +218,37 @@ const classify_action= (value,from_address,to_address,wallet) => {
 const createTx_tuple= (data,wallet) =>{
   var _finalTuple="";
   var _collectionSet = new Set();
+  var _buysell = {};
+  let buy_volume=0;
+  let sell_volume=0;
 
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '\"'+data.result[idx].block_number+'\"';
     const block_timestamp= '\"'+data.result[idx].block_timestamp.replace('T',' ').replace('Z','') +'\"';
-    const block_hash='\"'+data.result[idx].block_hash.replace('0x','')+'\"';
-    const transaction_hash='\"'+data.result[idx].block_hash.replace('0x','')+'\"';
+    const block_hash='\"'+data.result[idx].block_hash+'\"';
+    const transaction_hash='\"'+data.result[idx].block_hash+'\"';
     const transaction_index='\"'+data.result[idx].transaction_index+'\"';
     const log_index='\"'+data.result[idx].log_index+'\"';
     const value='\"'+data.result[idx].value+'\"';
     const transaction_type='\"'+data.result[idx].transaction_type+'\"';
-    const token_address='\"'+data.result[idx].token_address.replace('0x','')+'\"';
+    const token_address='\"'+data.result[idx].token_address+'\"';
     const token_id='\"'+data.result[idx].token_id+'\"';
-    const from_address = '\"'+data.result[idx].from_address.replace('0x','')+'\"';
-    const to_address='\"'+data.result[idx].to_address.replace('0x','')+'\"';
+    const from_address = '\"'+data.result[idx].from_address+'\"';
+    const to_address='\"'+data.result[idx].to_address+'\"';
     const amount='\"'+data.result[idx].amount+'\"';
     const verified='\"'+data.result[idx].verified+'\"';
-
 
     const action ='\"'+  classify_action(data.result[idx].value,data.result[idx].from_address,data.result[idx].to_address,wallet)+'\"';
     //여기서는 " "넣어서 보내면 불편하니 그냥 보내기 그리고 0x변환도 안해야 비교하니 빠르니 그냥 보내기
 
+    if(action=='"0"'){
+      buy_volume+=parseInt(data.result[idx].value);
+    }
+    if(action=='"2"'){
+      sell_volume+=parseInt(data.result[idx].value);
+    }
+  
     let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
     value, transaction_type, token_address, token_id, from_address, to_address, amount, verified,action];
     let res = sqlData.join(',');
@@ -222,16 +259,18 @@ const createTx_tuple= (data,wallet) =>{
       _finalTuple+=",("+res+")";
     }
 
-    _collectionSet.add(data.result[idx].token_address.replace('0x',''));
+    _collectionSet.add(data.result[idx].token_address);
 
     
   };
+  _buysell.buy_volume=buy_volume;
+  _buysell.sell_volume=sell_volume;
 
-  
+  // console.log(_buysell);  
   // console.log(_collectionSet);
   // console.log(_finalTuple);
 
-  return {finalTuple : _finalTuple, collectionSet : _collectionSet};
+  return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell : _buysell };
 }
 
 
@@ -240,7 +279,7 @@ const save_nft_fp= async(data) =>{
     var finalTuple="";
   
     const nft_fp_id = '\"'+uuidv4.v1()+'\"';
-    const token_address= '\"'+data.primary_asset_contracts[0].address.replace('0x','')+'\"';
+    const token_address= '\"'+data.primary_asset_contracts[0].address+'\"';
     const fp='\"'+data.stats.floor_price+'\"';
 
     const collection_icon='\"'+data.image_url+'\"';
@@ -253,10 +292,10 @@ const save_nft_fp= async(data) =>{
     conn = await pool.getConnection();
 
     const sql = 'INSERT IGNORE INTO tb_nft_fp_eth (nft_fp_id, token_address, fp) VALUES '+ finalTuple;
-
     const query ="UPDATE innodb.tb_nft_collection_eth  SET collection_icon ="+collection_icon +"WHERE token_address="+token_address;
 
     const dbRes = await conn.query(sql);
+
     rows = await conn.query(query, token_address);
     if(rows[0] == undefined){
         return false;
@@ -310,6 +349,7 @@ const checkAddress = async(addressSet) =>{
 module.exports = {
   nft_coll_db_save,
   nft_db_save,
+  createTx,
   createTx_and_portfolio,
   save_nft_fp,
   checkAddress,
