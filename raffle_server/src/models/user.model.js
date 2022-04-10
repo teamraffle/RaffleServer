@@ -43,7 +43,7 @@ const searchByWallet= async (query) => {
       
       //TODO 체인아이디 따라 디비테이블 분기 넣을것 
       if(query.chain_id==1){
-        const splittedAddr = query.address.replace('0x','');
+        const splittedAddr = query.address;
       
         const sqlquery ="SELECT tb_user.user_id,tb_user.nickname,tb_user.profile_pic, tb_user.status,tb_user.email  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
 

@@ -7,6 +7,7 @@ const create= async (body) => {
         address : body.address,
         chainId : body.chain_id
       }
+  
       try {
         conn = await pool.getConnection();
     
@@ -16,7 +17,7 @@ const create= async (body) => {
         ) VALUES (
             ?, ?, ?
         )`
-        var splittedAddr = wallet.address.replace('0x','');
+        var splittedAddr = wallet.address;
         const wallet_id = uuidv4.v1();
         const dbRes = await conn.query(sql, [wallet_id, 1,  splittedAddr]);
         
@@ -42,7 +43,7 @@ const findIdByAddress= async (body) => {
     
         const sql = `SELECT wallet_id FROM tb_wallet_eth
         WHERE address = ?`
-        var splittedAddr = wallet.address.replace('0x','');
+        var splittedAddr = wallet.address;
         const dbRes = await conn.query(sql, splittedAddr);
         
         // console.log(dbRes[0].wallet_id);//성공 리턴

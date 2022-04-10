@@ -17,8 +17,8 @@ const nft_coll_db_save= async (data,wallet) => {
     }
     
     const nft_coll_id = '\"'+uuidv4.v1()+'\"';
-    const token_address = '\"'+data[idx].primary_asset_contracts[0].address.replace('0x','')+'\"';
-    const return_token_address = data[idx].primary_asset_contracts[0].address.replace('0x','');
+    const token_address = '\"'+data[idx].primary_asset_contracts[0].address+'\"';
+    const return_token_address = data[idx].primary_asset_contracts[0].address;
     const symbol='\"'+data[idx].primary_asset_contracts[0].symbol+'\"';
     const name= '\"'+data[idx].primary_asset_contracts[0].name+'\"';
     const contract_type= '\"'+data[idx].primary_asset_contracts[0].schema_name+'\"';
@@ -90,10 +90,10 @@ const nft_db_save= async (data,wallet,fp_total) => {
 
     const nft_item_id = '\"'+uuidv4.v1()+'\"';
     const token_id='\"'+data.result[idx].token_id+'\"';
-    const owner_of= '\"'+wallet.replace('0x','')+'\"';;
+    const owner_of= '\"'+wallet+'\"';;
     const metadata= '""';
     const block_number='\"'+data.result[idx].block_number+'\"';
-    const token_address='\"'+data.result[idx].token_address.replace('0x','')+'\"';
+    const token_address='\"'+data.result[idx].token_address+'\"';
     const frozen= '\"'+data.result[idx].frozen+'\"';
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number];
     let res = nft_string.join(',');
@@ -144,7 +144,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
       (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
       VALUES 
       (?,?,?,?,?,?,?,?,?,?,?,?)`;
-      var splittedAddr = wallet.replace('0x','');
+      var splittedAddr = wallet;
       // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
       const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
       // console.log(dbRes2);//성공 
@@ -226,16 +226,16 @@ const createTx_tuple= (data,wallet) =>{
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '\"'+data.result[idx].block_number+'\"';
     const block_timestamp= '\"'+data.result[idx].block_timestamp.replace('T',' ').replace('Z','') +'\"';
-    const block_hash='\"'+data.result[idx].block_hash.replace('0x','')+'\"';
-    const transaction_hash='\"'+data.result[idx].block_hash.replace('0x','')+'\"';
+    const block_hash='\"'+data.result[idx].block_hash+'\"';
+    const transaction_hash='\"'+data.result[idx].block_hash+'\"';
     const transaction_index='\"'+data.result[idx].transaction_index+'\"';
     const log_index='\"'+data.result[idx].log_index+'\"';
     const value='\"'+data.result[idx].value+'\"';
     const transaction_type='\"'+data.result[idx].transaction_type+'\"';
-    const token_address='\"'+data.result[idx].token_address.replace('0x','')+'\"';
+    const token_address='\"'+data.result[idx].token_address+'\"';
     const token_id='\"'+data.result[idx].token_id+'\"';
-    const from_address = '\"'+data.result[idx].from_address.replace('0x','')+'\"';
-    const to_address='\"'+data.result[idx].to_address.replace('0x','')+'\"';
+    const from_address = '\"'+data.result[idx].from_address+'\"';
+    const to_address='\"'+data.result[idx].to_address+'\"';
     const amount='\"'+data.result[idx].amount+'\"';
     const verified='\"'+data.result[idx].verified+'\"';
 
@@ -259,7 +259,7 @@ const createTx_tuple= (data,wallet) =>{
       _finalTuple+=",("+res+")";
     }
 
-    _collectionSet.add(data.result[idx].token_address.replace('0x',''));
+    _collectionSet.add(data.result[idx].token_address);
 
     
   };
@@ -279,7 +279,7 @@ const save_nft_fp= async(data) =>{
     var finalTuple="";
   
     const nft_fp_id = '\"'+uuidv4.v1()+'\"';
-    const token_address= '\"'+data.primary_asset_contracts[0].address.replace('0x','')+'\"';
+    const token_address= '\"'+data.primary_asset_contracts[0].address+'\"';
     const fp='\"'+data.stats.floor_price+'\"';
 
     const collection_icon='\"'+data.image_url+'\"';

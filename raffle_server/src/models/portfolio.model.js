@@ -17,7 +17,7 @@ const get_user= async (wallet,chain_id) => {
     var rows2;
     var rows3;
     var rows4;
-    const splittedAddr = wallet.address.replace('0x','');
+    const splittedAddr = wallet.address;
     try {
       conn = await pool.getConnection();
   
@@ -49,7 +49,7 @@ const get_user= async (wallet,chain_id) => {
         // rows[0].most_collection=rows4[0].name;
         // rows[0].most_collection_icon=rows4[0].collection_icon;
     
-        const wallet_address=wallet.address.replace('0x','');
+        const wallet_address=wallet.address;
         const nft_holdings=rows2[0]['COUNT( * )']; 
         const collections_holdings=rows3[0]['COUNT(DISTINCT token_address)']; 
         const most_collection_name=rows4[0].name;
@@ -78,7 +78,7 @@ const get_portfolio= async (query) => {
   var total = {};
   
   var rows;
-  const splittedAddr = wallet.address.replace('0x','');
+  const splittedAddr = wallet.address;
   try {
     conn = await pool.getConnection();
 
