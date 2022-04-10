@@ -1,6 +1,3 @@
-//=========================
-//TODO: Mariadb 로 대체할것
-//=========================
 const request = require('supertest');
 const { faker } = require('@faker-js/faker');
 const httpStatus = require('http-status');
@@ -12,10 +9,10 @@ const { userEmpty, userSmall, walletEmpty, walletSmall, insertUser } = require('
 
 setupTestDB();
 
-describe('User routes', () => {
+describe.skip('User routes', () => {
   describe('POST /v1/users', () => {
     let newUser;
-
+  
     beforeEach(() => {
         faker.seed(0);
         const zero = faker.datatype.number();
@@ -224,8 +221,8 @@ describe('User routes', () => {
     test('should return 404 because user doesn\'t exist', async () => {
       
         const updateBody = {
-          profile_pic: faker.name.findName(),
-          nickname: faker.internet.email().toLowerCase(),
+          profile_pic: faker.image.avatar(),
+          nickname: faker.name.findName(),
         };
   
         await request(app)
