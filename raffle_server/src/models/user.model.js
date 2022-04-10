@@ -15,13 +15,13 @@ const create= async (body, wallet_id) => {
         conn = await pool.getConnection();
         const sql = `INSERT INTO tb_user
         (
-            user_id, wallet_id, nickname, profile_pic
+            user_id, wallet_id, nickname, profile_pic,email
         ) VALUES (
-            ?, ?, ?, ?
+            ?, ?, ?, ?, ?
         )`
         
         const user_id = uuidv4.v1();
-        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profile_pic]);
+        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profile_pic,user.email]);
         logger.info(dbRes);//성공 리턴
         return user_id;
     
