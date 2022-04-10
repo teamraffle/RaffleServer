@@ -158,6 +158,25 @@ const isNicknameTaken= async (body) => {
 
 }
 
+const delete_user_only = async (user_id) => {
+  
+  try {
+    conn = await pool.getConnection();
+
+      const query ="DELETE FROM tb_user WHERE user_id =?"
+      rows = await conn.query(query, user_id);
+      if(rows[0] == undefined){
+          return false;
+      }else{
+      
+          return true;
+          ;
+      }
+  } finally {
+      if (conn) conn.release();
+  } 
+}
+
 
 module.exports = {
     create,
@@ -165,5 +184,6 @@ module.exports = {
     searchById,
     updatepatchUserById,
     isNicknameTaken,
+    delete_user_only,
 };
   
