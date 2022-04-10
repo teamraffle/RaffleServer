@@ -9,7 +9,7 @@ const { userEmpty, userSmall, walletEmpty, walletSmall, insertUser } = require('
 
 setupTestDB();
 
-describe.skip('User routes', () => {
+describe('User routes', () => {
   describe('POST /v1/users', () => {
     let newUser;
   
