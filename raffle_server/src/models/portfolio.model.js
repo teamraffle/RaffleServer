@@ -56,7 +56,7 @@ const get_user= async (wallet,chain_id) => {
         const most_collection_icon=rows4[0].collection_icon;
        
         const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=? where wallet_address=?`;
-   
+        console.log("here",nft_holdings,collections_holdings,most_collection_name,most_collection_icon,wallet_address)
         const dbRes = await conn.query(update_portfolio, [nft_holdings,collections_holdings,most_collection_name,most_collection_icon,wallet_address]);
             
         
