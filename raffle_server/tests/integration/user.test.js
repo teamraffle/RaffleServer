@@ -3,12 +3,18 @@ const { faker } = require('@faker-js/faker');
 const httpStatus = require('http-status');
 const app = require('../../src/app');
 const setupTestDB = require('../utils/setupTestDB');
-const { User } = require('../../src/models');
-const { userEmpty, userSmall, walletEmpty, walletSmall, insertUser } = require('../fixtures/user.fixture');
+const { User, WalletEth } = require('../../src/models');
+const { userEmpty, userSmall } = require('../fixtures/user.fixture');
 // const { userOneAccessToken, adminAccessToken } = require('../fixtures/token.fixture');
 
 setupTestDB();
 
+/**
+ * 이 테스트는 통합테스트 - API 에 집중하기 때문에
+ * userSmall만 테스트함
+ * 더 다양한 유저에 대한 테스트는 유닛테스트 끝나고 함
+ * 
+ */
 describe('User routes', () => {
   describe('POST /v1/users', () => {
     let newUser;
@@ -41,7 +47,7 @@ describe('User routes', () => {
     test('should return 201 and successfully create new user if data is ok', async () => {
         input = {
             chain_id : 1,
-            address : walletSmall.address,
+            address : userSmall.wallet.address,
             nickname : userSmall.nickname,
             email: userSmall.email,
             profile_pic : userSmall.profile_pic
@@ -65,10 +71,11 @@ describe('User routes', () => {
     });
 
 
+   
     test('should return 400 error if nickname is already used', async () => {
         input = {
             chain_id : 1,
-            address : walletEmpty.address,
+            address : userEmpty.wallet.address,
             nickname : userSmall.nickname,
             email: userSmall.email,
             profile_pic : userSmall.profile_pic
@@ -90,7 +97,7 @@ describe('User routes', () => {
         .query(
             {
                 chain_id : 1,
-                address: walletSmall.address,
+                address: userSmall.wallet.address,
             }
         )
         .send()
@@ -104,7 +111,7 @@ describe('User routes', () => {
         status: userSmall.status,
         wallet: {
             wallet_id :  expect.anything(),
-            address : walletSmall.address,
+            address : userSmall.wallet.address,
             chain_id: 1
         }
       });
@@ -156,7 +163,7 @@ describe('User routes', () => {
         status: userSmall.status,
         wallet: {
             wallet_id :  expect.anything(),
-            address : walletSmall.address,
+            address : userSmall.wallet.address,
             chain_id: 1
         }
       });
@@ -233,6 +240,13 @@ describe('User routes', () => {
 
   });
   
-
+  afterAll(() => {
+    //DB에 userSmall 관련 데이터 삭제
+    //지갑테이블에서 삭제
+    WalletEth.deleteByAddr(userSmall.wallet.address);
+    //user테이블에서 삭제
+    User.delete_user_only(userSmall.user_id);
+    //nft, 바닥, 포폴은 삭제안함 어차피 유닛에서도 테스트함
+  });
 
 });
