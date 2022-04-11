@@ -15,7 +15,7 @@ setupTestDB();
  * 더 다양한 유저에 대한 테스트는 유닛테스트 끝나고 함
  * 
  */
-describe('User routes', () => {
+describe.skip('User routes', () => {
   describe('POST /v1/users', () => {
     let newUser;
   

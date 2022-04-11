@@ -70,8 +70,7 @@ const get_user= async (wallet,chain_id) => {
 }
 
 const get_portfolio= async (query) => {
-  //TODO
-  //우리 디비에서 유저정보가져와주기
+ 
   var wallet ={
     address : query.user_id_or_address
   }
