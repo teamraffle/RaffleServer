@@ -6,6 +6,7 @@ const { nftService,portfolioService } = require('../services');
 
 const get_portfolio = catchAsync(async (req, res, next) => {
   
+  //TDOO address 일때만 구현됐음
   const portfolio= await portfolioService.get_user_info(req.query);
   res.status(httpStatus.OK).send(portfolio);
 

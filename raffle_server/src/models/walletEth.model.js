@@ -59,8 +59,30 @@ const findIdByAddress= async (body) => {
       }
 }
 
+const deleteByAddr= async (address) => {
+    try {
+      conn = await pool.getConnection();
+      const sql ="DELETE FROM tb_wallet_eth WHERE address =?"
+
+      var splittedAddr = address;
+      const dbRes = await conn.query(sql, splittedAddr);
+      
+      // console.log(dbRes);//성공 리턴
+      
+      return true;
+      
+    }catch(err) {
+      console.log(err);
+      return false;
+    }
+     finally {
+        if (conn) conn.release(); //release to pool
+    }
+}
+
 module.exports = {
     create,
     findIdByAddress,
+    deleteByAddr,
 };
   

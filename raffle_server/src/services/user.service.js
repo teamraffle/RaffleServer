@@ -4,18 +4,18 @@ const ApiError = require('../utils/ApiError');
 
 const create_user = async (body) => {
  
-  const walletId = await WalletEth.create(body);
-  if(!walletId){//지갑이 만들어지지 않았다면
-    //이미 해당 월렛으로 가입한적 있는지 확인
-    if (await User.searchByWallet(body) != false) {
-      throw new ApiError(httpStatus.BAD_REQUEST, 'Already registered with this address');
-    }
-  }
 
+  //지갑이 만들어지지 않았다면
+    //이미 해당 월렛으로 가입한적 있는지 확인
+  if (await User.searchByWallet(body) != false) {
+   throw new ApiError(httpStatus.BAD_REQUEST, 'Already registered with this address');
+  }
   //닉네임 중복체크하기
   if (await User.isNicknameTaken(body)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Nickname already taken');
   }
+
+  const walletId = await WalletEth.create(body);
   const userID = await User.create(body, walletId);
   const msg ={
     user_id : userID

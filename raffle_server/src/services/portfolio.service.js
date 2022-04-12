@@ -18,7 +18,7 @@ const get_user_info = async(query)=>{
 
     const portfolio_user_data = await Portfolio.get_portfolio(query);
     if(!portfolio_user_data){
-        throw new ApiError(httpStatus.CONFLICT, 'No user found');
+        throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
     }else{
         return portfolio_user_data;
     }

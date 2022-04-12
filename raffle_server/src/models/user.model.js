@@ -95,34 +95,37 @@ const updatepatchUserById= async (params,body) => {
   var profile_pic = body.profile_pic;
 
   var rows;
+  var rows2;
+  var query;
 
-  var query = "";
-  if(typeof profile_pic =="undefined"){
-    query ="UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ user_id+ "'";
-    ;}
-  else if(typeof nickname =="undefined")
-  { 
-  query ="UPDATE tb_user SET profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
-  }
-  else{
-   
-    query ="UPDATE tb_user SET nickname='"+nickname +"',profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
+
+  const idcheck = "SELECT user_id FROM tb_user WHERE user_id =?";
+  rows = await conn.query(idcheck,user_id);
+ 
+
+  if(rows[0]==undefined){
+    return false;
   }
 
   try {
-  
-    conn = await pool.getConnection();
+    if(typeof profile_pic =="undefined"){
+      query ="UPDATE tb_user SET nickname='"+nickname+"'WHERE tb_user.user_id='"+ user_id+ "'";
+      ;}
+    else if(typeof nickname =="undefined")
+    { 
+    query ="UPDATE tb_user SET profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
+    }
+    else{
+      query ="UPDATE tb_user SET nickname='"+nickname +"',profile_pic='"+profile_pic+"'WHERE tb_user.user_id='"+ user_id+ "'";
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-      rows = await conn.query(query);
-
-      if(rows == undefined){
-          return false;
-      }else{
-          logger.info(rows[0]);
-          return true;//TODO 양식맞추기
-      }
-    
+    }
+    rows2 = await conn.query(query,user_id);
+    if(rows2 == undefined){
+      return false;
+  }else{
+      logger.info(rows2[0]);
+      return true;//TODO 양식맞추기
+  }
   } finally {
       if (conn) conn.release();
   }    
@@ -155,6 +158,25 @@ const isNicknameTaken= async (body) => {
 
 }
 
+const delete_user_only = async (user_id) => {
+  
+  try {
+    conn = await pool.getConnection();
+
+      const query ="DELETE FROM tb_user WHERE user_id =?"
+      rows = await conn.query(query, user_id);
+      if(rows[0] == undefined){
+          return false;
+      }else{
+      
+          return true;
+          ;
+      }
+  } finally {
+      if (conn) conn.release();
+  } 
+}
+
 
 module.exports = {
     create,
@@ -162,5 +184,6 @@ module.exports = {
     searchById,
     updatepatchUserById,
     isNicknameTaken,
+    delete_user_only,
 };
   
