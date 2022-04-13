@@ -155,8 +155,48 @@ const get_nft = async (query) => {
   }
 };
 
+const get_portfolio_activity= async (query) => {
+ 
+  var wallet ={
+    address : query.address
+  }
+  var total = {};
+  
+  var rows;
+  const splittedAddr = wallet.address;
+  try {
+    conn = await pool.getConnection();
+
+    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
+        
+    
+      const query ="SELECT COUNT(*)  FROM tb_nft_transfer_eth WHERE from_address="+splittedAddr+" or to_address="+splittedAddr+";"
+
+
+      rows = await conn.query(portfolio_query, splittedAddr);
+      rows2 = await conn.query(user_query, splittedAddr);
+  
+
+      if(rows[0] == undefined ){
+          return false;
+      }else{
+        total.updated_at=rows[0].create_timestamp;
+        total.user=rows2[0];
+        total.portfolio=rows[0];
+        
+        delete total.portfolio.create_timestamp;
+      return total;//TODO 양식맞추기
+      
+    }
+  
+  } finally {
+      if (conn) conn.release();
+  }    
+}
+
 module.exports = {
   get_user,
   get_portfolio,
   get_nft,
+  get_portfolio_activity,
 };

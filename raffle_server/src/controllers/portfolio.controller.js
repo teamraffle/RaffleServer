@@ -13,6 +13,15 @@ const get_portfolio = catchAsync(async (req, res, next) => {
   
 });
 
+const get_activity = catchAsync(async (req, res, next) => {
+  
+  //TDOO address 일때만 구현됐음
+  const activity= await portfolioService.get_activity(req.query);
+  res.status(httpStatus.OK).send(portfolio);
+
+  
+});
+
 const test = catchAsync(async (req, res, next) => {
   res.status(httpStatus.CREATED).send('test');
 });
@@ -26,4 +35,5 @@ module.exports = {
   get_portfolio,
   get_nft,
   test,
+  get_activity
 };
