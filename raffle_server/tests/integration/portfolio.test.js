@@ -35,7 +35,7 @@ describe('Portfolio routes', () => {
               .query(
                   {
                     chain_id : 1,
-                    user_id_or_address: '0xccce16Cdc8c47e1E1E7ccaf62a36D0d4ac7B7ccc',
+                    address: '0xccce16Cdc8c47e1E1E7ccaf62a36D0d4ac7B7ccc',
                   }
               )
               .send()
@@ -53,7 +53,7 @@ describe('Portfolio routes', () => {
             .query(
                 {
                     chain_id : 1,
-                    user_id_or_address: userSmall.wallet.address,
+                    address: userSmall.wallet.address,
                 }
             )
             .send()

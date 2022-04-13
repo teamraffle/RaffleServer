@@ -72,7 +72,7 @@ const get_user= async (wallet,chain_id) => {
 const get_portfolio= async (query) => {
  
   var wallet ={
-    address : query.user_id_or_address
+    address : query.address
   }
   var total = {};
   

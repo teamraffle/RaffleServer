@@ -145,7 +145,7 @@ paths:
                       chain_id: 0
                 properties:
                   user_id:
-                    type: number
+                    type: string
                   nickname:
                     type: string
                     minLength: 1
@@ -437,14 +437,14 @@ paths:
       operationId: get-portfolios-user-id-or-address
       parameters:
         - schema:
-            type: string
+            type: integer
           in: query
           name: chain_id
           required: true
         - schema:
             type: string
           in: query
-          name: user_id_or_address
+          name: address
           required: true
       tags:
         - Portfolios
@@ -462,10 +462,6 @@ paths:
         - schema:
             type: string
           in: query
-          name: cursor
-        - schema:
-            type: string
-          in: query
           name: format
         - schema:
             type: integer
@@ -475,7 +471,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: user_id_or_address
+          name: address
           required: true
       description: NFT탭 재정렬/리프레시할때 사용
       responses:
@@ -543,10 +539,6 @@ paths:
         - schema:
             type: string
           in: query
-          name: cursor
-        - schema:
-            type: string
-          in: query
           name: format
           description: 정렬 기준
         - schema:
@@ -557,7 +549,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: user_id_or_address
+          name: address
           required: true
       tags:
         - Portfolios
@@ -643,10 +635,6 @@ paths:
         - schema:
             type: string
           in: query
-          name: cursor
-        - schema:
-            type: string
-          in: query
           name: format
           description: 정렬 기준
         - schema:
@@ -657,15 +645,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: user_id
-        - schema:
-            type: string
-          in: query
           name: address
-        - schema:
-            type: string
-          in: query
-          name: user_id_or_address
           required: true
       tags:
         - Portfolios

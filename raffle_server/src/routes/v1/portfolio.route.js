@@ -12,6 +12,10 @@ router
   .route('/basic')
   .get(validate(portfolioValidation.getPortfolio), portfolioController.get_portfolio)
 
+  router
+  .route('/activity')
+  .get(validate(portfolioValidation.activity), portfolioController.get_portfolio)
+
 
 
 
