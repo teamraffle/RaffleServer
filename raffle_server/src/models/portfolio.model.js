@@ -114,30 +114,33 @@ const get_portfolio_activity= async (query) => {
     address : query.address
   }
   var total = {};
-  
+  var result = {};
   var rows;
+  var rows2;
   const splittedAddr = wallet.address;
   try {
     conn = await pool.getConnection();
 
     //TODO 체인아이디 따라 디비테이블 분기 넣을것 
         
+      const id = uuidv4.v1();
+      const query ='SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address="'+splittedAddr+'" or to_address="'+splittedAddr+'";';
+      console.log(query)
+
+      const query2 = 'SELECT trans.block_timestamp,trans.from_address,trans.to_address,trans.token_address,trans.transaction_hash,trans.action,trans.token_id,trans.value, coll.name FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address="'+splittedAddr+'" OR trans.to_address="'+splittedAddr+'" ORDER BY trans.block_timestamp desc';
     
-      const query ="SELECT COUNT(*)  FROM tb_nft_transfer_eth WHERE from_address="+splittedAddr+" or to_address="+splittedAddr+";"
-
-
-      rows = await conn.query(portfolio_query, splittedAddr);
-      rows2 = await conn.query(user_query, splittedAddr);
-  
-
+      rows = await conn.query(query);
+      rows2 = await conn.query(query2);
+      console.log(rows2.slice(0,rows[0]['COUNT(*)']));
       if(rows[0] == undefined ){
           return false;
       }else{
-        total.updated_at=rows[0].create_timestamp;
-        total.user=rows2[0];
-        total.portfolio=rows[0];
-        
-        delete total.portfolio.create_timestamp;
+        total.total=rows[0]['COUNT(*)'];
+        total.page_size=10;
+        rows2[0].activity_id=id;
+   
+        total.result=rows2[0];
+       
       return total;//TODO 양식맞추기
       
     }
