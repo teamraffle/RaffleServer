@@ -17,6 +17,7 @@ const activity = {
     chain_id : Joi.number().required().integer(),
     offset: Joi.number().integer(),
     limit: Joi.number().integer(),
+    format: Joi.string(),
   }),
 };
 module.exports = {

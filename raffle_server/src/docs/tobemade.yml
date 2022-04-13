@@ -645,10 +645,6 @@ paths:
         - schema:
             type: string
           in: query
-          name: user_id
-        - schema:
-            type: string
-          in: query
           name: address
           required: true
       tags:
