@@ -17,7 +17,7 @@ const get_activity = catchAsync(async (req, res, next) => {
   
   //TDOO address 일때만 구현됐음
   const activity= await portfolioService.get_activity(req.query);
-  res.status(httpStatus.OK).send(portfolio);
+  res.status(httpStatus.OK).send(activity);
 
   
 });

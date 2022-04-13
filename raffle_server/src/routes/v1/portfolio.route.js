@@ -14,7 +14,7 @@ router
 
   router
   .route('/activity')
-  .get(validate(portfolioValidation.activity), portfolioController.get_portfolio)
+  .get(validate(portfolioValidation.activity), portfolioController.get_activity)
 
   router
   .route('/nft')
