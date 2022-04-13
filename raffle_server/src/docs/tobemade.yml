@@ -462,10 +462,6 @@ paths:
         - schema:
             type: string
           in: query
-          name: cursor
-        - schema:
-            type: string
-          in: query
           name: format
         - schema:
             type: integer
@@ -540,10 +536,6 @@ paths:
             type: integer
           in: query
           name: limit
-        - schema:
-            type: string
-          in: query
-          name: cursor
         - schema:
             type: string
           in: query
@@ -640,10 +632,6 @@ paths:
             type: integer
           in: query
           name: limit
-        - schema:
-            type: string
-          in: query
-          name: cursor
         - schema:
             type: string
           in: query
