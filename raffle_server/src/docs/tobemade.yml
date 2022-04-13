@@ -454,7 +454,7 @@ paths:
         - schema:
             type: integer
           in: query
-          name: offset
+          name: page
         - schema:
             type: integer
           in: query
@@ -531,7 +531,7 @@ paths:
         - schema:
             type: integer
           in: query
-          name: offset
+          name: page
         - schema:
             type: integer
           in: query
@@ -627,7 +627,7 @@ paths:
         - schema:
             type: integer
           in: query
-          name: offset
+          name: page
         - schema:
             type: integer
           in: query
@@ -736,8 +736,11 @@ components:
     NFT:
       title: NFT
       type: object
+      description: ''
       properties:
         collection_name:
+          type: string
+        collection_icon:
           type: string
         nft_name:
           type: string
@@ -749,7 +752,8 @@ components:
           type: string
         in_timestamp:
           type: string
-      description: ''
+        nft_image:
+          type: string
     Ranking:
       title: Ranking
       type: object

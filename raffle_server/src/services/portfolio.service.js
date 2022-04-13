@@ -25,8 +25,19 @@ const get_user_info = async(query)=>{
  
 
 }
+const get_activity = async(query)=>{
 
+    const portfolio_user_data = await Portfolio.get_portfolio_activity(query);
+    if(!portfolio_user_data){
+        throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
+    }else{
+        return portfolio_user_data;
+    }
+ 
+
+}
 module.exports = {
     user_info,
-    get_user_info
+    get_user_info,
+    get_activity
 };
