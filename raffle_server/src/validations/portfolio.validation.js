@@ -7,7 +7,6 @@ const getPortfolio = {
     chain_id : Joi.number().required().integer(),
     offset: Joi.number().integer(),
     limit: Joi.number().integer(),
-    cursor: Joi.string(),
   }),
 };
 
@@ -18,7 +17,6 @@ const activity = {
     chain_id : Joi.number().required().integer(),
     offset: Joi.number().integer(),
     limit: Joi.number().integer(),
-    cursor: Joi.string(),
   }),
 };
 module.exports = {
