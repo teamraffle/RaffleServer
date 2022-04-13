@@ -16,7 +16,9 @@ router
   .route('/activity')
   .get(validate(portfolioValidation.activity), portfolioController.get_activity)
 
-
+  router
+  .route('/nft')
+  .get(validate(portfolioValidation.nft), portfolioController.get_nft)
 
 
 module.exports = router;
