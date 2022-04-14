@@ -50,7 +50,7 @@ const searchByWallet= async (query) => {
         const sqlquery2 ="SELECT tb_wallet_eth.wallet_id,tb_wallet_eth.address, tb_wallet_eth.chain_id  FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id WHERE tb_wallet_eth.address=?"
         rows = await conn.query(sqlquery, splittedAddr);
         rows2 = await conn.query(sqlquery2, splittedAddr);
-        console.log("yaya",rows[0])
+     
         if(rows[0] == undefined){
             return false;
         }else{
