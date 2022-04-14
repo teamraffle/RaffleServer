@@ -201,58 +201,75 @@ const get_nft = async (query) => {
 };
 
 const get_portfolio_activity = async (query) => {
+
+
   var wallet = {
     address: query.address,
     page: query.page,
   };
-  var total = {};
-  var result = {};
+ 
   var rows;
   var rows2;
-  const splittedAddr = wallet.address;
-  const page_num = (wallet.page-1)*10;
+  const DEFAULT_LIMIT = 10;
+  const DEFAULT_PAGE = (wallet.page)*DEFAULT_LIMIT;
+  
+  
 
   try {
     conn = await pool.getConnection();
 
     //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
-    const id = uuidv4.v1();
-    const query =
-      'SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address="' +
-      splittedAddr +
-      '" or to_address="' +
-      splittedAddr +
-      '";';
-    console.log(query);
+    const count_query =
+      'SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
+    const activity_query =
+      "SELECT trans.nft_trans_id,trans.block_timestamp,trans.from_address,\
+      trans.to_address,trans.action,trans.token_id,coll.collection_icon,\
+      coll.nft_coll_id,coll.name,coll.token_address,trans.value,\
+      trans.transaction_hash \
+      FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address=? \
+      OR trans.to_address=? ORDER BY trans.block_timestamp desc LIMIT ?,10";
 
-    const query2 =
-      "SELECT JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection',JSON_OBJECT('icon',coll.collection_icon,'id',coll.nft_coll_id,'name',coll.name, 'token_address',coll.token_address),'value',trans.value, 'transaction_hash',trans.transaction_hash)) FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address=" +
-      '"' +
-      splittedAddr +
-      '" OR trans.to_address="' +
-      splittedAddr +
-      '" ORDER BY trans.block_timestamp desc';
-    console.log(query2);
-    rows = await conn.query(query);
-    rows2 = await conn.query(query2);
+    rows = await conn.query(count_query,[wallet.address,wallet.address]);
+    rows2 = await conn.query(activity_query,[wallet.address,wallet.address,DEFAULT_PAGE]);
 
-    let result_value =
-      rows2[0][
-        "JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection'"
-      ];
-    let result_final = JSON.parse(result_value);
+    const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
+    let result_Data = resultArray.map(function (item) {
+      return {
+        nft_trans_id: item.nft_item_id,
+        in_timestamp: item.token_address,
+        action: item.action,
+        collection: {
+          icon: item.collection_icon,
+          id: item.nft_coll_id,
+          name: item.name,
+          token_address: item.collection_icon,
+        },
+        token_id:item.token_id,
+        from_address:item.from_address,
+        to_address:item.to_address,
+        value:item.value,
+        transaction_hash:item.transaction_hash
+
+      };
+    });
+
+    console.log(rows)
     if (rows[0] == undefined) {
       return false;
     } else {
-      total.total = rows[0]['COUNT(*)'];
 
-      total.page_size = 10;
-      rows2[0].activity_id = id;
+     const page= Math.ceil(rows[0]['COUNT(*)']/DEFAULT_LIMIT);
+      var final_json = {
+        total: rows[0]['COUNT(*)'],
+        page: page,
+        page_size : 10,
+        result: result_Data,
+      };
 
-      total.result = result_final;
+      console.log(util.inspect(JSON.stringify(final_json), false, null, true));
 
-      return total; //TODO 양식맞추기
+    return JSON.stringify(final_json);
     }
   } finally {
     if (conn) conn.release();
