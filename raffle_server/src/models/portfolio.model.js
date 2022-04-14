@@ -2,6 +2,7 @@ const uuidv4 = require('uuid');
 const { query } = require('../config/logger');
 const logger = require('../config/logger');
 const pool = require('./plugins/dbHelper');
+const util = require('util');
 let conn;
 
 const get_user = async (wallet, chain_id) => {
@@ -109,71 +110,84 @@ const get_portfolio = async (query) => {
   }
 };
 
+// const get_nft = async (query) => {
 const get_nft = async (query) => {
-  let address = 0xa96e16cdc8c47e1e1e754af62a36d0d4ac7b7c67;
-  var wallet = {
-    address: query.address,
-  };
-  var total = {};
-
   
+  //TODO 체인아이디 따라 디비테이블 분기 넣을것
+  
+  const chain_id = query.chain_id; 
+  
+  const page = query.page;
+  const limit = query.limit;
+  const address = query.address;
+
   try {
     conn = await pool.getConnection();
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것
-    // "total": 0,
-    // "page": 0,
-    // "page_size": 0,
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
-      "SELECT JSON_ARRAYAGG( \
-        JSON_OBJECT( \
-          'nft_item_id', tb_nft_eth.nft_item_id, \
-          'token_id', tb_nft_eth.token_id, \
-          'nft_image', tb_nft_eth.nft_image, \
-          'collection',JSON_OBJECT( \
-            'nft_coll_id',tb_nft_collection_eth.nft_coll_id, \
-            'symbol', tb_nft_collection_eth.symbol, \
-            'name', tb_nft_collection_eth.name , \
-            'collection_icon\',tb_nft_collection_eth.collection_icon , \
-            'fp', tb_nft_fp_eth.fp \
-            ) \
-          ) \
-      ) as res\
-      FROM tb_nft_eth  \
-            INNER JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address  \
-            INNER Join tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
-            WHERE owner_of= ?"; 
+      'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , \
+      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,\
+      tb_nft_fp_eth.fp\
+      FROM tb_nft_eth \
+      JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
+      JOIN tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
+      WHERE tb_nft_eth.owner_of=? \
+      ';
+    const timestamp_query =
+      'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
+      ORDER BY block_timestamp DESC LIMIT 1 ';
 
-    // const rows = await conn.query(count_query, address);
+    const rows = await conn.query(count_query, address);
     const rows2 = await conn.query(nft_coll_query, address);
 
-    // console.log(rows[0].cnt);
-    console.log(rows2[0].res);
-    let result_final = JSON.parse(rows2[0].res);
-    //   if(rows[0] == undefined ){
-    //       return false;
-    //   }else{
-    //     total.updated_at=rows[0].create_timestamp;
-    //     total.user=rows2[0];
-    //     total.portfolio=rows[0];
+    const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
+    let result_Data = resultArray.map(function (item) {
+      return {
+        nft_item_id: item.nft_item_id,
+        token_address: item.token_address,
+        token_id: item.token_id,
+        in_timestamp: '',
+        nft_image: item.nft_image,
+        collection: {
+          nft_coll_id: item.nft_coll_id,
+          symbol: item.symbol,
+          name: item.name,
+          collection_icon: item.collection_icon,
+          fp: item.fp,
+        },
+      };
+    });
 
-    //     delete total.portfolio.create_timestamp;
-    //   return total;
+    //TODO 이러면 페이지 크기만큼 sql을 추가로 실행하게됨;  이게 과연 빠를까???
+    // result_Data.forEach(async function (element, index) { //
+    //   // console.log(index);
+    //   let timestamp = await conn.query(timestamp_query, [element.token_address, element.token_id]);
+    //   // console.log(timestamp[0].block_timestamp)
+    //   result_Data[index].in_timestamp = timestamp[0].block_timestamp;
+    //   console.log(result_Data[index]);
+    // });
 
-    // }
-    return 1;
+    var final_json = {
+      total: rows[0].cnt,
+      page: 0,
+      page_size: 0,
+      result: result_Data,
+    };
+
+    console.log(util.inspect(final_json, false, null, true));
+
+    return final_json;
   } finally {
     if (conn) conn.release();
   }
 };
 
-const get_portfolio_activity= async (query) => {
- 
-  var wallet ={
-    address : query.address,
-    page : query.page
-  }
+const get_portfolio_activity = async (query) => {
+  var wallet = {
+    address: query.address,
+    page: query.page,
+  };
   var total = {};
   var result = {};
   var rows;
@@ -182,38 +196,49 @@ const get_portfolio_activity= async (query) => {
   try {
     conn = await pool.getConnection();
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-        
-      const id = uuidv4.v1();
-      const query ='SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address="'+splittedAddr+'" or to_address="'+splittedAddr+'";';
-      console.log(query)
+    //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
-     const query2 = "SELECT JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection',JSON_OBJECT('icon',coll.collection_icon,'id',coll.nft_coll_id,'name',coll.name, 'token_address',coll.token_address),'value',trans.value, 'transaction_hash',trans.transaction_hash)) FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address="+'"'+splittedAddr+'" OR trans.to_address="'+splittedAddr+'" ORDER BY trans.block_timestamp desc';
-     console.log(query2)
-      rows = await conn.query(query);
-      rows2 = await conn.query(query2);
+    const id = uuidv4.v1();
+    const query =
+      'SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address="' +
+      splittedAddr +
+      '" or to_address="' +
+      splittedAddr +
+      '";';
+    console.log(query);
 
-      let result_value = rows2[0][ "JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection'"];
-      let result_final = JSON.parse(result_value);
-      if(rows[0] == undefined ){
-          return false;
-      }else{
+    const query2 =
+      "SELECT JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection',JSON_OBJECT('icon',coll.collection_icon,'id',coll.nft_coll_id,'name',coll.name, 'token_address',coll.token_address),'value',trans.value, 'transaction_hash',trans.transaction_hash)) FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address=" +
+      '"' +
+      splittedAddr +
+      '" OR trans.to_address="' +
+      splittedAddr +
+      '" ORDER BY trans.block_timestamp desc';
+    console.log(query2);
+    rows = await conn.query(query);
+    rows2 = await conn.query(query2);
 
-        total.total=rows[0]['COUNT(*)'];
-   
-        total.page_size=10;
-        rows2[0].activity_id=id;
-   
-        total.result=result_final;
-       
-      return total;//TODO 양식맞추기
-      
+    let result_value =
+      rows2[0][
+        "JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection'"
+      ];
+    let result_final = JSON.parse(result_value);
+    if (rows[0] == undefined) {
+      return false;
+    } else {
+      total.total = rows[0]['COUNT(*)'];
+
+      total.page_size = 10;
+      rows2[0].activity_id = id;
+
+      total.result = result_final;
+
+      return total; //TODO 양식맞추기
     }
-  
   } finally {
-      if (conn) conn.release();
-  }    
-}
+    if (conn) conn.release();
+  }
+};
 
 module.exports = {
   get_user,
