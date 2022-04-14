@@ -599,7 +599,27 @@ paths:
                   - page
                   - page_size
                   - result
-              examples: {}
+              examples:
+                example-1:
+                  value:
+                    total: 0
+                    page: 0
+                    page_size: 0
+                    result:
+                      - nft_trans_id: string
+                        in_timestamp: string
+                        action: string
+                        collection:
+                          icon: string
+                          id: string
+                          name: string
+                          token_address: string
+                        token_id: string
+                        from_address: string
+                        to_address: string
+                        value: 0
+                        gas: 0
+                        transaction_hash: string
             application/xml:
               schema:
                 type: object
