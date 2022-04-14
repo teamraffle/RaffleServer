@@ -213,37 +213,6 @@ const get_portfolio_activity = async (query) => {
   try {
     conn = await pool.getConnection();
 
-<<<<<<< HEAD
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것 
-        
-      const id = uuidv4.v1();
-      const query ='SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address="'+splittedAddr+'" or to_address="'+splittedAddr+'";';
-      console.log(query)
-
-     const query2 = "SELECT JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection',JSON_OBJECT('icon',coll.collection_icon,'id',coll.nft_coll_id,'name',coll.name, 'token_address',coll.token_address), 'value',trans.value, 'transaction_hash',trans.transaction_hash)) FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address="+ "'"+ splittedAddr+ '" OR trans.to_address="'+splittedAddr+'" ORDER BY trans.block_timestamp desc LIMIT '+ page_num +",10";
-     console.log(query2)
-      rows = await conn.query(query);
-      rows2 = await conn.query(query2);
-
-      // let result_value = rows2[0][ "JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection'"];
-      // let result_final = JSON.parse(result_value);
-      console.log(rows2)
-
-
-      if(rows[0] == undefined ){
-          return false;
-      }else{
-
-        total.total=rows[0]['COUNT(*)'];
-   
-        total.page_size=10;
-        rows2[0].activity_id=id;
-   
-        // total.result=result_final;
-       
-      return total;//TODO 양식맞추기
-      
-=======
     //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
     const id = uuidv4.v1();
@@ -282,7 +251,6 @@ const get_portfolio_activity = async (query) => {
       total.result = result_final;
 
       return total; //TODO 양식맞추기
->>>>>>> b13ac97b0e61488e714b4846d23a7a011cd68ce8
     }
   } finally {
     if (conn) conn.release();
