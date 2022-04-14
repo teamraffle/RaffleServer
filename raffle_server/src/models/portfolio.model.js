@@ -197,8 +197,7 @@ const get_nft = async (query) => {
       };
 
       console.log(util.inspect(JSON.stringify(final_json), false, null, true));
-
-      return JSON.stringify(final_json);
+      return JSON.stringify(final_json, null, 2);
     }
   } finally {
     if (conn) conn.release();
@@ -206,32 +205,43 @@ const get_nft = async (query) => {
 };
 
 const get_portfolio_activity = async (query) => {
-  var wallet = {
-    address: query.address,
-    page: query.page,
-  };
-
-  var rows;
-  var rows2;
+  const DEFAULT_PAGE = 0;
   const DEFAULT_LIMIT = 10;
-  const DEFAULT_PAGE = wallet.page * DEFAULT_LIMIT;
+
+    //TODO 체인아이디 따라 디비테이블 분기 넣을것
+  const chain_id = query.chain_id;
+  const address = query.address;
+  let _page, _limit;
+
+  if (query.page == undefined) {
+    _page = DEFAULT_PAGE;
+  } else {
+    _page = query.page;
+  }
+
+  if (query.limit == undefined) {
+    _limit = DEFAULT_LIMIT;
+  } else {
+    _limit = query.limit;
+  }
+
+  const offset = _page * _limit;
 
   try {
     conn = await pool.getConnection();
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
-    const count_query = 'SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
+    const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
     const activity_query =
       'SELECT trans.nft_trans_id,trans.block_timestamp,trans.from_address,\
       trans.to_address,trans.action,trans.token_id,coll.collection_icon,\
       coll.nft_coll_id,coll.name,coll.token_address,trans.value,\
       trans.transaction_hash \
       FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address=? \
-      OR trans.to_address=? ORDER BY trans.block_timestamp desc LIMIT ?,10';
+      OR trans.to_address=? ORDER BY trans.block_timestamp desc LIMIT ? OFFSET ?';
 
-    rows = await conn.query(count_query, [wallet.address, wallet.address]);
-    rows2 = await conn.query(activity_query, [wallet.address, wallet.address, DEFAULT_PAGE]);
+    const rows = await conn.query(count_query, [address, address]);
+    const rows2 = await conn.query(activity_query, [address, address, _limit, offset]);
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
     let result_Data = resultArray.map(function (item) {
@@ -253,21 +263,20 @@ const get_portfolio_activity = async (query) => {
       };
     });
 
-    console.log(rows);
     if (rows[0] == undefined) {
       return false;
     } else {
-      const page = Math.ceil(rows[0]['COUNT(*)'] / DEFAULT_LIMIT);
+      const _page_size = Math.ceil(rows[0].cnt / _limit);
       var final_json = {
-        total: rows[0]['COUNT(*)'],
-        page: page,
-        page_size: 10,
+        total: rows[0].cnt,
+        page: _page,
+        page_size: _page_size,
         result: result_Data,
       };
 
       console.log(util.inspect(JSON.stringify(final_json), false, null, true));
 
-      return JSON.stringify(final_json);
+      return JSON.stringify(final_json, null, 2);
     }
   } finally {
     if (conn) conn.release();
