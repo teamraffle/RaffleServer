@@ -126,7 +126,7 @@ const get_nft = async (query) => {
     // "page_size": 0,
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
-      'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , \
+      'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image, \
       tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon \
       FROM tb_nft_eth \
       INNER JOIN tb_nft_collection_eth ON tb_nft_eth.token_address=tb_nft_collection_eth.token_address \
