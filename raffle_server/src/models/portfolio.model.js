@@ -110,7 +110,7 @@ const get_portfolio = async (query) => {
   }
 };
 
-// const get_nft = async (query) => {
+
 const get_nft = async (query) => {
   const DEFAULT_PAGE = 0;
   const DEFAULT_LIMIT = 12;
@@ -146,6 +146,7 @@ const get_nft = async (query) => {
       JOIN tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
       WHERE tb_nft_eth.owner_of=? \
       LIMIT ? OFFSET ?\
+      ORDER BY tb_nft_eth.block_number DESC \
       ';
       // LIMIT ?, OFFSET ?\
 
@@ -183,10 +184,11 @@ const get_nft = async (query) => {
     //   console.log(result_Data[index]);
     // });
 
+    const page= Math.ceil(rows[0]['COUNT(*)']/DEFAULT_LIMIT);
     var final_json = {
       total: rows[0].cnt,
-      page: 0,
-      page_size: 0,
+      page: page,
+      page_size: Math.round( rows[0].cnt / page),
       result: result_Data,
     };
 

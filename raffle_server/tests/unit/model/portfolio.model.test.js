@@ -3,7 +3,7 @@ const { faker } = require('@faker-js/faker');
 const app = require('../../../src/app');
 const setupTestDB = require('../../utils/setupTestDB');
 const { Portfolio } = require('../../../src/models');
-const expect = require("chai").expect;
+const expect = require('chai').expect;
 
 setupTestDB();
 
@@ -19,14 +19,14 @@ describe('Portfolio Model test', () => {
   });
 
   test('get nft Page and Limit option ', async () => {
-    const _limit = 3;
+    const _limit = 5;
     const query = {
       chain_id: 1,
       address: _address,
       page: 0,
       limit: _limit,
     };
-    const res = await Portfolio.get_nft(query)
+    const res = await Portfolio.get_nft(query);
 
     expect(JSON.parse(res).result.length).to.equal(_limit);
   });
