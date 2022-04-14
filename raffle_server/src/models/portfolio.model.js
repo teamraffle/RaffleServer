@@ -174,19 +174,23 @@ const get_portfolio_activity= async (query) => {
       const query ='SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address="'+splittedAddr+'" or to_address="'+splittedAddr+'";';
       console.log(query)
 
-      const query2 = 'SELECT trans.block_timestamp,trans.from_address,trans.to_address,trans.token_address,trans.transaction_hash,trans.action,trans.token_id,trans.value, coll.name FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address="'+splittedAddr+'" OR trans.to_address="'+splittedAddr+'" ORDER BY trans.block_timestamp desc';
-    
+     const query2 = "SELECT JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection',JSON_OBJECT('icon',coll.collection_icon,'id',coll.nft_coll_id,'name',coll.name, 'token_address',coll.token_address,'value',trans.value, 'transaction_hash',trans.transaction_hash))) FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address="+'"'+splittedAddr+'" OR trans.to_address="'+splittedAddr+'" ORDER BY trans.block_timestamp desc';
+     console.log(query2)
       rows = await conn.query(query);
       rows2 = await conn.query(query2);
-      console.log(rows2.slice(0,rows[0]['COUNT(*)']));
+
+      let result_value = rows2[0][ "JSON_ARRAYAGG(JSON_OBJECT('transfer_id',trans.nft_trans_id,'in_timestamp',trans.block_timestamp,'from_address',trans.from_address,'to_address',trans.to_address,'token_address',coll.token_address,'action',trans.action,'token_id',trans.token_id,'collection'"];
+      let result_final = JSON.parse(result_value);
       if(rows[0] == undefined ){
           return false;
       }else{
+
         total.total=rows[0]['COUNT(*)'];
+   
         total.page_size=10;
         rows2[0].activity_id=id;
    
-        total.result=rows2[0];
+        total.result=result_final;
        
       return total;//TODO 양식맞추기
       

@@ -599,27 +599,7 @@ paths:
                   - page
                   - page_size
                   - result
-              examples:
-                example-1:
-                  value:
-                    total: 0
-                    page: 0
-                    page_size: 0
-                    result:
-                      - activity_id: string
-                        in_timestamp: string
-                        action: string
-                        collection:
-                          icon: string
-                          id: string
-                          name: string
-                          token_address: string
-                        token_id: string
-                        from_address: string
-                        to_address: string
-                        value: 0
-                        gas: 0
-                        transaction_hash: string
+              examples: {}
             application/xml:
               schema:
                 type: object
@@ -773,7 +753,22 @@ components:
     NFTActivity:
       description: ''
       type: object
-      x-examples: {}
+      x-examples:
+        example-1:
+          nft_trans_id: string
+          in_timestamp: string
+          action: string
+          collection:
+            icon: string
+            id: string
+            name: string
+            token_address: string
+          token_id: string
+          from_address: string
+          to_address: string
+          value: 0
+          gas: 0
+          transaction_hash: string
       title: ''
       properties:
         nft_trans_id:
@@ -849,6 +844,13 @@ components:
           type: string
         fp:
           type: number
+      x-examples:
+        example-1:
+          nft_coll_id: string
+          symbol: string
+          name: string
+          collection_icon: string
+          fp: 0
   responses:
     '400':
       description: Bad Request - 주소가 hex number양식이 아닌 경우
