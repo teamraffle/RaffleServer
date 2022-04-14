@@ -112,14 +112,26 @@ const get_portfolio = async (query) => {
 
 // const get_nft = async (query) => {
 const get_nft = async (query) => {
-  
+  const DEFAULT_PAGE = 0;
+  const DEFAULT_LIMIT = 12;
+
   //TODO 체인아이디 따라 디비테이블 분기 넣을것
   
   const chain_id = query.chain_id; 
-  
-  const page = query.page;
-  const limit = query.limit;
   const address = query.address;
+  let page, limit;
+
+  if(query.page == undefined){
+    page = DEFAULT_PAGE;
+  }else{
+    page = query.page;
+  }
+
+  if(query.limit == undefined){
+    limit = DEFAULT_LIMIT;
+  }else{
+    limit = query.limit;
+  }
 
   try {
     conn = await pool.getConnection();
@@ -133,13 +145,16 @@ const get_nft = async (query) => {
       JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
       JOIN tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
       WHERE tb_nft_eth.owner_of=? \
+      LIMIT ? OFFSET ?\
       ';
-    const timestamp_query =
-      'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
-      ORDER BY block_timestamp DESC LIMIT 1 ';
+      // LIMIT ?, OFFSET ?\
+
+    // const timestamp_query =
+    //   'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
+    //   ORDER BY block_timestamp DESC LIMIT 1 ';
 
     const rows = await conn.query(count_query, address);
-    const rows2 = await conn.query(nft_coll_query, address);
+    const rows2 = await conn.query(nft_coll_query, [address, limit, page*limit]); //, limit, page*limit
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
     let result_Data = resultArray.map(function (item) {
@@ -175,9 +190,9 @@ const get_nft = async (query) => {
       result: result_Data,
     };
 
-    console.log(util.inspect(final_json, false, null, true));
+    console.log(util.inspect(JSON.stringify(final_json), false, null, true));
 
-    return final_json;
+    return JSON.stringify(final_json);
   } finally {
     if (conn) conn.release();
   }

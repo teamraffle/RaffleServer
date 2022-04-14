@@ -13,7 +13,7 @@ describe('Portfolio Model test', () => {
       chain_id: 1,
       address: '0xC6eAfD3a5A919a17374c5a6d5BcE45CFE4dc76F9',
     };
-    await Portfolio.get_nft('');
+    await Portfolio.get_nft(query);
   });
 
   // afterAll(() => {
