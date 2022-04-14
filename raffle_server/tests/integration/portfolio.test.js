@@ -9,7 +9,7 @@ const { userSmall } = require('../fixtures/user.fixture');
 
 setupTestDB();
 
-describe('Portfolio routes', () => {
+describe.skip('Portfolio routes', () => {
     
     beforeAll(async () => {
         input = {

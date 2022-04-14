@@ -454,7 +454,7 @@ paths:
         - schema:
             type: integer
           in: query
-          name: offset
+          name: page
         - schema:
             type: integer
           in: query
@@ -499,12 +499,16 @@ paths:
                     page: 0
                     page_size: 0
                     result:
-                      - id: string
-                        name: string
-                        symbol: string
+                      - nft_item_id: string
                         token_id: string
-                        floor_price: string
                         in_timestamp: string
+                        nft_image: string
+                        collection:
+                          nft_coll_id: string
+                          symbol: string
+                          name: string
+                          collection_icon: string
+                          fp: 0
         '404':
           $ref: '#/components/responses/404'
       operationId: get-portfolios-nft-userid-or-address
@@ -531,7 +535,7 @@ paths:
         - schema:
             type: integer
           in: query
-          name: offset
+          name: page
         - schema:
             type: integer
           in: query
@@ -602,18 +606,19 @@ paths:
                     page: 0
                     page_size: 0
                     result:
-                      - activity_id: string
+                      - nft_trans_id: string
                         in_timestamp: string
-                        state: int
+                        action: string
                         collection:
                           icon: string
                           id: string
                           name: string
                           token_address: string
-                        token_id: int
+                        token_id: string
                         from_address: string
-                        value: number
-                        gas: number
+                        to_address: string
+                        value: 0
+                        gas: 0
                         transaction_hash: string
             application/xml:
               schema:
@@ -627,7 +632,7 @@ paths:
         - schema:
             type: integer
           in: query
-          name: offset
+          name: page
         - schema:
             type: integer
           in: query
@@ -736,20 +741,19 @@ components:
     NFT:
       title: NFT
       type: object
+      description: ''
+      x-examples: {}
       properties:
-        collection_name:
-          type: string
-        nft_name:
-          type: string
-        symbol:
+        nft_item_id:
           type: string
         token_id:
           type: string
-        floor_price:
-          type: string
         in_timestamp:
           type: string
-      description: ''
+        nft_image:
+          type: string
+        collection:
+          $ref: '#/components/schemas/Collection'
     Ranking:
       title: Ranking
       type: object
@@ -771,27 +775,29 @@ components:
       type: object
       x-examples:
         example-1:
-          activity_id: string
+          nft_trans_id: string
           in_timestamp: string
-          state: int
+          action: string
           collection:
             icon: string
             id: string
             name: string
             token_address: string
-          token_id: int
+          token_id: string
           from_address: string
-          value: number
-          gas: number
+          to_address: string
+          value: 0
+          gas: 0
           transaction_hash: string
+      title: ''
       properties:
-        activity_id:
+        nft_trans_id:
           type: string
           minLength: 1
         in_timestamp:
           type: string
           minLength: 1
-        type:
+        action:
           type: string
           minLength: 1
           description: |-
@@ -827,6 +833,8 @@ components:
         from_address:
           type: string
           minLength: 1
+        to_address:
+          type: string
         value:
           type: number
         gas:
@@ -835,13 +843,34 @@ components:
           type: string
           minLength: 1
       required:
-        - activity_id
+        - nft_trans_id
         - in_timestamp
-        - type
+        - action
         - collection
         - token_id
         - gas
         - transaction_hash
+    Collection:
+      title: Collection
+      type: object
+      properties:
+        nft_coll_id:
+          type: string
+        symbol:
+          type: string
+        name:
+          type: string
+        collection_icon:
+          type: string
+        fp:
+          type: number
+      x-examples:
+        example-1:
+          nft_coll_id: string
+          symbol: string
+          name: string
+          collection_icon: string
+          fp: 0
   responses:
     '400':
       description: Bad Request - 주소가 hex number양식이 아닌 경우
