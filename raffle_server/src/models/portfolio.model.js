@@ -110,52 +110,52 @@ const get_portfolio = async (query) => {
   }
 };
 
-
 const get_nft = async (query) => {
   const DEFAULT_PAGE = 0;
   const DEFAULT_LIMIT = 12;
 
   //TODO 체인아이디 따라 디비테이블 분기 넣을것
-  
-  const chain_id = query.chain_id; 
+
+  const chain_id = query.chain_id;
   const address = query.address;
-  let page, limit;
+  let _page, _limit;
 
-  if(query.page == undefined){
-    page = DEFAULT_PAGE;
-  }else{
-    page = query.page;
+  if (query.page == undefined) {
+    _page = DEFAULT_PAGE;
+  } else {
+    _page = query.page;
   }
 
-  if(query.limit == undefined){
-    limit = DEFAULT_LIMIT;
-  }else{
-    limit = query.limit;
+  if (query.limit == undefined) {
+    _limit = DEFAULT_LIMIT;
+  } else {
+    _limit = query.limit;
   }
+
+  const offset = _page * _limit;
 
   try {
     conn = await pool.getConnection();
 
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
-      'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , \
+      'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , tb_nft_eth.block_number,\
       tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,\
       tb_nft_fp_eth.fp\
       FROM tb_nft_eth \
       JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
       JOIN tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
       WHERE tb_nft_eth.owner_of=? \
+      ORDER BY tb_nft_eth.block_number DESC\
       LIMIT ? OFFSET ?\
-      ORDER BY tb_nft_eth.block_number DESC \
       ';
-      // LIMIT ?, OFFSET ?\
 
     // const timestamp_query =
     //   'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
     //   ORDER BY block_timestamp DESC LIMIT 1 ';
 
     const rows = await conn.query(count_query, address);
-    const rows2 = await conn.query(nft_coll_query, [address, limit, page*limit]); //, limit, page*limit
+    const rows2 = await conn.query(nft_coll_query, [address, _limit, offset]); //, limit, page*limit
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
     let result_Data = resultArray.map(function (item) {
@@ -184,54 +184,54 @@ const get_nft = async (query) => {
     //   console.log(result_Data[index]);
     // });
 
-    const page= Math.ceil(rows[0]['COUNT(*)']/DEFAULT_LIMIT);
-    var final_json = {
-      total: rows[0].cnt,
-      page: page,
-      page_size: Math.round( rows[0].cnt / page),
-      result: result_Data,
-    };
+    if (rows[0] == undefined) {
+      return false;
+    } else {
+      // console.log(rows[0].cnt / _limit);
+      const _page_size = Math.ceil(rows[0].cnt / _limit);
+      var final_json = {
+        total: rows[0].cnt,
+        page: _page,
+        page_size: _page_size,
+        result: result_Data,
+      };
 
-    console.log(util.inspect(JSON.stringify(final_json), false, null, true));
+      console.log(util.inspect(JSON.stringify(final_json), false, null, true));
 
-    return JSON.stringify(final_json);
+      return JSON.stringify(final_json);
+    }
   } finally {
     if (conn) conn.release();
   }
 };
 
 const get_portfolio_activity = async (query) => {
-
-
   var wallet = {
     address: query.address,
     page: query.page,
   };
- 
+
   var rows;
   var rows2;
   const DEFAULT_LIMIT = 10;
-  const DEFAULT_PAGE = (wallet.page)*DEFAULT_LIMIT;
-  
-  
+  const DEFAULT_PAGE = wallet.page * DEFAULT_LIMIT;
 
   try {
     conn = await pool.getConnection();
 
     //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
-    const count_query =
-      'SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
+    const count_query = 'SELECT COUNT(*) FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
     const activity_query =
-      "SELECT trans.nft_trans_id,trans.block_timestamp,trans.from_address,\
+      'SELECT trans.nft_trans_id,trans.block_timestamp,trans.from_address,\
       trans.to_address,trans.action,trans.token_id,coll.collection_icon,\
       coll.nft_coll_id,coll.name,coll.token_address,trans.value,\
       trans.transaction_hash \
       FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address=? \
-      OR trans.to_address=? ORDER BY trans.block_timestamp desc LIMIT ?,10";
+      OR trans.to_address=? ORDER BY trans.block_timestamp desc LIMIT ?,10';
 
-    rows = await conn.query(count_query,[wallet.address,wallet.address]);
-    rows2 = await conn.query(activity_query,[wallet.address,wallet.address,DEFAULT_PAGE]);
+    rows = await conn.query(count_query, [wallet.address, wallet.address]);
+    rows2 = await conn.query(activity_query, [wallet.address, wallet.address, DEFAULT_PAGE]);
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
     let result_Data = resultArray.map(function (item) {
@@ -245,31 +245,29 @@ const get_portfolio_activity = async (query) => {
           name: item.name,
           token_address: item.collection_icon,
         },
-        token_id:item.token_id,
-        from_address:item.from_address,
-        to_address:item.to_address,
-        value:item.value,
-        transaction_hash:item.transaction_hash
-
+        token_id: item.token_id,
+        from_address: item.from_address,
+        to_address: item.to_address,
+        value: item.value,
+        transaction_hash: item.transaction_hash,
       };
     });
 
-    console.log(rows)
+    console.log(rows);
     if (rows[0] == undefined) {
       return false;
     } else {
-
-     const page= Math.ceil(rows[0]['COUNT(*)']/DEFAULT_LIMIT);
+      const page = Math.ceil(rows[0]['COUNT(*)'] / DEFAULT_LIMIT);
       var final_json = {
         total: rows[0]['COUNT(*)'],
         page: page,
-        page_size : 10,
+        page_size: 10,
         result: result_Data,
       };
 
       console.log(util.inspect(JSON.stringify(final_json), false, null, true));
 
-    return JSON.stringify(final_json);
+      return JSON.stringify(final_json);
     }
   } finally {
     if (conn) conn.release();

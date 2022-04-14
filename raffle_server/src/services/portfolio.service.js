@@ -29,8 +29,8 @@ const get_portfolio = async(query)=>{
 const get_nft = async(query)=>{
 
     const nft_data = await Portfolio.get_nft(query);
-    if(!portfolio_user_data){
-        throw new ApiError(httpStatus.NOT_FOUND, 'No user found');
+    if(!nft_data){
+        throw new ApiError(httpStatus.NOT_FOUND, 'No nft found');
     }else{
         return nft_data;
     }
