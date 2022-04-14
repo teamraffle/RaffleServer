@@ -126,31 +126,31 @@ const get_nft = async (query) => {
     // "page_size": 0,
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
-      'SELECT JSON_ARRAYAGG( \
+      "SELECT JSON_ARRAYAGG( \
         JSON_OBJECT( \
-          \'nft_item_id\', tb_nft_eth.nft_item_id, \
-          \'token_id\', tb_nft_eth.token_id, \
-          \'nft_image\', tb_nft_eth.nft_image, \
-          \'collection\',JSON_OBJECT( \
-            \'nft_coll_id\',tb_nft_collection_eth.nft_coll_id, \
-            \'symbol\', tb_nft_collection_eth.symbol, \
-            \'name\', tb_nft_collection_eth.name , \
-            \'collection_icon\',tb_nft_collection_eth.collection_icon , \
-            \'fp\', tb_nft_fp_eth.fp \
+          'nft_item_id', tb_nft_eth.nft_item_id, \
+          'token_id', tb_nft_eth.token_id, \
+          'nft_image', tb_nft_eth.nft_image, \
+          'collection',JSON_OBJECT( \
+            'nft_coll_id',tb_nft_collection_eth.nft_coll_id, \
+            'symbol', tb_nft_collection_eth.symbol, \
+            'name', tb_nft_collection_eth.name , \
+            'collection_icon\',tb_nft_collection_eth.collection_icon , \
+            'fp', tb_nft_fp_eth.fp \
             ) \
           ) \
       ) as res\
       FROM tb_nft_eth  \
             INNER JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address  \
             INNER Join tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
-            WHERE owner_of= ?'; 
+            WHERE owner_of= ?"; 
 
     // const rows = await conn.query(count_query, address);
     const rows2 = await conn.query(nft_coll_query, address);
 
     // console.log(rows[0].cnt);
     console.log(rows2[0].res);
-
+    let result_final = JSON.parse(rows2[0].res);
     //   if(rows[0] == undefined ){
     //       return false;
     //   }else{
