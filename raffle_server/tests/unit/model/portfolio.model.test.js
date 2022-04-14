@@ -10,7 +10,7 @@ setupTestDB();
 describe('Portfolio Model test', () => {
   const _address = '0xC6eAfD3a5A919a17374c5a6d5BcE45CFE4dc76F9';
 
-  describe('NFT', () => {
+  describe.skip('NFT', () => {
     test('get nft Basic : Address, Chain id only', async () => {
       const query = {
         chain_id: 1,
