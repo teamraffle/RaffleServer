@@ -5,7 +5,7 @@ const setupTestDB = require('../../utils/setupTestDB');
 const { Portfolio } = require('../../../src/models');
 setupTestDB();
 
-describe('Portfolio Model test', () => {
+describe.skip('Portfolio Model test', () => {
   test('get nft', async () => {
     await Portfolio.get_nft('');
 

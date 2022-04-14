@@ -56,6 +56,8 @@ const get_and_save_first_data = async (address, chain_id) => {
       let coll_set_duplicate_removed = nftService.remove_SetA_from_SetB(coll_set, transfer_coll_set);
       // db에 무중복 세트가 있는지 확인
       final_coll_set = await nftService.check_collection_exists(coll_set_duplicate_removed);
+      // NFT콜렉션 검색해 디비에 저장
+      await nftService.get_and_save_nftcoll(final_coll_set); 
     } else {
       // 지갑주소의 transfer을 db에 저장
       let transfer_coll_set = await nftService.get_all_NFT_transfers_no_fp(address, chain_id);
