@@ -130,7 +130,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
 
 const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
 
-  let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
+  let {finalTuple, collectionSet, buy_sell_related_address} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
 
@@ -142,12 +142,12 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
     if(fp_total !== 'undefined'){
 
       const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
-      (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume) 
+      (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume,related_addr_count,activity_count) 
       VALUES 
-      (?,?,?,?,?,?,?,?,?,?,?,?)`;
+      (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
       var splittedAddr = wallet;
       // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
-      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
+      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell_related_address.buy_volume*Math.pow(0.1,18),buy_sell_related_address.sell_volume*Math.pow(0.1,18),buy_sell_related_address.related_address_count,0]);
       // console.log(dbRes2);//성공 
     }
     
@@ -166,7 +166,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
 const createTx = async(data,wallet, arr_ave_date) => {
 
   
-  let {finalTuple, collectionSet, buy_sell} = createTx_tuple(data,wallet);
+  let {finalTuple, collectionSet, buy_sell_related_address} = createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
@@ -222,6 +222,7 @@ const createTx_tuple= (data,wallet) =>{
   var _buysell = {};
   let buy_volume=0;
   let sell_volume=0;
+  let related_address_count=0;
 
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
@@ -242,7 +243,9 @@ const createTx_tuple= (data,wallet) =>{
 
     const action ='\"'+  classify_action(data.result[idx].value,data.result[idx].from_address,data.result[idx].to_address,wallet)+'\"';
     //여기서는 " "넣어서 보내면 불편하니 그냥 보내기 그리고 0x변환도 안해야 비교하니 빠르니 그냥 보내기
-
+    if(action=='"0"' || action=='"2"' || action=='"4"' || action=='"5"' ){
+      related_address_count++;
+    }
     if(action=='"0"'){
       buy_volume+=parseInt(data.result[idx].value);
     }
@@ -266,12 +269,13 @@ const createTx_tuple= (data,wallet) =>{
   };
   _buysell.buy_volume=buy_volume;
   _buysell.sell_volume=sell_volume;
+  _buysell.related_address_count=related_address_count;
 
   // console.log(_buysell);  
   // console.log(_collectionSet);
   // console.log(_finalTuple);
 
-  return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell : _buysell };
+  return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell_related_address : _buysell };
 }
 
 
