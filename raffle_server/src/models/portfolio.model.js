@@ -16,6 +16,7 @@ const get_user = async (wallet, chain_id) => {
   var rows2;
   var rows3;
   var rows4;
+  var rows5;
   const splittedAddr = wallet.address;
   try {
     conn = await pool.getConnection();
@@ -25,46 +26,43 @@ const get_user = async (wallet, chain_id) => {
       //첫번째 쿼리, 두개 조인해서 닉네임 가져오기
       //두번째 쿼리, 일단 해당 사용자 값 nft 갯수 가져오기
 
-      const query =
+      const portfolio_basic =
         'SELECT tb_user.nickname,tb_user.profile_pic FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id  WHERE tb_wallet_eth.address=?';
-      const query2 = 'SELECT COUNT( * ) FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
-      const query3 = 'SELECT COUNT(DISTINCT token_address) FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
-      const query4 =
-        'SELECT name,collection_icon FROM tb_nft_collection_eth WHERE token_address=(SELECT token_address AS counted FROM tb_nft_eth WHERE tb_nft_eth.owner_of=' +
+      const nft_count = 'SELECT COUNT( * ) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
+      const nft_coll_count = 'SELECT COUNT(DISTINCT token_address) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
+      const activity_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
+      const collection = 'SELECT name,collection_icon FROM tb_nft_collection_eth WHERE token_address=(SELECT token_address AS counted FROM tb_nft_eth WHERE tb_nft_eth.owner_of=' +
         '"' +
         splittedAddr +
         '"' +
         'GROUP BY token_address ORDER BY counted DESC LIMIT 1)';
 
-      rows = await conn.query(query, splittedAddr);
-      rows2 = await conn.query(query2, splittedAddr);
-      rows3 = await conn.query(query3, splittedAddr);
-      rows4 = await conn.query(query4);
+      rows = await conn.query(portfolio_basic, splittedAddr);
+      rows2 = await conn.query(nft_count, splittedAddr);
+      rows3 = await conn.query(nft_coll_count, splittedAddr);
+      rows4 = await conn.query(collection);
+      rows5 = await conn.query(activity_query,[splittedAddr,splittedAddr]);
 
       if (rows[0] == undefined || rows2[0] == undefined || rows3[0] == undefined || rows4[0] == undefined) {
         return false;
       } else {
-        // json 반환용 -> 나중에
-        // rows[0].address=wallet.address;
-        // rows[0].nft_count=rows2[0]['COUNT( * )'];
-        // rows[0].collection_count=rows3[0]['COUNT(DISTINCT token_address)'];
-        // rows[0].most_collection=rows4[0].name;
-        // rows[0].most_collection_icon=rows4[0].collection_icon;
-
+     
         const wallet_address = wallet.address;
-        const nft_holdings = rows2[0]['COUNT( * )'];
-        const collections_holdings = rows3[0]['COUNT(DISTINCT token_address)'];
+        const nft_holdings = rows2[0].cnt;
+        const collections_holdings = rows3[0].cnt;
         const most_collection_name = rows4[0].name;
         const most_collection_icon = rows4[0].collection_icon;
+        const activity_count=rows5[0].cnt;
 
-        const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=? where wallet_address=?`;
+        const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=? where wallet_address=?`;
         console.log('here', nft_holdings, collections_holdings, most_collection_name, most_collection_icon, wallet_address);
         const dbRes = await conn.query(update_portfolio, [
           nft_holdings,
           collections_holdings,
           most_collection_name,
           most_collection_icon,
-          wallet_address,
+          activity_count,
+          wallet_address
         ]);
 
         return dbRes; //TODO 양식맞추기
