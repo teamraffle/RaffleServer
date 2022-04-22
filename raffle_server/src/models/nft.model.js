@@ -100,7 +100,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
 
     if (JSON.parse(data.result[idx].metadata).image != undefined) {
       const metadata_image = JSON.parse(data.result[idx].metadata).image;
-      console.log()
+    
       nft_image = '"' + metadata_image + '"';
 
     } else if( JSON.parse(data.result[idx].metadata).image_url != undefined){
@@ -110,7 +110,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
       nft_image = '""';
     }
   }
-    console.log(nft_image)
+  
 
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image];
     let res = nft_string.join(',');
