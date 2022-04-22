@@ -306,49 +306,6 @@ paths:
           name: chain_id
       tags:
         - Register
-  '/rankings/{standard}':
-    parameters:
-      - schema:
-          type: string
-        name: standard
-        in: path
-        required: true
-    get:
-      summary: Get ranking
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: ''
-                type: object
-                properties:
-                  total:
-                    type: integer
-                  page:
-                    type: integer
-                  page_size:
-                    type: integer
-                  result:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Ranking'
-        '201':
-          description: Created
-        '400':
-          $ref: '#/components/responses/400'
-        '404':
-          $ref: '#/components/responses/404'
-      operationId: get-rankings-standard
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: wallet_addr
-          description: Should be hex number
-      tags:
-        - Rankings
   /portfolios/basic:
     get:
       summary: Get basic information of portfolio
@@ -659,9 +616,9 @@ paths:
           required: true
       tags:
         - Portfolios
-  /rankings/v1:
+  '/rankings/{standard}':
     get:
-      summary: Your GET endpoint
+      summary: Get Ranking
       tags: []
       responses:
         '200':
@@ -745,7 +702,12 @@ paths:
             type: integer
           in: query
           name: limit
-    parameters: []
+    parameters:
+      - schema:
+          type: string
+        name: standard
+        in: path
+        required: true
 components:
   schemas:
     User:
