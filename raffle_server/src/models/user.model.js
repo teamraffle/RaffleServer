@@ -8,20 +8,21 @@ const create= async (body, wallet_id) => {
     var user = {
         nickname : body.nickname,
         profile_pic : body.profile_pic,
-        email: body.email
+        email: body.email,
+        address : body.address
       } 
 
     try {
         conn = await pool.getConnection();
         const sql = `INSERT INTO tb_user
         (
-            user_id, wallet_id, nickname, profile_pic,email
+            user_id, wallet_id, nickname, profile_pic,email,address
         ) VALUES (
-            ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?,?
         )`
         
         const user_id = uuidv4.v1();
-        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profile_pic,user.email]);
+        const dbRes = await conn.query(sql, [user_id, wallet_id, user.nickname, user.profile_pic,user.email,user.address]);
         logger.info(dbRes);//성공 리턴
         return user_id;
     

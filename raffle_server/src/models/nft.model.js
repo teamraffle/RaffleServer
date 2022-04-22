@@ -95,11 +95,20 @@ const nft_db_save= async (data,wallet,fp_total) => {
     const block_number='\"'+data.result[idx].block_number+'\"';
     const token_address='\"'+data.result[idx].token_address+'\"';
     const frozen= '\"'+data.result[idx].frozen+'\"';
-    const nft_image = '\"'+''+'\"';
+    let nft_image;
+
+    const metadata_image=JSON.parse(data.result[idx].metadata).image;
+    if(metadata_image!=undefined){
+      nft_image = '\"'+metadata_image+'\"';
+    }
+    else{
+      const metadata_image2=JSON.parse(data.result[idx].metadata).image_url;
+      nft_image = '\"'+metadata_image2+'\"';
+    }
+ 
+
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image];
     let res = nft_string.join(',');
-    // console.log(idx+":"+token_id);
-    
     if(idx==0){
       finaltuple+="("+res+")";
     

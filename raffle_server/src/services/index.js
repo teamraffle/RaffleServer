@@ -4,3 +4,4 @@ module.exports.tokenService = require('./token.service');//never used yet
 module.exports.userService = require('./user.service');
 module.exports.nftService = require('./nft.service');
 module.exports.portfolioService = require('./portfolio.service');
+module.exports.RankingService = require('./ranking.service');
