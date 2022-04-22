@@ -1,10 +1,11 @@
 const express = require('express');
+const rankingController = require('../../controllers/ranking.controller');
 
 const router = express.Router();
 
-router.get('/', function (req, res) {
-  res.send('r');
-})
+router
+.route('/v1')
+.get(rankingController.get_rank)
 
 module.exports = router;
 
