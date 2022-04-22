@@ -4,10 +4,10 @@ info:
   version: '1.0'
   description: ''
 servers:
-  - url: 'http://localhost:3033'
+  - url: 'http://localhost:8888'
     description: local
   - description: server
-    url: 'https://nftranks.xyz:3033'
+    url: 'https://nftranks.xyz:8888'
 paths:
   '/users/{user_id}':
     parameters:
@@ -210,10 +210,7 @@ paths:
                 properties:
                   user_id:
                     type: string
-              examples:
-                example-1:
-                  value:
-                    user_id: string
+              examples: {}
         '400':
           description: Conflict - 지갑주소나 닉네임이 겹침
         '404':
@@ -255,6 +252,14 @@ paths:
                 - nickname
                 - email
                 - profile_pic
+            examples:
+              example-1:
+                value:
+                  chain_id: 1
+                  address: string
+                  nickname: string
+                  email: string
+                  profile_pic: string
           application/xml:
             schema:
               type: object
@@ -654,6 +659,93 @@ paths:
           required: true
       tags:
         - Portfolios
+  /rankings/v1:
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                x-examples:
+                  example-1:
+                    total: 0
+                    page: 0
+                    page_size: 0
+                    result:
+                      - rank_id: string
+                        ranking: 0
+                        nickname: string
+                        address: string
+                        standard: 0
+                        timestamp: datatime
+                        hands: string
+                        est_market_value: 0
+                        Earning: 0
+                        ave_holding_period: 0
+                properties:
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  page_size:
+                    type: integer
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rank_id:
+                          type: string
+                        ranking:
+                          type: integer
+                        nickname:
+                          type: string
+                        address:
+                          type: string
+                        standard:
+                          type: integer
+                        timestamp:
+                          type: string
+                        hands:
+                          type: string
+                        est_market_value:
+                          type: integer
+                        earning:
+                          type: integer
+                        ave_holding_period:
+                          type: integer
+              examples:
+                example-1:
+                  value:
+                    total: 0
+                    page: 0
+                    page_size: 0
+                    result:
+                      - rank_id: string
+                        ranking: 0
+                        standard: 0
+                        timestamp: datatime
+                        nickname: string
+                        hands: string
+                        est_market_value: 0
+                        Earning: 0
+                        ave_holding_period: null
+      operationId: get-ranking-v1
+      description: ''
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+        - schema:
+            type: integer
+          in: query
+          name: limit
+    parameters: []
 components:
   schemas:
     User:
@@ -673,6 +765,13 @@ components:
           type: integer
       required:
         - user_id
+      x-examples:
+        example-1:
+          user_id: string
+          nickname: string
+          profile_pic: string
+          email: string
+          status: 0
     Wallet:
       title: Wallet
       type: object
@@ -745,6 +844,8 @@ components:
       x-examples: {}
       properties:
         nft_item_id:
+          type: string
+        nft_token_address:
           type: string
         token_id:
           type: string
