@@ -619,7 +619,8 @@ paths:
   '/rankings/{standard}':
     get:
       summary: Get Ranking
-      tags: []
+      tags:
+        - Rankings
       responses:
         '200':
           description: OK
