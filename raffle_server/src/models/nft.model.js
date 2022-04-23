@@ -110,7 +110,6 @@ const nft_db_save= async (data,wallet,fp_total) => {
       nft_image = '""';
     }
   }
-  
 
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image];
     let res = nft_string.join(',');
@@ -156,12 +155,12 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
     if(fp_total !== 'undefined'){
 
       const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
-      (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume,related_addr_count,activity_count) 
+      (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume,related_addr_count,activity_count,sync) 
       VALUES 
-      (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+      (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
       var splittedAddr = wallet;
       // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
-      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell_related_address.buy_volume*Math.pow(0.1,18),buy_sell_related_address.sell_volume*Math.pow(0.1,18),buy_sell_related_address.related_address_count,0]);
+      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell_related_address.buy_volume*Math.pow(0.1,18),buy_sell_related_address.sell_volume*Math.pow(0.1,18),buy_sell_related_address.related_address_count,0,0]);
       // console.log(dbRes2);//성공 
     }
     

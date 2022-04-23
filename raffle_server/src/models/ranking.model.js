@@ -85,7 +85,6 @@ const get_ranking = async (query) => {
 
 const hand_check= (total,index) => {
 
-    
     let hands;
     console.log(total,index)
     if(index<=total*0.3){
