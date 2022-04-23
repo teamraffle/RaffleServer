@@ -31,7 +31,7 @@ const get_ranking = async (query) => {
     conn = await pool.getConnection();
     console.log(_limit, offset)
 
-    const count_query = 'SELECT (SELECT COUNT(wallet_address) FROM tb_portfolio_eth)as cnt,b.nickname,a.wallet_address,a.create_timestamp,a.est_market_value,a.earnings_rate,a.av_holding_period  FROM tb_portfolio_eth as a  INNER JOIN tb_user AS b ON a.wallet_address=b.address ORDER BY a.av_holding_period DESC LIMIT ? OFFSET ?;';
+    const count_query = 'SELECT (SELECT COUNT(wallet_address) FROM tb_portfolio_eth)as cnt,b.nickname,a.wallet_address,a.create_timestamp,a.est_market_value,a.earnings_rate,a.av_holding_period  FROM tb_portfolio_eth as a  INNER JOIN tb_user AS b ON a.wallet_address=b.address WHERE a.sync=1 ORDER BY a.av_holding_period DESC LIMIT ? OFFSET ?;';
 
 
     const rows = await conn.query(count_query,[_limit, offset]);
