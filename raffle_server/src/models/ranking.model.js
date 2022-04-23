@@ -85,12 +85,12 @@ const get_ranking = async (query) => {
 
 const hand_check= (total,index) => {
 
-    
     let hands;
+    console.log(total,index)
     if(index<=total*0.3){
         hands="dia"
     }
-    if(total-index<total*0.1){
+    else if(total-index+1<total*0.1){
         hands="paper"
     }
     else{

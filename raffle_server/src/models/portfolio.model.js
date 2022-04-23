@@ -54,14 +54,14 @@ const get_user = async (wallet, chain_id) => {
         const most_collection_icon = rows4[0].collection_icon;
         const activity_count=rows5[0].cnt;
 
-        const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=? where wallet_address=?`;
+        const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=?,sync=? where wallet_address=?`;
         console.log('here', nft_holdings, collections_holdings, most_collection_name, most_collection_icon, wallet_address);
         const dbRes = await conn.query(update_portfolio, [
           nft_holdings,
           collections_holdings,
           most_collection_name,
           most_collection_icon,
-          activity_count,
+          activity_count,1,
           wallet_address
         ]);
 

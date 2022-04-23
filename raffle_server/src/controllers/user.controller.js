@@ -12,6 +12,7 @@ const create_user = catchAsync(async (req, res) => {
   if(is_worthy_wallet){
     await analyze_first_data(req.body.address, req.body.chain_id);
   }
+
 });
 
 const get_user_by_wallet = catchAsync(async (req, res) => {
