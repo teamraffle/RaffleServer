@@ -147,6 +147,7 @@ const get_nft = async (query) => {
       ORDER BY tb_nft_eth.block_number DESC\
       LIMIT ? OFFSET ?\
       ';
+    const get_sync = 'SELECT sync FROM tb_portfolio_eth WHERE wallet_address=?';
 
     // const timestamp_query =
     //   'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
@@ -154,6 +155,7 @@ const get_nft = async (query) => {
 
     const rows = await conn.query(count_query, address);
     const rows2 = await conn.query(nft_coll_query, [address, _limit, offset]); //, limit, page*limit
+    const rows3 = await conn.query(get_sync, address); //, limit, page*limit
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
     let result_Data = resultArray.map(function (item) {
@@ -191,6 +193,7 @@ const get_nft = async (query) => {
         total: rows[0].cnt,
         page: _page,
         page_size: _page_size,
+        sync: rows3[0].sync,
         result: result_Data,
       };
 
