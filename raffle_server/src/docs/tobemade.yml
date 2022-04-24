@@ -344,20 +344,22 @@ paths:
                       activity_count: 0
                       activity_count_7d: 0
                 properties:
+                  sync:
+                    type: integer
                   updated_at:
                     type: string
                     minLength: 1
                   user:
                     type: object
                     required:
-                      - nickname
                       - user_id
+                      - nickname
                       - badge
                     properties:
-                      nickname:
+                      user_id:
                         type: string
                         minLength: 1
-                      user_id:
+                      nickname:
                         type: string
                         minLength: 1
                       badge:
@@ -444,6 +446,8 @@ paths:
               schema:
                 type: object
                 properties:
+                  sync:
+                    type: integer
                   total:
                     type: integer
                   page:

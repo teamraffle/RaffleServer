@@ -217,16 +217,16 @@ const get_nft = async (query) => {
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
       'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , tb_nft_eth.block_number,\
-      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,\
-      tb_nft_fp_eth.fp\
-      FROM tb_nft_eth \
+      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name ,\ tb_nft_collection_eth.collection_icon ,final.fp\
+      FROM tb_nft_eth\
       JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
-      JOIN tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
-      WHERE tb_nft_eth.owner_of=? \
-      ORDER BY tb_nft_eth.block_number DESC\
-      LIMIT ? OFFSET ?\
-      ';
+      JOIN (SELECT m1.* FROM tb_nft_fp_eth m1,(SELECT max(update_timestamp) as max_time,fp,token_address  from tb_nft_fp_eth group by token_address) m2 WHERE m1.update_timestamp = m2.max_time AND m1.token_address = m2.token_address)final ON tb_nft_eth.token_address = final.token_address\
+      WHERE tb_nft_eth.owner_of=?\
+      ORDER BY tb_nft_eth.block_number DESC \
+      LIMIT ? OFFSET ?';
+
     const get_sync = 'SELECT sync FROM tb_portfolio_eth WHERE wallet_address=?';
+
 
     // const timestamp_query =
     //   'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
@@ -269,6 +269,7 @@ const get_nft = async (query) => {
       // console.log(rows[0].cnt / _limit);
       const _page_size = Math.ceil(rows[0].cnt / _limit);
       var final_json = {
+
         total: rows[0].cnt,
         page: _page,
         page_size: _page_size,
