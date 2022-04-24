@@ -96,11 +96,14 @@ const get_portfolio = async (query) => {
     if (rows[0] == undefined) {
       return false;
     } else {
+      total.sync = rows[0].sync;
       total.updated_at = rows[0].create_timestamp;
       total.user = rows2[0];
       total.portfolio = rows[0];
 
       delete total.portfolio.create_timestamp;
+      delete total.portfolio.sync;
+      
       return total; //TODO 양식맞추기
     }
   } finally {
@@ -175,7 +178,7 @@ const get_nft = async (query) => {
       };
     });
 
-    //TODO 이러면 페이지 크기만큼 sql을 추가로 실행하게됨;  이게 과연 빠를까???
+    // TODO 이러면 페이지 크기만큼 sql을 추가로 실행하게됨;  이게 과연 빠를까???
     // result_Data.forEach(async function (element, index) { //
     //   // console.log(index);
     //   let timestamp = await conn.query(timestamp_query, [element.token_address, element.token_id]);
