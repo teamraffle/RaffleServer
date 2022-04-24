@@ -96,11 +96,14 @@ const get_portfolio = async (query) => {
     if (rows[0] == undefined) {
       return false;
     } else {
+      total.sync = rows[0].sync;
       total.updated_at = rows[0].create_timestamp;
       total.user = rows2[0];
       total.portfolio = rows[0];
 
       delete total.portfolio.create_timestamp;
+      delete total.portfolio.sync;
+      
       return total; //TODO 양식맞추기
     }
   } finally {
@@ -138,15 +141,16 @@ const get_nft = async (query) => {
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
       'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , tb_nft_eth.block_number,\
-      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,\
-      tb_nft_fp_eth.fp\
-      FROM tb_nft_eth \
+      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name ,\ tb_nft_collection_eth.collection_icon ,final.fp\
+      FROM tb_nft_eth\
       JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
-      JOIN tb_nft_fp_eth ON tb_nft_eth.token_address = tb_nft_fp_eth.token_address  \
-      WHERE tb_nft_eth.owner_of=? \
-      ORDER BY tb_nft_eth.block_number DESC\
-      LIMIT ? OFFSET ?\
-      ';
+      JOIN (SELECT m1.* FROM tb_nft_fp_eth m1,(SELECT max(update_timestamp) as max_time,fp,token_address  from tb_nft_fp_eth group by token_address) m2 WHERE m1.update_timestamp = m2.max_time AND m1.token_address = m2.token_address)final ON tb_nft_eth.token_address = final.token_address\
+      WHERE tb_nft_eth.owner_of=?\
+      ORDER BY tb_nft_eth.block_number DESC \
+      LIMIT ? OFFSET ?';
+
+    const get_sync = 'SELECT sync FROM tb_portfolio_eth WHERE wallet_address=?';
+
 
     // const timestamp_query =
     //   'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
@@ -154,6 +158,7 @@ const get_nft = async (query) => {
 
     const rows = await conn.query(count_query, address);
     const rows2 = await conn.query(nft_coll_query, [address, _limit, offset]); //, limit, page*limit
+    const rows3 = await conn.query(get_sync, address); //, limit, page*limit
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows2)));
     let result_Data = resultArray.map(function (item) {
@@ -173,7 +178,7 @@ const get_nft = async (query) => {
       };
     });
 
-    //TODO 이러면 페이지 크기만큼 sql을 추가로 실행하게됨;  이게 과연 빠를까???
+    // TODO 이러면 페이지 크기만큼 sql을 추가로 실행하게됨;  이게 과연 빠를까???
     // result_Data.forEach(async function (element, index) { //
     //   // console.log(index);
     //   let timestamp = await conn.query(timestamp_query, [element.token_address, element.token_id]);
@@ -188,9 +193,11 @@ const get_nft = async (query) => {
       // console.log(rows[0].cnt / _limit);
       const _page_size = Math.ceil(rows[0].cnt / _limit);
       var final_json = {
+
         total: rows[0].cnt,
         page: _page,
         page_size: _page_size,
+        sync: rows3[0].sync,
         result: result_Data,
       };
 
