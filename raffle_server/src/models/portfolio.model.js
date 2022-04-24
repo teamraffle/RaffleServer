@@ -5,71 +5,147 @@ const pool = require('./plugins/dbHelper');
 const util = require('util');
 let conn;
 
-const get_user = async (wallet, chain_id) => {
-  //TODO
-  //우리 디비에서 유저정보가져와주기
-  var wallet = {
-    address: wallet,
-    chain_id: chain_id,
-  };
-  var rows;
+const save_portfolio = async (wallet, chain_id) => {
+  try {
+    conn = await pool.getConnection();
+    save_portfolio_no_user(wallet);
+    //유저 존재하는지 확인
+    // const user = if_user_exist(wallet);
+    // console.log("2");
+   
+    // if (!user) {
+    // console.log("2");
+
+    //   save_portfolio_no_user(wallet);
+    // } else {
+    //   save_portfolio_with_user(wallet, user);
+    // }
+  } finally {
+    if (conn) conn.release();
+  }
+};
+
+const if_user_exist = async (wallet) => {
+  //조인해서 닉네임 가져오기
+  const portfolio_basic =
+    'SELECT tb_user.nickname,tb_user.profile_pic FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id  WHERE tb_wallet_eth.address=?';
+  const rows = await conn.query(portfolio_basic, wallet);
+  if (rows[0] == undefined) {
+    return false;
+  } else {
+    return rows[0];
+  }
+};
+
+const save_portfolio_with_user = async (wallet, user) => {
   var rows2;
   var rows3;
   var rows4;
   var rows5;
-  const splittedAddr = wallet.address;
-  try {
-    conn = await pool.getConnection();
+  //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것
-    if (wallet.chain_id == 1) {
-      //첫번째 쿼리, 두개 조인해서 닉네임 가져오기
-      //두번째 쿼리, 일단 해당 사용자 값 nft 갯수 가져오기
+  //해당 사용자 값 nft 갯수 가져오기
+  const nft_count = 'SELECT COUNT( * ) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
+  const nft_coll_count = 'SELECT COUNT(DISTINCT token_address) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
+  const activity_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
+  const collection =
+    'SELECT name,collection_icon FROM tb_nft_collection_eth WHERE token_address=(SELECT token_address AS counted FROM tb_nft_eth WHERE tb_nft_eth.owner_of=' +
+    '"' +
+    wallet +
+    '"' +
+    'GROUP BY token_address ORDER BY counted DESC LIMIT 1)';
 
-      const portfolio_basic =
-        'SELECT tb_user.nickname,tb_user.profile_pic FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id  WHERE tb_wallet_eth.address=?';
-      const nft_count = 'SELECT COUNT( * ) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
-      const nft_coll_count = 'SELECT COUNT(DISTINCT token_address) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
-      const activity_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
-      const collection = 'SELECT name,collection_icon FROM tb_nft_collection_eth WHERE token_address=(SELECT token_address AS counted FROM tb_nft_eth WHERE tb_nft_eth.owner_of=' +
-        '"' +
-        splittedAddr +
-        '"' +
-        'GROUP BY token_address ORDER BY counted DESC LIMIT 1)';
+  rows2 = await conn.query(nft_count, wallet);
+  rows3 = await conn.query(nft_coll_count, wallet);
+  rows4 = await conn.query(collection);
+  rows5 = await conn.query(activity_query, [wallet, wallet]);
 
-      rows = await conn.query(portfolio_basic, splittedAddr);
-      rows2 = await conn.query(nft_count, splittedAddr);
-      rows3 = await conn.query(nft_coll_count, splittedAddr);
-      rows4 = await conn.query(collection);
-      rows5 = await conn.query(activity_query,[splittedAddr,splittedAddr]);
+  if (rows2[0] == undefined || rows3[0] == undefined || rows4[0] == undefined) {
+    return false;
+  } else {
+    const wallet_address = wallet;
+    const nft_holdings = rows2[0].cnt;
+    const collections_holdings = rows3[0].cnt;
+    const most_collection_name = rows4[0].name;
+    const most_collection_icon = rows4[0].collection_icon;
+    const activity_count = rows5[0].cnt;
 
-      if (rows[0] == undefined || rows2[0] == undefined || rows3[0] == undefined || rows4[0] == undefined) {
-        return false;
-      } else {
-     
-        const wallet_address = wallet.address;
-        const nft_holdings = rows2[0].cnt;
-        const collections_holdings = rows3[0].cnt;
-        const most_collection_name = rows4[0].name;
-        const most_collection_icon = rows4[0].collection_icon;
-        const activity_count=rows5[0].cnt;
+    const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=?,sync=? where wallet_address=?`;
+    console.log('here', nft_holdings, collections_holdings, most_collection_name, most_collection_icon, wallet_address);
+    const dbRes = await conn.query(update_portfolio, [
+      nft_holdings,
+      collections_holdings,
+      most_collection_name,
+      most_collection_icon,
+      activity_count,
+      1,
+      wallet_address,
+    ]);
 
-        const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=?,sync=? where wallet_address=?`;
-        console.log('here', nft_holdings, collections_holdings, most_collection_name, most_collection_icon, wallet_address);
-        const dbRes = await conn.query(update_portfolio, [
-          nft_holdings,
-          collections_holdings,
-          most_collection_name,
-          most_collection_icon,
-          activity_count,1,
-          wallet_address
-        ]);
+    return dbRes; //TODO 양식맞추기
+  }
+};
 
-        return dbRes; //TODO 양식맞추기
-      }
+const save_portfolio_no_user = async (wallet) => {
+  var rows2;
+  var rows3;
+  var rows4;
+  var rows5;
+  //TODO 체인아이디 따라 디비테이블 분기 넣을것
+
+  //해당 사용자 값 nft 갯수 가져오기
+  const nft_count = 'SELECT COUNT( * ) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
+  const nft_coll_count = 'SELECT COUNT(DISTINCT token_address) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
+  const activity_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
+  const collection =
+    'SELECT name,collection_icon FROM tb_nft_collection_eth WHERE token_address=(SELECT token_address AS counted FROM tb_nft_eth WHERE tb_nft_eth.owner_of=' +
+    '"' +
+    wallet +
+    '"' +
+    'GROUP BY token_address ORDER BY counted DESC LIMIT 1)';
+
+  rows2 = await conn.query(nft_count, wallet);
+  rows3 = await conn.query(nft_coll_count, wallet);
+  rows4 = await conn.query(collection);
+  rows5 = await conn.query(activity_query, [wallet, wallet]);
+
+  console.log(rows2[0]);
+  console.log(rows3[0]);
+  console.log(rows4[0]);
+  console.log(rows5[0]);
+
+
+  if (rows2[0] == undefined || rows3[0] == undefined ) {
+    return false;
+  } else {
+    const wallet_address = wallet;
+    const nft_holdings = rows2[0].cnt;
+    const collections_holdings = rows3[0].cnt;
+    let most_collection_name;
+    let most_collection_icon;
+    if(rows4[0] == undefined){
+      most_collection_name = "";
+      most_collection_icon = "";
+    }else{
+      most_collection_name = rows4[0].name;
+      most_collection_icon = rows4[0].collection_icon;
     }
-  } finally {
-    if (conn) conn.release();
+
+    const activity_count = rows5[0].cnt;
+
+    const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=?,sync=? where wallet_address=?`;
+    console.log('here', nft_holdings, collections_holdings, most_collection_name, most_collection_icon, wallet_address);
+    const dbRes = await conn.query(update_portfolio, [
+      nft_holdings,
+      collections_holdings,
+      most_collection_name,
+      most_collection_icon,
+      activity_count,
+      1,
+      wallet_address,
+    ]);
+
+    return dbRes; 
   }
 };
 
@@ -103,7 +179,7 @@ const get_portfolio = async (query) => {
 
       delete total.portfolio.create_timestamp;
       delete total.portfolio.sync;
-      
+
       return total; //TODO 양식맞추기
     }
   } finally {
@@ -212,7 +288,7 @@ const get_portfolio_activity = async (query) => {
   const DEFAULT_PAGE = 0;
   const DEFAULT_LIMIT = 10;
 
-    //TODO 체인아이디 따라 디비테이블 분기 넣을것
+  //TODO 체인아이디 따라 디비테이블 분기 넣을것
   const chain_id = query.chain_id;
   const address = query.address;
   let _page, _limit;
@@ -233,7 +309,6 @@ const get_portfolio_activity = async (query) => {
 
   try {
     conn = await pool.getConnection();
-
 
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
     const activity_query =
@@ -288,7 +363,7 @@ const get_portfolio_activity = async (query) => {
 };
 
 module.exports = {
-  get_user,
+  save_portfolio,
   get_portfolio,
   get_nft,
   get_portfolio_activity,

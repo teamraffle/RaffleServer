@@ -239,7 +239,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total)
         'x-api-key': config.moralis.secret,
       },
     });
-    // console.log(response.data);
+    console.log(response.data);
     total = response.data.total;
     cursor = response.data.cursor;
     if(response.data.result.length>0){
