@@ -66,7 +66,7 @@ const get_and_save_first_data = async (address, chain_id) => {
       final_coll_set = transfer_coll_set;
 
 
-      if(final_coll_set.size >1){
+      if(final_coll_set.size >0){
         // 이미 팔아버려서 저장되지 않은 NFT 콜렉션 추가로 검색해 db에 저장
         await nftService.get_and_save_nftcoll(final_coll_set); 
       } else {
