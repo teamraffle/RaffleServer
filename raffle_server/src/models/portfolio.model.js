@@ -12,7 +12,7 @@ const save_portfolio = async (wallet, chain_id) => {
     //유저 존재하는지 확인
     // const user = if_user_exist(wallet);
     // console.log("2");
-   
+
     // if (!user) {
     // console.log("2");
 
@@ -114,8 +114,7 @@ const save_portfolio_no_user = async (wallet) => {
   console.log(rows4[0]);
   console.log(rows5[0]);
 
-
-  if (rows2[0] == undefined || rows3[0] == undefined ) {
+  if (rows2[0] == undefined || rows3[0] == undefined) {
     return false;
   } else {
     const wallet_address = wallet;
@@ -123,10 +122,10 @@ const save_portfolio_no_user = async (wallet) => {
     const collections_holdings = rows3[0].cnt;
     let most_collection_name;
     let most_collection_icon;
-    if(rows4[0] == undefined){
-      most_collection_name = "";
-      most_collection_icon = "";
-    }else{
+    if (rows4[0] == undefined) {
+      most_collection_name = '';
+      most_collection_icon = '';
+    } else {
       most_collection_name = rows4[0].name;
       most_collection_icon = rows4[0].collection_icon;
     }
@@ -145,17 +144,33 @@ const save_portfolio_no_user = async (wallet) => {
       wallet_address,
     ]);
 
-    return dbRes; 
+    return dbRes;
   }
+};
+
+const check_get_user = async (res_user, res_portfolio) => {
+  let _user_nickname;
+  let _user_id;
+  let _profile_pic;
+
+  if (res_user == undefined) {
+    _user_nickname = res_portfolio.wallet_address;
+    _user_id = '';
+    _profile_pic = '';
+  } else {
+    _user_nickname = res_user.nickname;
+    _user_id = res_user.user_id;
+    _profile_pic = res_user.profile_pic;
+  }
+
+  return { _user_nickname, _user_id, _profile_pic };
 };
 
 const get_portfolio = async (query) => {
   var wallet = {
     address: query.address,
   };
-  var total = {};
 
-  var rows;
   const splittedAddr = wallet.address;
   try {
     conn = await pool.getConnection();
@@ -166,21 +181,39 @@ const get_portfolio = async (query) => {
     const user_query =
       'SELECT tb_user.nickname,tb_user.user_id,tb_user.profile_pic FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id  WHERE tb_wallet_eth.address=?';
 
-    rows = await conn.query(portfolio_query, splittedAddr);
-    rows2 = await conn.query(user_query, splittedAddr);
+    const rows = await conn.query(portfolio_query, splittedAddr);
+    const rows2 = await conn.query(user_query, splittedAddr);
 
     if (rows[0] == undefined) {
       return false;
     } else {
-      total.sync = rows[0].sync;
-      total.updated_at = rows[0].create_timestamp;
-      total.user = rows2[0];
-      total.portfolio = rows[0];
+      const { _user_nickname, _user_id, _profile_pic } = await check_get_user(rows2[0], rows[0]);
 
-      delete total.portfolio.create_timestamp;
-      delete total.portfolio.sync;
-
-      return total; //TODO 양식맞추기
+      return {
+        sync: rows[0].sync,
+        updated_at: rows[0].create_timestamp,
+        user: {
+          nickname: _user_nickname,
+          user_id: _user_id,
+          profile_pic: _profile_pic,
+        },
+        portfolio: {
+          wallet_address: rows[0].wallet_address,
+          nft_holdings: rows[0].nft_holdings,
+          collections_holdings: rows[0].collections_holdings,
+          av_holding_period: rows[0].av_holding_period,
+          most_collection_name: rows[0].most_collection_name,
+          most_collection_icon: rows[0].most_collection_icon,
+          est_market_value: rows[0].est_market_value,
+          holding_volume: rows[0].holding_volume,
+          earnings_rate: rows[0].earnings_rate,
+          total_gas_fee: rows[0].total_gas_fee,
+          buy_volume: rows[0].buy_volume,
+          sell_volume: rows[0].sell_volume,
+          related_addr_count: rows[0].related_addr_count,
+          activity_count: rows[0].activity_count,
+        },
+      };
     }
   } finally {
     if (conn) conn.release();
@@ -217,7 +250,7 @@ const get_nft = async (query) => {
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
       'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , tb_nft_eth.block_number,\
-      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name ,\ tb_nft_collection_eth.collection_icon ,final.fp\
+      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,final.fp\
       FROM tb_nft_eth\
       JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
       JOIN (SELECT m1.* FROM tb_nft_fp_eth m1,(SELECT max(update_timestamp) as max_time,fp,token_address  from tb_nft_fp_eth group by token_address) m2 WHERE m1.update_timestamp = m2.max_time AND m1.token_address = m2.token_address)final ON tb_nft_eth.token_address = final.token_address\
@@ -226,7 +259,6 @@ const get_nft = async (query) => {
       LIMIT ? OFFSET ?';
 
     const get_sync = 'SELECT sync FROM tb_portfolio_eth WHERE wallet_address=?';
-
 
     // const timestamp_query =
     //   'SELECT block_timestamp FROM tb_nft_transfer_eth WHERE token_address = ? AND token_id =? \
@@ -269,7 +301,6 @@ const get_nft = async (query) => {
       // console.log(rows[0].cnt / _limit);
       const _page_size = Math.ceil(rows[0].cnt / _limit);
       var final_json = {
-
         total: rows[0].cnt,
         page: _page,
         page_size: _page_size,
