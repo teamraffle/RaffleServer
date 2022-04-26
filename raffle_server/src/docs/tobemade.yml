@@ -804,6 +804,8 @@ components:
               type: number
             activity_count_7d:
               type: number
+            hands:
+              type: string
     NFT:
       title: NFT
       type: object

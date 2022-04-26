@@ -212,6 +212,7 @@ const get_portfolio = async (query) => {
           sell_volume: rows[0].sell_volume,
           related_addr_count: rows[0].related_addr_count,
           activity_count: rows[0].activity_count,
+          hands: rows[0].hands,
         },
       };
     }

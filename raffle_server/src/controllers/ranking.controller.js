@@ -4,12 +4,12 @@ const catchAsync = require('../utils/catchAsync');
 const { RankingService } = require('../services');
 
 
-const get_rank = catchAsync(async (req,res) => {
-  const rank = await RankingService.get_rank(req,res);
+const make_rank = catchAsync(async (req,res) => {
+  const rank = await RankingService.make_rank(req,res);
   res.status(httpStatus.OK).send(rank);
 });
 
 
 module.exports = {
-  get_rank
+  make_rank
 };
