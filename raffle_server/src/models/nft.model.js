@@ -253,7 +253,7 @@ const createTx_tuple= (data,wallet) =>{
     const block_number= '\"'+data.result[idx].block_number+'\"';
     const block_timestamp= '\"'+data.result[idx].block_timestamp.replace('T',' ').replace('Z','') +'\"';
     const block_hash='\"'+data.result[idx].block_hash+'\"';
-    const transaction_hash='\"'+data.result[idx].block_hash+'\"';
+    const transaction_hash='\"'+data.result[idx].transaction_hash+'\"';
     const transaction_index='\"'+data.result[idx].transaction_index+'\"';
     const log_index='\"'+data.result[idx].log_index+'\"';
     const value='\"'+data.result[idx].value+'\"';
