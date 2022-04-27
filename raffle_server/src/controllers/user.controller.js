@@ -3,6 +3,7 @@ const pick = require('../utils/pick');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { userService, nftService, portfolioService } = require('../services');
+const { Ranking } = require('../models');
 
 const create_user = catchAsync(async (req, res) => {
   const userId = await userService.create_user(req.body);
@@ -11,9 +12,10 @@ const create_user = catchAsync(async (req, res) => {
   const is_worthy_wallet = await get_and_save_first_data(req.body.address, req.body.chain_id);
   if(is_worthy_wallet){
     await analyze_first_data(req.body.address, req.body.chain_id);
-
+    
     //랭킹
   }
+  await Ranking.userpost_make_ranking();
 
 });
 
