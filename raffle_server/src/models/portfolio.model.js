@@ -359,7 +359,7 @@ const get_portfolio_activity = async (query) => {
     let result_Data = resultArray.map(function (item) {
       return {
         nft_trans_id: item.nft_item_id,
-        in_timestamp: item.token_address,
+        in_timestamp: item.block_timestamp,
         action: item.action,
         collection: {
           icon: item.collection_icon,
