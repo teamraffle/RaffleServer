@@ -212,6 +212,7 @@ const get_portfolio = async (query) => {
           sell_volume: rows[0].sell_volume,
           related_addr_count: rows[0].related_addr_count,
           activity_count: rows[0].activity_count,
+          hands: rows[0].hands,
         },
       };
     }
@@ -358,7 +359,7 @@ const get_portfolio_activity = async (query) => {
     let result_Data = resultArray.map(function (item) {
       return {
         nft_trans_id: item.nft_item_id,
-        in_timestamp: item.token_address,
+        in_timestamp: item.block_timestamp,
         action: item.action,
         collection: {
           icon: item.collection_icon,
