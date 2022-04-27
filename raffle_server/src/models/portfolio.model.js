@@ -365,7 +365,7 @@ const get_portfolio_activity = async (query) => {
           icon: item.collection_icon,
           id: item.nft_coll_id,
           name: item.name,
-          token_address: item.collection_icon,
+          token_address: item.token_address,
         },
         token_id: item.token_id,
         from_address: item.from_address,
