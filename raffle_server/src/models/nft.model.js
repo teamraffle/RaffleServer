@@ -104,9 +104,14 @@ const nft_db_save= async (data,wallet,fp_total) => {
       nft_image = '"' + metadata_image + '"';
 
     } else if( JSON.parse(data.result[idx].metadata).image_url != undefined){
-      const metadata_image2 = JSON.parse(data.result[idx].metadata).image_url;
-      nft_image = '"' + metadata_image2 + '"';
-    } else{
+      const metadata_image = JSON.parse(data.result[idx].metadata).image_url;
+      nft_image = '"' + metadata_image + '"';
+
+    } else if( JSON.parse(data.result[idx].metadata).animation_url != undefined){
+      const metadata_image = JSON.parse(data.result[idx].metadata).animation_url;
+      nft_image = '"' + metadata_image + '"';
+      
+    }else{
       nft_image = '""';
     }
   }
