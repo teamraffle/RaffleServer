@@ -26,7 +26,7 @@ const get_portfolio = catchAsync(async (req, res) => {
     const is_worthy_wallet = await get_and_save_first_data(req.query.address, 1);
     if(is_worthy_wallet){
       await analyze_first_data(req.query.address, 1);
-      await Ranking.make_ranking();
+      await Ranking.notuser_make_ranking();
     }
   }else{
     res.status(httpStatus.OK).send(portfolio);
