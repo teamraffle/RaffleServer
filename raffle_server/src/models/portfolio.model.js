@@ -8,7 +8,7 @@ let conn;
 const save_portfolio = async (wallet, chain_id) => {
   try {
     conn = await pool.getConnection();
-    save_portfolio_no_user(wallet);
+    await save_portfolio_no_user(wallet);
     //유저 존재하는지 확인
     // const user = if_user_exist(wallet);
     // console.log("2");
@@ -108,11 +108,6 @@ const save_portfolio_no_user = async (wallet) => {
   rows3 = await conn.query(nft_coll_count, wallet);
   rows4 = await conn.query(collection);
   rows5 = await conn.query(activity_query, [wallet, wallet]);
-
-  console.log(rows2[0]);
-  console.log(rows3[0]);
-  console.log(rows4[0]);
-  console.log(rows5[0]);
 
   if (rows2[0] == undefined || rows3[0] == undefined) {
     return false;

@@ -5,9 +5,20 @@ const axios = require('axios');
 const config = require('../config/config');
 
 //포폴저장할때씀
-const make_rank =  async(page,limit)=>{
+const make_rank =  async()=>{
   
-    const user_ranking = await Ranking.make_ranking(page,limit);
+    const user_ranking = await Ranking.make_ranking();
+    if(!user_ranking){
+        throw new ApiError(httpStatus.CONFLICT, 'No Data');
+    }else{
+        return user_ranking;
+    }
+}
+
+// 랭킹 불러오기
+const get_rank =  async(page,limit)=>{
+  
+    const user_ranking = await Ranking.get_ranking(page,limit);
     if(!user_ranking){
         throw new ApiError(httpStatus.CONFLICT, 'No Data');
     }else{
@@ -18,5 +29,6 @@ const make_rank =  async(page,limit)=>{
 
 
 module.exports = {
-    make_rank
+    make_rank,
+    get_rank
 };
