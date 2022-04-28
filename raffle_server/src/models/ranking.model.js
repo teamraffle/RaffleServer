@@ -88,7 +88,7 @@ const make_ranking = async () => {
     console.log("호출되니",resultArray)
     let index = 0;
     let finaltuple="";
-
+    let finaltuple2="";
 
     let result_Data = resultArray.map(function (item) {
       index++;
@@ -106,27 +106,35 @@ const make_ranking = async () => {
       const est_market_value='"'+item.est_market_value+'"';
       const earning='"'+item.earnings_rate+'"';
       const score='"'+item.av_holding_period+'"';
-      
+      let hands_data = [address,hands];
       let ranking_data = [rank_id, ranking, hands, address,nickname, standard, timestamp, est_market_value,
         earning, score];
         let res = ranking_data.join(',');
+        let res2 = hands_data.join(',');
     
         if(index==1){
         finaltuple+="("+res+")";
+        finaltuple2+="("+res2+")";
 
       }else{
-        finaltuple+=",("+res+")"}
+        finaltuple+=",("+res+")";
+        finaltuple2+=",("+res2+")";
+      }
 
     
     });
 
     console.log(finaltuple)
     const delete_sql = 'DELETE FROM tb_ranking;';
-    const rows3 = await conn.query(delete_sql);
+    const rows2 = await conn.query(delete_sql);
+
+    // const insert_hands_query='INSERT INTO tb_portfolio_eth (wallet_address,hands) VALUES '+finaltuple2+'ON DUPLICATE KEY UPDATE wallet_address=VALUES(wallet_address),hands=VALUES(hands)';
+    // const rows3 = await conn.query(insert_hands_query);
+
     const sql = 'INSERT IGNORE INTO tb_ranking (rank_id, ranking, hands, address, nickname, standard, timestamp, est_market_value,earnings_rate,score) VALUES'+ finaltuple;
     // 첫번째 값의 토큰 어드레스 값을 읽을 수 없을때, continue 되기 때문에 idx=0일떄 (+res+) 구조 형성이 안먹혀서 임시방편으로 사용
 
-    const rows2 = await conn.query(sql);
+    const rows4 = await conn.query(sql);
   
 
     if (rows[0] == undefined) {
