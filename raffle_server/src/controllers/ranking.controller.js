@@ -9,7 +9,13 @@ const make_rank = catchAsync(async (req,res) => {
   res.status(httpStatus.OK).send(rank);
 });
 
+const get_rank = catchAsync(async (req,res) => {
+  const rank = await RankingService.get_rank(req,res);
+  res.status(httpStatus.OK).send(rank);
+});
+
 
 module.exports = {
-  make_rank
+  make_rank,
+  get_rank
 };

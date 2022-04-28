@@ -8,7 +8,7 @@ let conn;
 const save_portfolio = async (wallet, chain_id) => {
   try {
     conn = await pool.getConnection();
-    save_portfolio_no_user(wallet);
+    await save_portfolio_no_user(wallet);
     //유저 존재하는지 확인
     // const user = if_user_exist(wallet);
     // console.log("2");
@@ -109,11 +109,6 @@ const save_portfolio_no_user = async (wallet) => {
   rows4 = await conn.query(collection);
   rows5 = await conn.query(activity_query, [wallet, wallet]);
 
-  console.log(rows2[0]);
-  console.log(rows3[0]);
-  console.log(rows4[0]);
-  console.log(rows5[0]);
-
   if (rows2[0] == undefined || rows3[0] == undefined) {
     return false;
   } else {
@@ -177,13 +172,16 @@ const get_portfolio = async (query) => {
 
     //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
-    const portfolio_query = 'SELECT * FROM tb_portfolio_eth WHERE wallet_address=?';
+    const portfolio_query = 'SELECT a.wallet_address,a.nft_holdings,a.collections_holdings,a.av_holding_period,\
+a.most_collection_name,a.most_collection_icon,a.est_market_value,a.holding_volume,a.earnings_rate,a.total_gas_fee,\
+a.buy_volume,a.sell_volume,a.related_addr_count,a.activity_count,tb_ranking.hands FROM tb_portfolio_eth as a INNER JOIN tb_ranking ON tb_ranking.address  = a.wallet_address WHERE wallet_address=?';
+
     const user_query =
       'SELECT tb_user.nickname,tb_user.user_id,tb_user.profile_pic FROM tb_wallet_eth INNER JOIN tb_user ON tb_wallet_eth.wallet_id = tb_user.wallet_id  WHERE tb_wallet_eth.address=?';
 
     const rows = await conn.query(portfolio_query, splittedAddr);
     const rows2 = await conn.query(user_query, splittedAddr);
-
+    console.log(rows[0])
     if (rows[0] == undefined) {
       return false;
     } else {

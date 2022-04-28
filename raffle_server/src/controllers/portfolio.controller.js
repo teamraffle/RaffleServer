@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { nftService, portfolioService } = require('../services');
-
+const { Ranking } = require('../models');
 const get_activity = catchAsync(async (req, res) => {
   const activity = await portfolioService.get_activity(req.query);
   res.status(httpStatus.OK).send(activity);
@@ -26,6 +26,7 @@ const get_portfolio = catchAsync(async (req, res) => {
     const is_worthy_wallet = await get_and_save_first_data(req.query.address, 1);
     if(is_worthy_wallet){
       await analyze_first_data(req.query.address, 1);
+      await Ranking.notuser_make_ranking();
     }
   }else{
     res.status(httpStatus.OK).send(portfolio);

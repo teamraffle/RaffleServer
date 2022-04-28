@@ -5,7 +5,7 @@ const router = express.Router();
 
 router
 .route('/v1')
-.get(rankingController.make_rank)
+.get(rankingController.get_rank)
 
 module.exports = router;
 
