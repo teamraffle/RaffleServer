@@ -101,18 +101,11 @@ const nft_db_save= async (data,wallet,fp_total) => {
     if (data[idx].image_url!= undefined) {
     
       nft_image = '"' + data[idx].image_url + '"';
+   
+    
+    }else{
+      nft_image = '"' + data[idx].asset_contract.image_url + '"';
     }
-    // } else if( JSON.parse(data.result[idx].metadata).image_url != undefined){
-    //   const metadata_image = JSON.parse(data.result[idx].metadata).image_url;
-    //   nft_image = '"' + metadata_image + '"';
-
-    // } else if( JSON.parse(data.result[idx].metadata).animation_url != undefined){
-    //   const metadata_image = JSON.parse(data.result[idx].metadata).animation_url;
-    //   nft_image = '"' + metadata_image + '"';
-      
-    // }else{
-    //   nft_image = '""';
-    // }
   
   console.log(token_id,":",block_number)
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image];
