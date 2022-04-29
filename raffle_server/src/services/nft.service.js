@@ -60,7 +60,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
   let chain_type;
   let total;
   let cursor='';
-  const page_size = 500;
+  const page_size = 50; //오픈씨 리밋 50
 
   if (chain_id == 1) {
     chain_type = 'eth';
@@ -68,39 +68,42 @@ const get_nft_moralis = async (wallet, chain_id) => {
 
   try {
   
-    const response = await axios.get(
-      `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}`,
-      {
-        headers: {
-          'x-api-key': config.moralis.secret,
-        },
-      }
-      
-    );
-    // console.log(response.data);
-    total = response.data.total;
-    page = response.data.page;
-    cursor = response.data.cursor;
- 
-    await NFT.nft_db_save(response.data, wallet);
-    var repeat = Math.ceil(total / page_size)-1;
-  
+ const url  = "https://api.opensea.io/api/v1/assets";
+ console.log(url)
+    const response = await axios.get(url, {
+      params: {
+        owner: wallet,
+        order_direction: 'desc',
+        limit: page_size,
+        include_orders: 'false'
+      },
+      headers: {Accept: 'application/json', 'X-API-KEY': config.opensea.secret}
+      },
+    )
 
+    total = Object.keys(response.data.assets).length;
+    cursor = response.data.next; //next : cursor랑 동일 
+    await NFT.nft_db_save(response.data.assets, wallet);;
 
-    if(total > page_size){
-        // console.log("쳐넘음")
-        while(repeat--){
-          const url  = `https://deep-index.moralis.io/api/v2/${wallet}/nft/?chain=${chain_type}&format=decimal&limit=${page_size}&cursor=${cursor}`;
-          const response_rp = await axios.get( url,{
-            headers: {
-              'x-api-key': config.moralis.secret
-            }
-          });
-          page = response_rp.data.page;
-          cursor = response_rp.data.cursor;
-          // console.log("page,cursor:",page,cursor);
-          // console.log(response_rp.data);
-          await NFT.nft_db_save(response_rp.data,wallet);
+    if(cursor!=null){
+        while(true){
+          if(cursor==null)
+          {break}
+          const url  = "https://api.opensea.io/api/v1/assets";
+
+          const response_rp = await axios.get(url, {
+          params: {
+          owner: wallet,
+          order_direction: 'desc',
+          limit: page_size,
+          include_orders: 'false',
+          cursor: cursor
+      },
+      headers: {Accept: 'application/json', 'X-API-KEY': config.opensea.secret}
+      },
+    )
+          cursor = response_rp.data.next;
+          await NFT.nft_db_save(response_rp.data.assets,wallet);
          
         }
 

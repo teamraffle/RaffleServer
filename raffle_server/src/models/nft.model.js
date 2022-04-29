@@ -17,6 +17,7 @@ const nft_coll_db_save= async (data,wallet) => {
     }
     
     const nft_coll_id = '\"'+uuidv4.v1()+'\"';
+    
     const token_address = '\"'+data[idx].primary_asset_contracts[0].address+'\"';
     const return_token_address = data[idx].primary_asset_contracts[0].address;
     const symbol='\"'+data[idx].primary_asset_contracts[0].symbol+'\"';
@@ -67,7 +68,6 @@ const nft_coll_one_db_save= async (collection_) => {
 
   try {
     conn = await pool.getConnection();
-
     const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type, collection_icon, slug) VALUES (?,?,?,?,?,?,?);';
     var values = [uuidv4.v1(), collection_.token_address, collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
     const dbRes = await conn.query(sql, values);
@@ -86,36 +86,35 @@ const nft_coll_one_db_save= async (collection_) => {
 const nft_db_save= async (data,wallet,fp_total) => {
   let finaltuple="";
 
-  for(idx in data.result){
+  for(idx in data){
 
     const nft_item_id = '\"'+uuidv4.v1()+'\"';
-    const token_id='\"'+data.result[idx].token_id+'\"';
+    const token_id='\"'+data[idx].name+'\"';
     const owner_of= '\"'+wallet+'\"';;
     const metadata= '""';
-    const block_number='\"'+data.result[idx].block_number+'\"';
-    const token_address='\"'+data.result[idx].token_address+'\"';
-    const frozen= '\"'+data.result[idx].frozen+'\"';
+    const block_number='"'+""+'"';
+    const token_address='\"'+data[idx].asset_contract.address+'\"';
+    const frozen= '"'+""+'"';
     let nft_image='""';
-    if(data.result[idx].metadata!=null){
+   
 
-    if (JSON.parse(data.result[idx].metadata).image != undefined) {
-      const metadata_image = JSON.parse(data.result[idx].metadata).image;
+    if (data[idx].image_url!= undefined) {
     
-      nft_image = '"' + metadata_image + '"';
-
-    } else if( JSON.parse(data.result[idx].metadata).image_url != undefined){
-      const metadata_image = JSON.parse(data.result[idx].metadata).image_url;
-      nft_image = '"' + metadata_image + '"';
-
-    } else if( JSON.parse(data.result[idx].metadata).animation_url != undefined){
-      const metadata_image = JSON.parse(data.result[idx].metadata).animation_url;
-      nft_image = '"' + metadata_image + '"';
-      
-    }else{
-      nft_image = '""';
+      nft_image = '"' + data[idx].image_url + '"';
     }
-  }
+    // } else if( JSON.parse(data.result[idx].metadata).image_url != undefined){
+    //   const metadata_image = JSON.parse(data.result[idx].metadata).image_url;
+    //   nft_image = '"' + metadata_image + '"';
 
+    // } else if( JSON.parse(data.result[idx].metadata).animation_url != undefined){
+    //   const metadata_image = JSON.parse(data.result[idx].metadata).animation_url;
+    //   nft_image = '"' + metadata_image + '"';
+      
+    // }else{
+    //   nft_image = '""';
+    // }
+  
+  console.log(token_id,":",block_number)
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image];
     let res = nft_string.join(',');
     if(idx==0){
