@@ -680,6 +680,8 @@ paths:
                           type: integer
                         ave_holding_period:
                           type: integer
+                        nft_holdings:
+                          type: integer
               examples:
                 example-1:
                   value:
