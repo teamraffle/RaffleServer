@@ -89,12 +89,14 @@ const nft_db_save= async (data,wallet,fp_total) => {
   for(idx in data){
 
     const nft_item_id = '\"'+uuidv4.v1()+'\"';
-    const token_id='\"'+data[idx].name+'\"';
+    const token_id='\"'+data[idx].token_id+'\"';
     const owner_of= '\"'+wallet+'\"';;
     const metadata= '""';
     const block_number='"'+""+'"';
     const token_address='\"'+data[idx].asset_contract.address+'\"';
     const frozen= '"'+""+'"';
+    const  name= '"'+data[idx].name+'"';
+    const coll_name= '"'+data[idx].asset_contract.name+'"';
     let nft_image='""';
    
 
@@ -107,8 +109,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
       nft_image = '"' + data[idx].asset_contract.image_url + '"';
     }
   
-  console.log(token_id,":",block_number)
-    let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image];
+    let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image,name,coll_name];
     let res = nft_string.join(',');
     if(idx==0){
       finaltuple+="("+res+")";
@@ -121,7 +122,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
   try {
     conn = await pool.getConnection();
 
-    const sql = 'INSERT IGNORE INTO tb_nft_eth (nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number,nft_image) VALUES '+ finaltuple;
+    const sql = 'INSERT IGNORE INTO tb_nft_eth (nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number,nft_image,name,coll_name) VALUES '+ finaltuple;
 
 
     const dbRes = await conn.query(sql);
