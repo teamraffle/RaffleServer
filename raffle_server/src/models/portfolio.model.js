@@ -71,7 +71,7 @@ const save_portfolio_with_user = async (wallet, user) => {
     const activity_count = rows5[0].cnt;
 
     const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=?,sync=? where wallet_address=?`;
-    console.log('here', nft_holdings, collections_holdings, most_collection_name, most_collection_icon, wallet_address);
+
     const dbRes = await conn.query(update_portfolio, [
       nft_holdings,
       collections_holdings,
@@ -181,7 +181,7 @@ a.buy_volume,a.sell_volume,a.related_addr_count,a.activity_count,tb_ranking.hand
 
     const rows = await conn.query(portfolio_query, splittedAddr);
     const rows2 = await conn.query(user_query, splittedAddr);
-    console.log(rows[0])
+
     if (rows[0] == undefined) {
       return false;
     } else {
