@@ -140,12 +140,12 @@ const nft_db_save= async (data,wallet,fp_total) => {
 
 const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
 
-  let {finalTuple, collectionSet, buy_sell_related_address} = createTx_tuple(data,wallet);
+  let {finalTuple, collectionSet, buy_sell_related_address} = await createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
 
     conn = await pool.getConnection();
-    const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
       // console.log(dbRes);//성공 
    
@@ -177,12 +177,12 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
 const createTx = async(data,wallet, arr_ave_date) => {
 
   
-  let {finalTuple, collectionSet, buy_sell_related_address} = createTx_tuple(data,wallet);
+  let {finalTuple, collectionSet, buy_sell_related_address} = await createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
     conn = await pool.getConnection();
     
-    const sql_insert_transfer = 'INSERT INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
     
 
@@ -237,7 +237,7 @@ const classify_action= (value,from_address,to_address,wallet) => {
   }
 
 }
-const createTx_tuple= (data,wallet) =>{
+const createTx_tuple= async(data,wallet) =>{
   var _finalTuple="";
   var _collectionSet = new Set();
   var _buysell = {};
