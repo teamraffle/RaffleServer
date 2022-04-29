@@ -14,10 +14,15 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
   let slugSet = {} //slug 리턴
   try {
 
-    const response = await axios.get(
-      `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`,
-      
-    );
+    const url  = "https://api.opensea.io/api/v1/collections";
+       const response = await axios.get(url, {
+        params: {
+          asset_owner: wallet,
+          offset: '0',
+          limit: page_size
+        },
+        headers: {Accept: 'application/json'}
+      })
 
     if(response.data.length<1){
       return {has_nft_now : false};
@@ -32,9 +37,15 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
 
         while(true){
             
-          const url  = `https://api.opensea.io/api/v1/collections?asset_owner=${wallet}&offset=${offset}&limit=${page_size}`;
-
-          const response_rp = await axios.get(url);
+          const url  = "https://api.opensea.io/api/v1/collections";
+          const response_rp = await axios.get(url, {
+           params: {
+             asset_owner: wallet,
+             offset: offset,
+             limit: page_size
+           },
+           headers: {Accept: 'application/json'}
+         })
           if(Object.keys(response_rp.data).length==0) //빈값이 응답한다면 반복 끝내기
           {
            break;
