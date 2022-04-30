@@ -147,26 +147,23 @@ const make_ranking = async () => {
     if (conn) conn.release();
   }
 };
-const get_ranking = async () => {
+const get_ranking = async (query) => {
   const DEFAULT_PAGE = 0;
   const DEFAULT_LIMIT = 10;
 
   let _page, _limit;
 
-
-  if (query.page == undefined) {
+  if (query.query.page == undefined) {
     _page = DEFAULT_PAGE;
   } else {
-    _page = query.page;
+    _page = query.query.page;
   }
 
-  if (query.limit == undefined) {
-    _limit = DEFAULT_LIMIT;
-  } else {
-    _limit = query.limit;
-  }
-  console.log(_page, _limit)
-  const offset = _page * _limit;
+
+   _limit = DEFAULT_LIMIT;
+
+  
+  let offset = _page * _limit;
 
   try {
     conn = await pool.getConnection();
@@ -175,7 +172,7 @@ const get_ranking = async () => {
     const count_query = 'SELECT (SELECT COUNT(address) FROM tb_ranking)as cnt,a.rank_id,a.ranking,a.hands,a.nickname,a.address,a.timestamp,a.est_market_value,a.earnings_rate,a.nft_holdings,a.score FROM tb_ranking as a ORDER BY a.ranking LIMIT ? OFFSET ?;';  
 
     const rows = await conn.query(count_query,  [_limit, offset]);
-    console.log("da",rows);
+    console.log("da");
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows)));
 
     let finaltuple="";

@@ -10,11 +10,12 @@ const create_user = catchAsync(async (req, res) => {
   res.status(httpStatus.CREATED).send(userId);
 
   const is_worthy_wallet = await get_and_save_first_data(req.body.address, req.body.chain_id);
-  // if(is_worthy_wallet){
-  //   await analyze_first_data(req.body.address, req.body.chain_id);
-  //   await Ranking.make_ranking();
-  //   //랭킹
-  // }
+  if(is_worthy_wallet){
+    await analyze_first_data(req.body.address, req.body.chain_id);
+    await Ranking.make_ranking();
+    //랭킹
+    console.log("FINISHED")
+  }
 
 });
 
@@ -79,12 +80,10 @@ const get_and_save_first_data = async (address, chain_id) => {
       if(!has_nft_now && !has_transfers){
         is_worthy_wallet = false;
       }
-
-    return is_worthy_wallet;
     
-    //console.log("FINISHED")
 
     }
+    return is_worthy_wallet;
   } catch (err) {
     console.log('Error >>', err);
   }
