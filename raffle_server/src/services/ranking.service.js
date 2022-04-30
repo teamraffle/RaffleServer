@@ -16,9 +16,9 @@ const make_rank =  async()=>{
 }
 
 // 랭킹 불러오기
-const get_rank =  async(page,limit)=>{
-  
-    const user_ranking = await Ranking.get_ranking(page,limit);
+const get_rank =  async(query)=>{
+
+    const user_ranking = await Ranking.get_ranking(query);
     if(!user_ranking){
         throw new ApiError(httpStatus.CONFLICT, 'No Data');
     }else{
