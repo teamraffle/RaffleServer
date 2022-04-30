@@ -169,7 +169,7 @@ const get_all_NFT_transfers_no_fp = async (wallet, chain_id) => {
   //1~끝페이지
   if (total > page_size) {
     page++;
-    // console.log('페이지: '+page);
+    console.log('페이지: '+page);
     while (page < Math.ceil(total / page_size)) {
       var { collectionSet, total, cursor } = await getAndSaveTransfer_noFP(wallet, chain_id, cursor, page_size);
       finalSet = new Set([...finalSet, ...collectionSet]);
@@ -212,8 +212,8 @@ const getAndSaveTransfer_noFP = async (wallet, chain_id, _cursor, page_size) => 
     cursor = response.data.cursor;
     if(response.data.result.length>0){
       //평균홀딩기간
-      const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
-      
+     
+      const arr_ave_date = await get_ave_holding_date(response.data.asset_events, map_ave_date);
       //DB에 저장
       const collectionSet = await NFT.createTx(response.data, wallet, arr_ave_date);
 
@@ -250,7 +250,6 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total)
 
   try {
     const url  = "https://api.opensea.io/api/v1/events";
-    console.log(url)
     const response = await axios.get(url, {
       params: {
         only_opensea: 'false',
@@ -287,12 +286,16 @@ const get_ave_holding_date = async(data, map_ave_date) =>{
 
   //out 된 nft의 평균기간
   for(idx in data){
+    
 
-    const token_address= data[idx].asset.asset_contract.address;
-    const token_id= data[idx].asset.token_id;
-    const block_timestamp= data[idx].event_timestamp;
-
-    get_holding_date(map_ave_date, arr_ave_date, token_address, token_id, block_timestamp);
+   
+      const token_address= data[idx].asset?.asset_contract?.address ?? "";
+      const token_id= data[idx].asset?.token_id ?? 0;
+      const block_timestamp= data[idx].event_timestamp;
+  
+      await get_holding_date(map_ave_date, arr_ave_date, token_address, token_id, block_timestamp);
+      
+  
   };
 
   //현재홀딩중인 NFT의 평균기간
@@ -313,12 +316,13 @@ const get_ave_holding_date = async(data, map_ave_date) =>{
   // console.log('완성 리스트 : %O', arr_ave_date );
 
  
-  return average(arr_ave_date);
+  return average(arr_ave_date)??0;
 
 }
 const average = arr => arr.reduce((a,b) => a + b, 0) / arr.length;
 
 const get_holding_date = async (nftMap, timeArray, token_address, token_id, timestamp) => {
+
   const key = token_address.toString() +token_id.toString();
   // console.log('홀딩'+timestamp);
 

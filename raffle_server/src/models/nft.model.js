@@ -85,7 +85,7 @@ const nft_coll_one_db_save= async (collection_) => {
 
 const nft_db_save= async (data,wallet,fp_total) => {
   let finaltuple="";
-
+  let idx2=0;
   for(idx in data){
 
     const nft_item_id = '\"'+uuidv4.v1()+'\"';
@@ -111,12 +111,13 @@ const nft_db_save= async (data,wallet,fp_total) => {
   
     let nft_string = [nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number, nft_image,name,coll_name];
     let res = nft_string.join(',');
-    if(idx==0){
+    if(idx2==0){
       finaltuple+="("+res+")";
     
     }else{
       finaltuple+=",("+res+")";
     }
+    idx2++;
   };
 
   try {
@@ -140,27 +141,28 @@ const nft_db_save= async (data,wallet,fp_total) => {
 }
 
 const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
-
+  let arr_ave_date_value=0;
+  
   let {finalTuple, buy_sell_related_address} = await createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
-
+   
     conn = await pool.getConnection();
-    const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
+    const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action,image,coll_name) VALUES '+ finalTuple;
 
     const dbRes = await conn.query(sql_insert_transfer);
       // console.log(dbRes);//성공 
    
   
     if(fp_total !== 'undefined'){
-
+      console.log(splittedAddr, 0, 0,arr_ave_date_value??0,'','',fp_total,0,0,0,buy_sell_related_address.buy_volume*Math.pow(0.1,18),buy_sell_related_address.sell_volume*Math.pow(0.1,18),buy_sell_related_address.related_address_count,0,0,"")
       const sql_insert_portfolio = `INSERT IGNORE INTO tb_portfolio_eth 
       (wallet_address,nft_holdings,collections_holdings,av_holding_period,most_collection_name,most_collection_icon, est_market_value,holding_volume,earnings_rate,total_gas_fee,buy_volume,sell_volume,related_addr_count,activity_count,sync,hands) 
       VALUES 
       (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
       var splittedAddr = wallet;
       // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
-      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell_related_address.buy_volume*Math.pow(0.1,18),buy_sell_related_address.sell_volume*Math.pow(0.1,18),buy_sell_related_address.related_address_count,0,0,""]);
+      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date_value,'','',fp_total,0,0,0,buy_sell_related_address.buy_volume*Math.pow(0.1,18),buy_sell_related_address.sell_volume*Math.pow(0.1,18),buy_sell_related_address.related_address_count,0,0,""]);
       // console.log(dbRes2);//성공 
     }
     
@@ -185,7 +187,6 @@ const createTx = async(data,wallet, arr_ave_date) => {
     conn = await pool.getConnection();
     const sql="SELECT * FROM tb_portfolio_eth WHERE wallet_address="+wallet;
     const rows = await conn.query(sql);
-    console.log(rows[0])
 
     const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     console.log(sql_insert_transfer)
@@ -264,8 +265,9 @@ const createTx_tuple= async(data,wallet) =>{
   let buy_volume=0;
   let sell_volume=0;
   let related_address_count=0;
-
+  let idx2=0; // 제일 첫번째값이 continue 될가능성 있으니 그걸위해서 추가하여서 맨앞 값 ,( 금지
   for(idx in data){
+
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '"'+""+'"';
     const block_timestamp= '"'+data[idx].event_timestamp +'"';
@@ -283,9 +285,17 @@ const createTx_tuple= async(data,wallet) =>{
     const log_index='"'+""+'"';
     let value='"'+""+'"';
     const transaction_type='"'+""+'"';
-    const token_address='"'+data[idx].asset.asset_contract.address+'"';
-    const token_id='"'+data[idx].asset.token_id+'"';
+    const token_address='"'+(data[idx].asset?.asset_contract?.address?? "") +'"';
+    const token_id='"'+(data[idx].asset.token_id??0)+'"';
     const amount='"'+data[idx].quantity+'"';
+    let image='"'+data[idx].asset.image_url+'"';
+
+    if(data[idx].asset.image_url==null){
+      image='"'+data[idx].asset.collection.image_url+'"';
+    }
+
+  
+    const coll_name='"'+data[idx].asset.asset_contract.name+'"';
     const verified='\"'+""+'\"';
     let from_address='"'+""+'"';
     let to_address='"'+""+'"';
@@ -293,7 +303,9 @@ const createTx_tuple= async(data,wallet) =>{
     if(data[idx].total_price!=null){
       value='"'+data[idx].total_price+'"';
     }
-
+    if(data[idx].event_type=="created"){
+      continue;
+    }
     if(data[idx].event_type=="transfer"){
       from_address = data[idx].from_account.address;
       to_address=data[idx].to_account.address;
@@ -307,18 +319,15 @@ const createTx_tuple= async(data,wallet) =>{
       let seller = data[idx].seller.address;
       action='"'+classify_action2(seller,wallet)+'"';
       if(action=='"0"' ){
-         from_address ='"'+ seller+'"';
-         to_address = '"'+wallet+'"';
+         from_address ='"'+ wallet+'"';
+         to_address = '"'+seller+'"';
       }
-      else{
-         from_address = '"'+wallet+'"';
-         to_address ='"'+ seller+'"';
+      if(action=='"2"'){
+         from_address = '"'+seller+'"';
+         to_address ='"'+ wallet+'"';
       }
     }
     
- 
-
-    console.log( token_address, token_id, from_address, to_address,action)
     if(action=='"0"' || action=='"2"' || action=='"4"' || action=='"5"' ){
       related_address_count++;
     }
@@ -330,16 +339,18 @@ const createTx_tuple= async(data,wallet) =>{
     }
   
     let sqlData = [nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index,
-    value, transaction_type, token_address, token_id, from_address, to_address, amount, verified,action];
+    value, transaction_type, token_address, token_id, from_address, to_address, amount, verified,action,image,coll_name];
     
     let res = sqlData.join(',');
 
-    if(idx==0){
+    if(idx2==0){
+    
       _finalTuple+="("+res+")";
     }else{
       _finalTuple+=",("+res+")";
     }
-    
+    idx2++;
+
   };
   _buysell.buy_volume=buy_volume;
   _buysell.sell_volume=sell_volume;
@@ -347,7 +358,6 @@ const createTx_tuple= async(data,wallet) =>{
 
   // console.log(_buysell);  
   // console.log(_collectionSet);
-  console.log(_finalTuple);
 
   return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell_related_address : _buysell };
 }

@@ -128,7 +128,7 @@ const save_portfolio_no_user = async (wallet) => {
     const activity_count = rows5[0].cnt;
 
     const update_portfolio = `UPDATE tb_portfolio_eth SET nft_holdings=?,collections_holdings=?,most_collection_name=?,most_collection_icon=?,activity_count=?,sync=? where wallet_address=?`;
-    console.log('here', nft_holdings, collections_holdings, most_collection_name, most_collection_icon, wallet_address);
+   
     const dbRes = await conn.query(update_portfolio, [
       nft_holdings,
       collections_holdings,
@@ -248,13 +248,11 @@ const get_nft = async (query) => {
 
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
     const nft_coll_query =
-      'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , tb_nft_eth.block_number,\
-      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,final.fp\
-      FROM tb_nft_eth\
-      JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
-      JOIN (SELECT m1.* FROM tb_nft_fp_eth m1,(SELECT max(update_timestamp) as max_time,fp,token_address  from tb_nft_fp_eth group by token_address) m2 WHERE m1.update_timestamp = m2.max_time AND m1.token_address = m2.token_address)final ON tb_nft_eth.token_address = final.token_address\
-      WHERE tb_nft_eth.owner_of=?\
-      ORDER BY tb_nft_eth.block_number DESC \
+      'SELECT a.nft_item_id, a.token_address, a.token_id ,a.coll_name, a.nft_image , a.block_number,final.fp\
+      FROM tb_nft_eth as a JOIN (SELECT m1.* FROM tb_nft_fp_eth m1,(SELECT max(update_timestamp)\
+      as max_time,fp,token_address  from tb_nft_fp_eth group by token_address) m2 \
+      WHERE m1.update_timestamp = m2.max_time AND m1.token_address = m2.token_address)final ON a.token_address = final.token_address\
+      WHERE a.owner_of=? ORDER BY a.block_number DESC \
       LIMIT ? OFFSET ?';
 
     const get_sync = 'SELECT sync FROM tb_portfolio_eth WHERE wallet_address=?';
@@ -275,11 +273,9 @@ const get_nft = async (query) => {
         token_id: item.token_id,
         in_timestamp: '',
         nft_image: item.nft_image,
+        nft_image: item.image,
         collection: {
-          nft_coll_id: item.nft_coll_id,
-          symbol: item.symbol,
-          name: item.name,
-          collection_icon: item.collection_icon,
+          name: item.coll_name,
           fp: item.fp,
         },
       };
@@ -343,12 +339,12 @@ const get_portfolio_activity = async (query) => {
 
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
     const activity_query =
-      'SELECT trans.nft_trans_id,trans.block_timestamp,trans.from_address,\
-      trans.to_address,trans.action,trans.token_id,coll.collection_icon,\
-      coll.nft_coll_id,coll.name,coll.token_address,trans.value,\
-      trans.transaction_hash \
-      FROM tb_nft_transfer_eth trans LEFT OUTER JOIN tb_nft_collection_eth coll ON coll.token_address=trans.token_address WHERE trans.from_address=? \
-      OR trans.to_address=? ORDER BY trans.block_timestamp desc LIMIT ? OFFSET ?';
+      'SELECT a.nft_trans_id,a.block_timestamp,a.from_address,\
+      a.to_address,a.action,a.token_id,a.image,\
+      a.coll_name,a.token_address,a.value,\
+      a.transaction_hash\
+      FROM tb_nft_transfer_eth as a WHERE a.from_address=? \
+      OR a.to_address=? ORDER BY a.block_timestamp desc LIMIT ? OFFSET ?';
 
     const rows = await conn.query(count_query, [address, address]);
     const rows2 = await conn.query(activity_query, [address, address, _limit, offset]);
@@ -359,12 +355,9 @@ const get_portfolio_activity = async (query) => {
         nft_trans_id: item.nft_item_id,
         in_timestamp: item.block_timestamp,
         action: item.action,
-        collection: {
-          icon: item.collection_icon,
-          id: item.nft_coll_id,
-          name: item.name,
-          token_address: item.token_address,
-        },
+        token_address:item.action,
+        coll_name:item.coll_name,
+        image:item.image,
         token_id: item.token_id,
         from_address: item.from_address,
         to_address: item.to_address,
