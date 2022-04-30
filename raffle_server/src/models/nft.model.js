@@ -140,10 +140,9 @@ const nft_db_save= async (data,wallet,fp_total) => {
   }
 }
 
-const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
+const createTx_and_portfolio= async(finalTuple,wallet, arr_ave_date,fp_total,buy_sell_related_address) => {
   let arr_ave_date_value=0;
   
-  let {finalTuple, buy_sell_related_address} = await createTx_tuple(data,wallet);
   // console.log("wallet"+wallet)
   try {
    
@@ -166,7 +165,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
       // console.log(dbRes2);//성공 
     }
     
-    
+    return finalTuple;
   }catch(err) {
     console.log(err);
   }finally {
@@ -439,6 +438,7 @@ module.exports = {
   nft_coll_db_save,
   nft_db_save,
   createTx,
+  createTx_tuple,
   createTx_and_portfolio,
   save_nft_fp,
   checkAddress,

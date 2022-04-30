@@ -93,4 +93,5 @@ module.exports = {
   get_user_by_id,
   update_user,
   check_nickname_duplication,
+  get_and_save_first_data
 };
