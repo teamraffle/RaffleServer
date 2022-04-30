@@ -146,8 +146,6 @@ const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
   final_buy_sell_related_address.buy_volume+=lasttuple.buy_sell_related_address.buy_volume
   final_buy_sell_related_address.sell_volume+=lasttuple.buy_sell_related_address.sell_volume
   final_buy_sell_related_address.related_address_count+=lasttuple.buy_sell_related_address.related_address_count
-
-  console.log(realtuple)
   //1~끝페이지
   if (cursor != null) {
     while (true) {
@@ -160,8 +158,6 @@ const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
      
         realtuple =realtuple+","+lasttuple.finalTuple;
       
-      
-      console.log(lasttuple.buy_sell_related_address)
       final_ave_date+=arr_ave_date;
       final_buy_sell_related_address.buy_volume+=lasttuple.buy_sell_related_address.buy_volume
       final_buy_sell_related_address.sell_volume+=lasttuple.buy_sell_related_address.sell_volume
@@ -169,7 +165,7 @@ const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
       page++;
     }
   }
-  console.log(final_buy_sell_related_address)
+  console.log("최종",final_buy_sell_related_address)
   await NFT.createTx_and_portfolio(realtuple, wallet, final_ave_date, fp_total,final_buy_sell_related_address);
 
 

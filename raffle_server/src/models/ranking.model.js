@@ -20,7 +20,7 @@ const notuser_make_ranking = async () => {
     // const rows2 = await conn.query(activity_query, [address, address, _limit, offset]);
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows)));
-    console.log("호출되니",resultArray)
+
     let index = 0;
     let finaltuple="";
 
@@ -86,7 +86,6 @@ const make_ranking = async () => {
     // const rows2 = await conn.query(activity_query, [address, address, _limit, offset]);
 
     const resultArray = Object.values(JSON.parse(JSON.stringify(rows)));
-    console.log("호출되니",resultArray)
     let index = 0;
     let finaltuple="";
     let finaltuple2="";
