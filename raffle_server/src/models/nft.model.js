@@ -286,16 +286,16 @@ const createTx_tuple= async(data,wallet) =>{
     let value='"'+""+'"';
     const transaction_type='"'+""+'"';
     const token_address='"'+(data[idx].asset?.asset_contract?.address?? "") +'"';
-    const token_id='"'+(data[idx].asset.token_id??0)+'"';
+    const token_id='"'+(data[idx].asset?.token_id??0)+'"';
     const amount='"'+data[idx].quantity+'"';
-    let image='"'+data[idx].asset.image_url+'"';
+    let image='"'+(data[idx].asset?.image_url??"")+'"';
 
-    if(data[idx].asset.image_url==null){
-      image='"'+data[idx].asset.collection.image_url+'"';
+    if(image=='""'){
+      image='"'+(data[idx].asset?.collection?.image_url??"")+'"';
     }
 
   
-    const coll_name='"'+data[idx].asset.asset_contract.name+'"';
+    const coll_name='"'+(data[idx].asset?.asset_contract?.name??"")+'"';
     const verified='\"'+""+'\"';
     let from_address='"'+""+'"';
     let to_address='"'+""+'"';
