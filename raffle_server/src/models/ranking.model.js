@@ -185,7 +185,7 @@ const get_ranking = async (query) => {
         ranking: item.ranking,
         nickname: item.nickname,
         hands: item.hands,
-        address: item.wallet_address,
+        address: item.address,
         timestamp: item.create_timestamp,
         est_market_value: item.est_market_value,
         earning: item.earnings_rate,
