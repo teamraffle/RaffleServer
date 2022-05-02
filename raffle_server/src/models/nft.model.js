@@ -69,7 +69,7 @@ const nft_coll_one_db_save= async (collection_) => {
   try {
     conn = await pool.getConnection();
     const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type, collection_icon, slug) VALUES (?,?,?,?,?,?,?);';
-    var values = [uuidv4.v1(), collection_.token_address, collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
+    var values = [uuidv4.v1(), collection_.token_address??"", collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
     const dbRes = await conn.query(sql, values);
 
     return dbRes;
@@ -118,8 +118,12 @@ const nft_db_save= async (data,wallet,fp_total) => {
       finaltuple+=",("+res+")";
     }
   };
-
+  console.log(finaltuple)
+ if(finaltuple!='')
+    {
   try {
+
+   
     conn = await pool.getConnection();
 
     const sql = 'INSERT IGNORE INTO tb_nft_eth (nft_item_id,token_address, token_id,owner_of,metadata,frozen,block_number,nft_image,name,coll_name) VALUES '+ finaltuple;
@@ -138,10 +142,11 @@ const nft_db_save= async (data,wallet,fp_total) => {
       if (conn) conn.release(); //release to pool
   }
 }
+}
 
-const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
+const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_sell_related_address) => {
 
-  let {finalTuple, collectionSet, buy_sell_related_address} = await createTx_tuple(data,wallet);
+
   // console.log("wallet"+wallet)
   try {
 
@@ -168,7 +173,7 @@ const createTx_and_portfolio= async(data,wallet, arr_ave_date,fp_total) => {
     console.log(err);
   }finally {
     if (conn) conn.release(); //release to pool
-    return collectionSet;
+ 
   }
   
 
@@ -381,5 +386,6 @@ module.exports = {
   save_nft_fp,
   checkAddress,
   nft_coll_one_db_save,
+  createTx_tuple
 };
   
