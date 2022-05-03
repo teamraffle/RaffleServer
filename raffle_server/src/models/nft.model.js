@@ -147,9 +147,13 @@ const nft_db_save= async (data,wallet,fp_total) => {
 const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_sell_related_address) => {
 
 
-  // console.log("wallet"+wallet)
-  try {
-
+  console.log("finalTuple"+finalTuple)
+  if(finalTuple == "undefined"){
+    console.log("들어와")
+      return false;
+  }
+    
+  try { 
     conn = await pool.getConnection();
     const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
@@ -163,8 +167,13 @@ const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_
       VALUES 
       (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
       var splittedAddr = wallet;
-      // console.log([splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,0,0,buy_sell.buy_volume*Math.pow(0.1,18),buy_sell.sell_volume*Math.pow(0.1,18)]);
-      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,0,(buy_sell_related_address.sell_volume*Math.pow(0.1,18)-buy_sell_related_address.buy_volume*Math.pow(0.1,18))*100,0,buy_sell_related_address.buy_volume*Math.pow(0.1,18),buy_sell_related_address.sell_volume*Math.pow(0.1,18),buy_sell_related_address.related_address_count,0,0,""]);
+    
+      let buy_volume=buy_sell_related_address.buy_volume*Math.pow(0.1,18);
+      let sell_volume=buy_sell_related_address.sell_volume*Math.pow(0.1,18);
+      let earnings_rate=(sell_volume-buy_volume)*100;
+      let holding_volume=buy_sell_related_address.holding_volume*Math.pow(0.1,18);
+      console.log(splittedAddr, 0, 0,arr_ave_date,'','',fp_total,holding_volume,earnings_rate,0,buy_volume,sell_volume,buy_sell_related_address.related_address_count,0,0,"");
+      const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,holding_volume,earnings_rate,0,buy_volume,sell_volume,buy_sell_related_address.related_address_count,0,0,""]);
       // console.log(dbRes2);//성공 
     }
     
@@ -175,9 +184,9 @@ const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_
     if (conn) conn.release(); //release to pool
  
   }
-  
-
 }
+
+
 
 
 const createTx = async(data,wallet, arr_ave_date) => {
@@ -243,14 +252,15 @@ const classify_action= (value,from_address,to_address,wallet) => {
   }
 
 }
-const createTx_tuple= async(data,wallet) =>{
+const createTx_tuple= async(collset, data,wallet) =>{
   var _finalTuple="";
   var _collectionSet = new Set();
   var _buysell = {};
   let buy_volume=0;
   let sell_volume=0;
   let related_address_count=0;
-
+  let holding_volume=0;
+  console.log("hye",data.result)
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '\"'+data.result[idx].block_number+'\"';
@@ -261,6 +271,12 @@ const createTx_tuple= async(data,wallet) =>{
     const log_index='\"'+data.result[idx].log_index+'\"';
     const value='\"'+data.result[idx].value+'\"';
     const transaction_type='\"'+data.result[idx].transaction_type+'\"';
+    if(collset){
+    if(collset.has(data.result[idx].token_address)){
+      collset.delete(data.result[idx].token_address);
+      holding_volume+=parseInt(data.result[idx].value);
+
+    }};
     const token_address='\"'+data.result[idx].token_address+'\"';
     const token_id='\"'+data.result[idx].token_id+'\"';
     const from_address = '\"'+data.result[idx].from_address+'\"';
@@ -297,10 +313,10 @@ const createTx_tuple= async(data,wallet) =>{
   _buysell.buy_volume=buy_volume;
   _buysell.sell_volume=sell_volume;
   _buysell.related_address_count=related_address_count;
-
+  _buysell.holding_volume=holding_volume;
   // console.log(_buysell);  
   // console.log(_collectionSet);
-  // console.log(_finalTuple);
+  console.log("hi",_finalTuple);
 
   return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell_related_address : _buysell };
 }

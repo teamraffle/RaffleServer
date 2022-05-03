@@ -56,9 +56,9 @@ const get_and_save_first_data = async (address, chain_id) => {
       // 소유중인 NFT 각각의 정보 가져옴  //TODO 이건 사실 병렬이 맞음
       await nftService.get_nft_moralis(address , chain_id);
       // 지갑주소의 transfer을 db에 저장
-      let transfer_coll_set = await nftService.get_all_NFT_transfers(address, chain_id, fp_total);
+      let transfer_coll_set = await nftService.get_all_NFT_transfers(coll_set,address, chain_id, fp_total);
       // 트랜스퍼 콜렉션 - 지갑주소 nft 콜렉션 = 무중복 세트
-      let coll_set_duplicate_removed = nftService.remove_SetA_from_SetB(coll_set, transfer_coll_set);
+      let coll_set_duplicate_removed = await nftService.remove_SetA_from_SetB(coll_set, transfer_coll_set);
       // db에 무중복 세트가 있는지 확인
       final_coll_set = await nftService.check_collection_exists(coll_set_duplicate_removed);
       // NFT콜렉션 검색해 디비에 저장

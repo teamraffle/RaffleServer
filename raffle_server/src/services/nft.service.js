@@ -59,7 +59,6 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
           }
           offset = offset+page_size; 
         }
-     
       return {has_nft_now : true, coll_set: collectionSet, slug_set: slugSet};
     
   } catch (err) {
@@ -128,7 +127,8 @@ const get_nft_moralis = async (wallet, chain_id) => {
 
 
 
-const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
+const get_all_NFT_transfers = async (collset,wallet, chain_id,fp_total) => {
+
   let finalSet = new Set();
   let page = 0;
   const page_size = 20;
@@ -137,17 +137,20 @@ const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
   let final_buy_sell_related_address={
     buy_volume:0,
     sell_volume:0,
-    related_address_count:0  
+    related_address_count:0,
+    holding_volume:0
   }
   //0페이지
-  var { finalTuple, collectionSet, total, cursor,arr_ave_date ,buy_sell_related_address } = await getAndSaveTransfer(wallet, chain_id, '', page_size,fp_total);
+  var { finalTuple, collectionSet, total, cursor,arr_ave_date ,buy_sell_related_address } = await getAndSaveTransfer(collset,wallet, chain_id, '', page_size,fp_total);
   finalSet = collectionSet;
 
   realtuple +=finalTuple;
   final_ave_date+=arr_ave_date;
-  final_buy_sell_related_address.buy_volume+=buy_sell_related_address.buy_volume
-  final_buy_sell_related_address.sell_volume+=buy_sell_related_address.sell_volume
-  final_buy_sell_related_address.related_address_count+=buy_sell_related_address.related_address_count
+  console.log(buy_sell_related_address)
+  final_buy_sell_related_address.buy_volume+=buy_sell_related_address?.buy_volume??0;
+  final_buy_sell_related_address.sell_volume+=buy_sell_related_address?.sell_volume??0;
+  final_buy_sell_related_address.related_address_count+=buy_sell_related_address?.related_address_count??0;
+  final_buy_sell_related_address.holding_volume+=buy_sell_related_address?.holding_volume??0;
   
  
   //1~끝페이지
@@ -155,18 +158,18 @@ const get_all_NFT_transfers = async (wallet, chain_id,fp_total) => {
     page++;
     // console.log('페이지: '+page);
     while (page < Math.ceil(total / page_size)) {
-      var { finalTuple, collectionSet, total, cursor,arr_ave_date ,buy_sell_related_address } =await getAndSaveTransfer(wallet, chain_id, cursor, page_size,fp_total);
+      var { finalTuple, collectionSet, total, cursor,arr_ave_date ,buy_sell_related_address } =await getAndSaveTransfer(collset,wallet, chain_id, cursor, page_size,fp_total);
       finalSet = new Set([...finalSet, ...collectionSet]);
       realtuple =realtuple+","+finalTuple;
       
       final_ave_date+=arr_ave_date;
       final_buy_sell_related_address.buy_volume+=buy_sell_related_address.buy_volume
       final_buy_sell_related_address.sell_volume+=buy_sell_related_address.sell_volume
-      final_buy_sell_related_address.related_address_count+=buy_sell_related_address.related_address_count
+      final_buy_sell_related_address.holding_volume+=buy_sell_related_address.holding_volume;
       page++;
     }
   }
-  console.log("최종",final_buy_sell_related_address)
+  console.log("최종",realtuple)
   await NFT.createTx_and_portfolio(realtuple, wallet, final_ave_date, fp_total,final_buy_sell_related_address);
 
   return finalSet;
@@ -247,10 +250,11 @@ const getAndSaveTransfer_noFP = async (wallet, chain_id, _cursor, page_size) => 
   }
 };
 
-const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total) => {
+const getAndSaveTransfer = async (collset,wallet, chain_id, _cursor, page_size,fp_total) => {
   let chain_type;
   let total;
   let cursor;
+
   if (_cursor == undefined) {
     cursor = '';
   } else {
@@ -281,10 +285,7 @@ const getAndSaveTransfer = async (wallet, chain_id, _cursor, page_size,fp_total)
       const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
           
       //DB에 저장
-    
-    
-      let {finalTuple, collectionSet,buy_sell_related_address} = await NFT.createTx_tuple(response.data,wallet);
-
+      let {finalTuple, collectionSet,buy_sell_related_address} = await NFT.createTx_tuple(collset,response.data,wallet);
       return {finalTuple, total, cursor,arr_ave_date ,collectionSet,buy_sell_related_address};
     }else{
       const collectionSet = {}
@@ -451,8 +452,8 @@ function remove_SetA_from_SetB (a, b) {
      return null;
   }
   let newSet = new Set();
-
-  b.forEach(elem => newSet.add(elem));
+  if(b!=undefined){
+  b.forEach(elem => newSet.add(elem));}
 
   if(a!=undefined){
   a.forEach(elem => newSet.delete(elem));}
