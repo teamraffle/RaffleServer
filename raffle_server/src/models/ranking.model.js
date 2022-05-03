@@ -59,6 +59,7 @@ const notuser_make_ranking = async () => {
     console.log(finaltuple)
     const delete_sql = 'DELETE FROM tb_ranking;';
     const rows3 = await conn.query(delete_sql);
+  
     const sql = 'INSERT IGNORE INTO tb_ranking (rank_id, ranking, hands, address, nickname, standard, timestamp, est_market_value,earnings_rate,nft_holdings,score) VALUES'+ finaltuple;
     // 첫번째 값의 토큰 어드레스 값을 읽을 수 없을때, continue 되기 때문에 idx=0일떄 (+res+) 구조 형성이 안먹혀서 임시방편으로 사용
 
@@ -126,13 +127,18 @@ const make_ranking = async () => {
     
     });
 
-    console.log(finaltuple)
+    console.log("here",finaltuple)
     const delete_sql = 'DELETE FROM tb_ranking;';
     const rows2 = await conn.query(delete_sql);
 
     // const insert_hands_query='INSERT INTO tb_portfolio_eth (wallet_address,hands) VALUES '+finaltuple2+'ON DUPLICATE KEY UPDATE wallet_address=VALUES(wallet_address),hands=VALUES(hands)';
     // const rows3 = await conn.query(insert_hands_query);
-
+    console.log()
+    if(finaltuple == ""){
+     
+        return false;
+    }
+  
     const sql = 'INSERT IGNORE INTO tb_ranking (rank_id, ranking, hands, address, nickname, standard, timestamp, est_market_value,earnings_rate,nft_holdings,score) VALUES'+ finaltuple;
     // 첫번째 값의 토큰 어드레스 값을 읽을 수 없을때, continue 되기 때문에 idx=0일떄 (+res+) 구조 형성이 안먹혀서 임시방편으로 사용
 

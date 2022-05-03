@@ -146,10 +146,11 @@ const get_all_NFT_transfers = async (collset,wallet, chain_id,fp_total) => {
 
   realtuple +=finalTuple;
   final_ave_date+=arr_ave_date;
-  final_buy_sell_related_address.buy_volume+=buy_sell_related_address.buy_volume;
-  final_buy_sell_related_address.sell_volume+=buy_sell_related_address.sell_volume;
-  final_buy_sell_related_address.related_address_count+=buy_sell_related_address.related_address_count;
-  final_buy_sell_related_address.holding_volume+=buy_sell_related_address.holding_volume;
+  console.log(buy_sell_related_address)
+  final_buy_sell_related_address.buy_volume+=buy_sell_related_address?.buy_volume??0;
+  final_buy_sell_related_address.sell_volume+=buy_sell_related_address?.sell_volume??0;
+  final_buy_sell_related_address.related_address_count+=buy_sell_related_address?.related_address_count??0;
+  final_buy_sell_related_address.holding_volume+=buy_sell_related_address?.holding_volume??0;
   
  
   //1~끝페이지
@@ -168,7 +169,7 @@ const get_all_NFT_transfers = async (collset,wallet, chain_id,fp_total) => {
       page++;
     }
   }
-  console.log("최종",final_buy_sell_related_address)
+  console.log("최종",realtuple)
   await NFT.createTx_and_portfolio(realtuple, wallet, final_ave_date, fp_total,final_buy_sell_related_address);
 
   return finalSet;
@@ -284,10 +285,7 @@ const getAndSaveTransfer = async (collset,wallet, chain_id, _cursor, page_size,f
       const arr_ave_date = await get_ave_holding_date(response.data, map_ave_date);
           
       //DB에 저장
-    
-    
       let {finalTuple, collectionSet,buy_sell_related_address} = await NFT.createTx_tuple(collset,response.data,wallet);
-      console.log("hey",buy_sell_related_address)
       return {finalTuple, total, cursor,arr_ave_date ,collectionSet,buy_sell_related_address};
     }else{
       const collectionSet = {}
@@ -454,8 +452,8 @@ function remove_SetA_from_SetB (a, b) {
      return null;
   }
   let newSet = new Set();
-
-  b.forEach(elem => newSet.add(elem));
+  if(b!=undefined){
+  b.forEach(elem => newSet.add(elem));}
 
   if(a!=undefined){
   a.forEach(elem => newSet.delete(elem));}
