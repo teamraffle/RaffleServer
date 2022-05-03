@@ -48,7 +48,7 @@ const get_and_save_first_data = async (address, chain_id) => {
   let is_worthy_wallet = true;
   try {
     // 소유중인 NFT 콜렉션의 정보를 db에 저장
-    let {has_nft_now, coll_set, slug_set} = await nftService.get_nftcoll_opensea(address, chain_id);
+    let {coll_set, slug_set} = await nftService.get_nftcoll_opensea(address, chain_id);
     
 
       // 소유중인 nft 콜렉션의 바닥값 가져옴
