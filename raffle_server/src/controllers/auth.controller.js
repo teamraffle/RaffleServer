@@ -4,10 +4,10 @@ const { authService, tokenService} = require('../services');
 
 
 const login = catchAsync(async (req, res) => {
-  const { address, secret, chain_id } = req.body;
-  const isSuccess = await authService.loginUserWithAddrAndSecret(address, secret);
+  const { user_id, secret } = req.body;
+  const isSuccess = await authService.loginUserWithIdAndSecret(user_id, secret);
   
-  const tokens = await tokenService.generateAuthTokens(address);
+  const tokens = await tokenService.generateAuthTokens(user_id);
   res.send({ tokens });
   
 });

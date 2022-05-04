@@ -717,6 +717,62 @@ paths:
         name: standard
         in: path
         required: true
+  /auth/login:
+    post:
+      summary: Get bearer token by login
+      operationId: post-auth-login
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokens:
+                    type: object
+                    properties:
+                      access:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                          expires:
+                            type: string
+                x-examples:
+                  example-1:
+                    tokens:
+                      access:
+                        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYjU4NWZjMC1jYjg2LTExZWMtODEzOS0zYmY4NTI2ZTBkOTYiLCJpYXQiOjE2NTE2NjMxMTUsImV4cCI6MTY1MTY3MzkxNSwidHlwZSI6ImFjY2VzcyJ9.1IN9BmvafTg-7WRELKfgzzDgUS_mmYbJSfKlJmEgfV4
+                        expires: '2022-05-04T14:18:35.443Z'
+              examples:
+                example-1:
+                  value:
+                    tokens:
+                      access:
+                        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYjU4NWZjMC1jYjg2LTExZWMtODEzOS0zYmY4NTI2ZTBkOTYiLCJpYXQiOjE2NTE2NjMxMTUsImV4cCI6MTY1MTY3MzkxNSwidHlwZSI6ImFjY2VzcyJ9.1IN9BmvafTg-7WRELKfgzzDgUS_mmYbJSfKlJmEgfV4
+                        expires: '2022-05-04T14:18:35.443Z'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                secret:
+                  type: string
+              x-examples:
+                example-1:
+                  user_id: b87b3700-caef-11ec-bfb8-2b6398d4df67
+                  secret: e6b70ca986c81c7543332b3a00164de0915ac57bfd3785bddd0e4d8c3c28e424
+            examples:
+              example-1:
+                value:
+                  user_id: b87b3700-caef-11ec-bfb8-2b6398d4df67
+                  secret: e6b70ca986c81c7543332b3a00164de0915ac57bfd3785bddd0e4d8c3c28e424
+      tags:
+        - Auth
 components:
   schemas:
     User:
