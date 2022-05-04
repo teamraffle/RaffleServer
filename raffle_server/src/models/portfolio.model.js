@@ -250,9 +250,9 @@ const get_nft = async (query) => {
     const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth JOIN tb_nft_collection_eth ON tb_nft_eth.token_address =tb_nft_collection_eth.token_address WHERE owner_of=?';
     const nft_coll_query =
       'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , tb_nft_eth.block_number,\
-      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,final.fp\
+      tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_eth.coll_name , tb_nft_collection_eth.collection_icon ,final.fp\
       FROM tb_nft_eth\
-      JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
+      INNER JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address \
       JOIN (SELECT m1.* FROM tb_nft_fp_eth m1,(SELECT max(update_timestamp) as max_time,fp,token_address  from tb_nft_fp_eth group by token_address) m2 WHERE m1.update_timestamp = m2.max_time AND m1.token_address = m2.token_address)final ON tb_nft_eth.token_address = final.token_address\
       WHERE tb_nft_eth.owner_of=?\
       ORDER BY tb_nft_eth.block_number DESC \

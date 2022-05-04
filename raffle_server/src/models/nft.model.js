@@ -113,7 +113,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
     const token_address='\"'+data[idx].asset_contract.address+'\"';
     const frozen= '"'+""+'"';
     const  name= '"'+data[idx].name+'"';
-    const coll_name= '"'+data[idx].asset_contract.name+'"';
+    const coll_name= '"'+data[idx].collection.name+'"';
     let nft_image='""';
    
 
@@ -281,10 +281,6 @@ const createTx_tuple= async(collset, data,wallet) =>{
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '\"'+data.result[idx].block_number+'\"';
-    let today = new Date("Fri, 29 Apr 2022 01:23:16 GMT");
-
-    // Fri Feb 26 2021 12:00:00 GMT+0900 (대한민국 표준시)
-    // 2021-02-26 12:00:00
     const block_timestamp= '\"'+ dateFormat(new Date(data.result[idx].block_timestamp)) +'\"';
     const block_hash='\"'+data.result[idx].block_hash+'\"';
     const transaction_hash='\"'+data.result[idx].transaction_hash+'\"';
