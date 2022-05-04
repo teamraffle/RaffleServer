@@ -83,6 +83,8 @@ paths:
     patch:
       summary: Update User Information
       operationId: patch-users-user_id
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: User Updated
@@ -973,3 +975,8 @@ components:
             example-1:
               value:
                 message: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

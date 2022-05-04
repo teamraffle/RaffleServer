@@ -45,7 +45,7 @@ const save_portfolio_with_user = async (wallet, user) => {
   //TODO 체인아이디 따라 디비테이블 분기 넣을것
 
   //해당 사용자 값 nft 갯수 가져오기
-  const nft_count = 'SELECT COUNT( * ) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
+  const nft_count = 'SELECT COUNT(*) as cnt FROM tb_nft_eth JOIN tb_nft_collection_eth ON tb_nft_eth.token_address = tb_nft_collection_eth.token_address WHERE owner_of=?';
   const nft_coll_count = 'SELECT COUNT(DISTINCT token_address) as cnt FROM tb_nft_eth WHERE tb_nft_eth.owner_of=?';
   const activity_query = 'SELECT COUNT(*) as cnt FROM tb_nft_transfer_eth WHERE from_address=? OR to_address=?';
   const collection =
@@ -247,7 +247,7 @@ const get_nft = async (query) => {
   try {
     conn = await pool.getConnection();
 
-    const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth WHERE owner_of=?';
+    const count_query = 'SELECT COUNT(*) as cnt FROM tb_nft_eth JOIN tb_nft_collection_eth ON tb_nft_eth.token_address =tb_nft_collection_eth.token_address WHERE owner_of=?';
     const nft_coll_query =
       'SELECT tb_nft_eth.nft_item_id, tb_nft_eth.token_address, tb_nft_eth.token_id , tb_nft_eth.nft_image , tb_nft_eth.block_number,\
       tb_nft_collection_eth.nft_coll_id, tb_nft_collection_eth.symbol , tb_nft_collection_eth.name , tb_nft_collection_eth.collection_icon ,final.fp\
