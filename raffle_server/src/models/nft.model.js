@@ -2,6 +2,22 @@ const uuidv4 = require('uuid');
 const pool = require('./plugins/dbHelper');
 let conn;
 
+function dateFormat(date) {
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
+  let hour = date.getHours();
+  let minute = date.getMinutes();
+  let second = date.getSeconds();
+
+  month = month >= 10 ? month : '0' + month;
+  day = day >= 10 ? day : '0' + day;
+  hour = hour >= 10 ? hour : '0' + hour;
+  minute = minute >= 10 ? minute : '0' + minute;
+  second = second >= 10 ? second : '0' + second;
+
+  return date.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+}
+
 const nft_coll_db_save= async (data,wallet) => {
   
   var collectionSet = new Set();
@@ -69,7 +85,8 @@ const nft_coll_one_db_save= async (collection_) => {
   try {
     conn = await pool.getConnection();
     const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type, collection_icon, slug) VALUES (?,?,?,?,?,?,?);';
-    var values = [uuidv4.v1(), collection_.token_address??"", collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
+    var values = [uuidv4.v1(), collection_.token_address??"", collection_.symbol??"", collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
+
     const dbRes = await conn.query(sql, values);
 
     return dbRes;
@@ -118,7 +135,7 @@ const nft_db_save= async (data,wallet,fp_total) => {
       finaltuple+=",("+res+")";
     }
   };
-  console.log(finaltuple)
+
  if(finaltuple!='')
     {
   try {
@@ -147,19 +164,20 @@ const nft_db_save= async (data,wallet,fp_total) => {
 const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_sell_related_address) => {
 
 
-  console.log("finalTuple"+finalTuple)
   if(finalTuple == "undefined"){
     console.log("들어와")
       return false;
   }
     
   try { 
+
     conn = await pool.getConnection();
+
     const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
       // console.log(dbRes);//성공 
    
-  
+    
     if(fp_total !== 'undefined'){
 
       const sql_insert_portfolio = `INSERT INTO tb_portfolio_eth 
@@ -260,11 +278,14 @@ const createTx_tuple= async(collset, data,wallet) =>{
   let sell_volume=0;
   let related_address_count=0;
   let holding_volume=0;
-  console.log("hye",data.result)
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '\"'+data.result[idx].block_number+'\"';
-    const block_timestamp= '\"'+data.result[idx].block_timestamp.replace('T',' ').replace('Z','') +'\"';
+    let today = new Date("Fri, 29 Apr 2022 01:23:16 GMT");
+
+    // Fri Feb 26 2021 12:00:00 GMT+0900 (대한민국 표준시)
+    // 2021-02-26 12:00:00
+    const block_timestamp= '\"'+ dateFormat(new Date(data.result[idx].block_timestamp)) +'\"';
     const block_hash='\"'+data.result[idx].block_hash+'\"';
     const transaction_hash='\"'+data.result[idx].transaction_hash+'\"';
     const transaction_index='\"'+data.result[idx].transaction_index+'\"';
@@ -316,7 +337,7 @@ const createTx_tuple= async(collset, data,wallet) =>{
   _buysell.holding_volume=holding_volume;
   // console.log(_buysell);  
   // console.log(_collectionSet);
-  console.log("hi",_finalTuple);
+
 
   return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell_related_address : _buysell };
 }

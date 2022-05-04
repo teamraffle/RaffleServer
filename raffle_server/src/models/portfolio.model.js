@@ -308,7 +308,7 @@ const get_nft = async (query) => {
         result: result_Data,
       };
 
-      console.log(util.inspect(JSON.stringify(final_json), false, null, true));
+      // console.log(util.inspect(JSON.stringify(final_json), false, null, true));
       return JSON.stringify(final_json, null, 2);
     }
   } finally {
@@ -385,7 +385,7 @@ const get_portfolio_activity = async (query) => {
         result: result_Data,
       };
 
-      console.log(util.inspect(JSON.stringify(final_json), false, null, true));
+      // console.log(util.inspect(JSON.stringify(final_json), false, null, true));
 
       return JSON.stringify(final_json, null, 2);
     }

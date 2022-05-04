@@ -79,7 +79,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
   try {
   
  const url  = "https://api.opensea.io/api/v1/assets";
- console.log(url)
+
     const response = await axios.get(url, {
       params: {
         owner: wallet,
@@ -146,7 +146,7 @@ const get_all_NFT_transfers = async (collset,wallet, chain_id,fp_total) => {
 
   realtuple +=finalTuple;
   final_ave_date+=arr_ave_date;
-  console.log(buy_sell_related_address)
+
   final_buy_sell_related_address.buy_volume+=buy_sell_related_address?.buy_volume??0;
   final_buy_sell_related_address.sell_volume+=buy_sell_related_address?.sell_volume??0;
   final_buy_sell_related_address.related_address_count+=buy_sell_related_address?.related_address_count??0;
@@ -169,7 +169,7 @@ const get_all_NFT_transfers = async (collset,wallet, chain_id,fp_total) => {
       page++;
     }
   }
-  console.log("최종",realtuple)
+  // console.log("최종",realtuple)
   await NFT.createTx_and_portfolio(realtuple, wallet, final_ave_date, fp_total,final_buy_sell_related_address);
 
   return finalSet;
@@ -387,6 +387,8 @@ const get_nft_fp = async(slug_set) => {
 
 const get_and_save_nftcoll = async (missingAddresses) => {
   for (let address of missingAddresses) {
+    console.log(address)
+    
     address = address;
     let collection = await get_collection_opensea(address);
     await NFT.nft_coll_one_db_save(collection);
@@ -429,8 +431,6 @@ const get_collection_opensea = async (address) => {
         'X-Api-Key': config.opensea.secret,
       },
     });
-    // console.log(response.data);
-
     var collection = {
       token_address : response.data.address,
       symbol : response.data.symbol,
@@ -439,6 +439,7 @@ const get_collection_opensea = async (address) => {
       slug: response.data.collection.slug,
       collection_icon : response.data.image_url,
     };
+
     return collection;
 
   } catch (err) {
