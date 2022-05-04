@@ -724,6 +724,34 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tokens:
+                    type: object
+                    properties:
+                      access:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                          expires:
+                            type: string
+                x-examples:
+                  example-1:
+                    tokens:
+                      access:
+                        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYjU4NWZjMC1jYjg2LTExZWMtODEzOS0zYmY4NTI2ZTBkOTYiLCJpYXQiOjE2NTE2NjMxMTUsImV4cCI6MTY1MTY3MzkxNSwidHlwZSI6ImFjY2VzcyJ9.1IN9BmvafTg-7WRELKfgzzDgUS_mmYbJSfKlJmEgfV4
+                        expires: '2022-05-04T14:18:35.443Z'
+              examples:
+                example-1:
+                  value:
+                    tokens:
+                      access:
+                        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYjU4NWZjMC1jYjg2LTExZWMtODEzOS0zYmY4NTI2ZTBkOTYiLCJpYXQiOjE2NTE2NjMxMTUsImV4cCI6MTY1MTY3MzkxNSwidHlwZSI6ImFjY2VzcyJ9.1IN9BmvafTg-7WRELKfgzzDgUS_mmYbJSfKlJmEgfV4
+                        expires: '2022-05-04T14:18:35.443Z'
       requestBody:
         content:
           application/json:
