@@ -2,6 +2,21 @@ const uuidv4 = require('uuid');
 const pool = require('./plugins/dbHelper');
 let conn;
 
+function dateFormat(date) {
+  let month = date.getMonth() + 1;
+  let day = date.getDate();
+  let hour = date.getHours();
+  let minute = date.getMinutes();
+  let second = date.getSeconds();
+
+  month = month >= 10 ? month : '0' + month;
+  day = day >= 10 ? day : '0' + day;
+  hour = hour >= 10 ? hour : '0' + hour;
+  minute = minute >= 10 ? minute : '0' + minute;
+  second = second >= 10 ? second : '0' + second;
+
+  return date.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+}
 
 const nft_coll_db_save= async (data,wallet) => {
   
@@ -265,8 +280,12 @@ const createTx_tuple= async(collset, data,wallet) =>{
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '\"'+data.result[idx].block_number+'\"';
+    let today = new Date("Fri, 29 Apr 2022 01:23:16 GMT");
 
-    const block_timestamp= '\"'+ data.result[idx].block_timestamp.replace('M','MT') +'\"';
+    // Fri Feb 26 2021 12:00:00 GMT+0900 (대한민국 표준시)
+    console.log(dateFormat(new Date(data.result[idx].block_timestamp)));
+    // 2021-02-26 12:00:00
+    const block_timestamp= '\"'+ dateFormat(new Date(data.result[idx].block_timestamp)) +'\"';
     const block_hash='\"'+data.result[idx].block_hash+'\"';
     const transaction_hash='\"'+data.result[idx].transaction_hash+'\"';
     const transaction_index='\"'+data.result[idx].transaction_index+'\"';
