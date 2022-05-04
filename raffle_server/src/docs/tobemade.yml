@@ -717,6 +717,34 @@ paths:
         name: standard
         in: path
         required: true
+  /auth/login:
+    post:
+      summary: Get bearer token by login
+      operationId: post-auth-login
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                secret:
+                  type: string
+              x-examples:
+                example-1:
+                  user_id: b87b3700-caef-11ec-bfb8-2b6398d4df67
+                  secret: e6b70ca986c81c7543332b3a00164de0915ac57bfd3785bddd0e4d8c3c28e424
+            examples:
+              example-1:
+                value:
+                  user_id: b87b3700-caef-11ec-bfb8-2b6398d4df67
+                  secret: e6b70ca986c81c7543332b3a00164de0915ac57bfd3785bddd0e4d8c3c28e424
+      tags:
+        - Auth
 components:
   schemas:
     User:
