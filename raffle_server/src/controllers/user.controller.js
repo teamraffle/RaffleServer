@@ -62,6 +62,8 @@ const get_and_save_first_data = async (address, chain_id) => {
       // db에 무중복 세트가 있는지 확인
       final_coll_set = await nftService.check_collection_exists(coll_set_duplicate_removed);
       // NFT콜렉션 검색해 디비에 저장
+
+      console.log(final_coll_set)
       await nftService.get_and_save_nftcoll(final_coll_set); 
   
     return is_worthy_wallet;

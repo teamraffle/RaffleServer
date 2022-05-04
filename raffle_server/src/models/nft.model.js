@@ -85,7 +85,8 @@ const nft_coll_one_db_save= async (collection_) => {
   try {
     conn = await pool.getConnection();
     const sql = 'INSERT IGNORE INTO tb_nft_collection_eth (nft_coll_id, token_address, symbol, name, contract_type, collection_icon, slug) VALUES (?,?,?,?,?,?,?);';
-    var values = [uuidv4.v1(), collection_.token_address??"", collection_.symbol, collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
+    var values = [uuidv4.v1(), collection_.token_address??"", collection_.symbol??"", collection_.name, collection_.contract_type , collection_.collection_icon, collection_.slug];
+
     const dbRes = await conn.query(sql, values);
 
     return dbRes;
@@ -171,7 +172,7 @@ const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_
   try { 
 
     conn = await pool.getConnection();
-    console.log(finalTuple)
+
     const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
       // console.log(dbRes);//성공 
@@ -283,7 +284,6 @@ const createTx_tuple= async(collset, data,wallet) =>{
     let today = new Date("Fri, 29 Apr 2022 01:23:16 GMT");
 
     // Fri Feb 26 2021 12:00:00 GMT+0900 (대한민국 표준시)
-    console.log(dateFormat(new Date(data.result[idx].block_timestamp)));
     // 2021-02-26 12:00:00
     const block_timestamp= '\"'+ dateFormat(new Date(data.result[idx].block_timestamp)) +'\"';
     const block_hash='\"'+data.result[idx].block_hash+'\"';
@@ -337,7 +337,7 @@ const createTx_tuple= async(collset, data,wallet) =>{
   _buysell.holding_volume=holding_volume;
   // console.log(_buysell);  
   // console.log(_collectionSet);
-  console.log("hi",_finalTuple);
+
 
   return {finalTuple : _finalTuple, collectionSet : _collectionSet , buy_sell_related_address : _buysell };
 }
