@@ -79,7 +79,7 @@ const get_nft_moralis = async (wallet, chain_id) => {
   try {
   
  const url  = "https://api.opensea.io/api/v1/assets";
- console.log(url)
+
     const response = await axios.get(url, {
       params: {
         owner: wallet,
@@ -169,7 +169,7 @@ const get_all_NFT_transfers = async (collset,wallet, chain_id,fp_total) => {
       page++;
     }
   }
-  console.log("최종",realtuple)
+  // console.log("최종",realtuple)
   await NFT.createTx_and_portfolio(realtuple, wallet, final_ave_date, fp_total,final_buy_sell_related_address);
 
   return finalSet;
