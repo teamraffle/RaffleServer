@@ -4,16 +4,12 @@ const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
-/**
- * Login with username and password
- * @param {string} email
- * @param {string} password
- * @returns {Promise<User>}
- */
+const config = require('./config');
+
 const loginUserWithIdAndSecret = async (user_id, secret) => {
   const { createHmac } = await import('node:crypto');
 
-  const secretKey = 'abcdefg';
+  const secretKey = config.jwt.secret;
   const hash = createHmac('sha256', secretKey)
                 .update(user_id)
                 .digest('hex');
@@ -21,6 +17,8 @@ const loginUserWithIdAndSecret = async (user_id, secret) => {
   if (secret != hash) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect secret phrase');
   }
+  
+
   return true
 };
 
