@@ -4,19 +4,24 @@ const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
-
 /**
  * Login with username and password
  * @param {string} email
  * @param {string} password
  * @returns {Promise<User>}
  */
-const loginUserWithAddrAndSecret = async (addr, secret) => {
-  // const user = await userService.getUserByEmail(email);
-  // if (!user || !(await user.isPasswordMatch(password))) {
-  //   throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
-  // }
-  return true;
+const loginUserWithIdAndSecret = async (user_id, secret) => {
+  const { createHmac } = await import('node:crypto');
+
+  const secretKey = 'abcdefg';
+  const hash = createHmac('sha256', secretKey)
+                .update(user_id)
+                .digest('hex');
+  
+  if (secret != hash) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect secret phrase');
+  }
+  return true
 };
 
 /**
@@ -48,7 +53,7 @@ const logout = async (refreshToken) => {
 // };
 
 module.exports = {
-  loginUserWithAddrAndSecret,
+  loginUserWithIdAndSecret,
   logout,
   // refreshAuth,
 };

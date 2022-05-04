@@ -20,7 +20,7 @@ module.exports = router;
 /**
  * @swagger
  * tags:
- *   name: Status
- *   description: Check if user is logged in or out
+ *   name: Auth
+ *   description: Check if user is logged in
  */
 
