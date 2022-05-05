@@ -143,7 +143,6 @@ const get_all_NFT_transfers = async (collset,wallet, chain_id,fp_total) => {
   //0페이지
   var { finalTuple, collectionSet, total, cursor,arr_ave_date ,buy_sell_related_address } = await getAndSaveTransfer(collset,wallet, chain_id, '', page_size,fp_total);
   finalSet = collectionSet;
-
   realtuple +=finalTuple;
   final_ave_date+=arr_ave_date;
 
@@ -288,8 +287,9 @@ const getAndSaveTransfer = async (collset,wallet, chain_id, _cursor, page_size,f
       let {finalTuple, collectionSet,buy_sell_related_address} = await NFT.createTx_tuple(collset,response.data,wallet);
       return {finalTuple, total, cursor,arr_ave_date ,collectionSet,buy_sell_related_address};
     }else{
-      const collectionSet = {}
-      return {finalTuple, total, cursor,arr_ave_date ,collectionSet,buy_sell_related_address};
+      
+      let {finalTuple, collectionSet,buy_sell_related_address} = await NFT.createTx_tuple(collset,response.data,wallet);
+      return {finalTuple, total, cursor,arr_ave_date:0,collectionSet,buy_sell_related_address};
 
     }
     
@@ -453,6 +453,7 @@ function remove_SetA_from_SetB (a, b) {
      return null;
   }
   let newSet = new Set();
+
   if(b!=undefined){
   b.forEach(elem => newSet.add(elem));}
 

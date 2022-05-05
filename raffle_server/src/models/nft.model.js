@@ -172,6 +172,7 @@ const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_
   try { 
 
     conn = await pool.getConnection();
+    console.log("hey",finalTuple)
 
     const sql_insert_transfer = 'INSERT IGNORE INTO tb_nft_transfer_eth (nft_trans_id, block_number, block_timestamp, block_hash, transaction_hash, transaction_index, log_index, value, transaction_type, token_address, token_id, from_address, to_address, amount, verified, action) VALUES '+ finalTuple;
     const dbRes = await conn.query(sql_insert_transfer);
@@ -188,7 +189,7 @@ const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_
     
       let buy_volume=buy_sell_related_address.buy_volume*Math.pow(0.1,18);
       let sell_volume=buy_sell_related_address.sell_volume*Math.pow(0.1,18);
-      let earnings_rate=(sell_volume-buy_volume)*100;
+      let earnings_rate=(sell_volume/buy_volume)*100;
       let holding_volume=buy_sell_related_address.holding_volume*Math.pow(0.1,18);
       console.log(splittedAddr, 0, 0,arr_ave_date,'','',fp_total,holding_volume,earnings_rate,0,buy_volume,sell_volume,buy_sell_related_address.related_address_count,0,0,"");
       const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,holding_volume,earnings_rate,0,buy_volume,sell_volume,buy_sell_related_address.related_address_count,0,0,""]);
@@ -278,6 +279,7 @@ const createTx_tuple= async(collset, data,wallet) =>{
   let sell_volume=0;
   let related_address_count=0;
   let holding_volume=0;
+
   for(idx in data.result){
     const nft_trans_id = '\"'+uuidv4.v1()+'\"';
     const block_number= '\"'+data.result[idx].block_number+'\"';
@@ -327,6 +329,12 @@ const createTx_tuple= async(collset, data,wallet) =>{
 
     
   };
+  if(data.result.length==0){
+    let sqlData2 = ['\"'+uuidv4.v1()+'\"', '"'+""+'"','"'+""+'"', '"'+""+'"','"'+""+'"', "0", "0",
+    '"'+""+'"', '"'+""+'"', '"'+""+'"', '"'+""+'"', '"'+""+'"', '"'+""+'"', '"'+""+'"', "0","0"];
+      let res2 = sqlData2.join(',');
+    _finalTuple="("+res2+")";
+  }
   _buysell.buy_volume=buy_volume;
   _buysell.sell_volume=sell_volume;
   _buysell.related_address_count=related_address_count;
