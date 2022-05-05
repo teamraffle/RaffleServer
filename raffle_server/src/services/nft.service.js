@@ -29,8 +29,8 @@ const get_nftcoll_opensea = async (wallet, chain_id) => {
     }
 
     const data= await NFT.nft_coll_db_save(response.data, wallet);
-  
-    collectionSet = new Set([...collectionSet, ...data.collectionSet]);
+    if(data!=0){
+    collectionSet = new Set([...collectionSet, ...data.collectionSet]);}
     // slugSet = new Set([...slugSet, ...data.slugSet]);
     Object.assign(slugSet, data.slugSet);
     offset = page_size;
