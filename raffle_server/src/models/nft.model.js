@@ -186,12 +186,17 @@ const createTx_and_portfolio=async(finalTuple,wallet, arr_ave_date,fp_total,buy_
       VALUES 
       (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
       var splittedAddr = wallet;
-    
       let buy_volume=buy_sell_related_address.buy_volume*Math.pow(0.1,18);
       let sell_volume=buy_sell_related_address.sell_volume*Math.pow(0.1,18);
       let earnings_rate=(sell_volume/buy_volume)*100;
       let holding_volume=buy_sell_related_address.holding_volume*Math.pow(0.1,18);
+      if(buy_volume==0){
+        earnings_rate=0;
+      }
+      console.log("hold",earnings_rate)
       console.log(splittedAddr, 0, 0,arr_ave_date,'','',fp_total,holding_volume,earnings_rate,0,buy_volume,sell_volume,buy_sell_related_address.related_address_count,0,0,"");
+
+
       const dbRes2 = await conn.query(sql_insert_portfolio, [splittedAddr, 0, 0,arr_ave_date,'','',fp_total,holding_volume,earnings_rate,0,buy_volume,sell_volume,buy_sell_related_address.related_address_count,0,0,""]);
       // console.log(dbRes2);//성공 
     }
