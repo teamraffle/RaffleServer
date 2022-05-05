@@ -279,7 +279,7 @@ const get_nft = async (query) => {
         collection: {
           nft_coll_id: item.nft_coll_id,
           symbol: item.symbol,
-          name: item.name,
+          name: item.coll_name,
           collection_icon: item.collection_icon,
           fp: item.fp,
         },
